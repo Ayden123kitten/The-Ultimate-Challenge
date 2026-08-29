@@ -4,7 +4,7 @@
 const CONFIG = {
     GITHUB_OWNER: 'Ayden123kitten', // Replace with your GitHub username
     GITHUB_REPO: 'The-Ultimate-Challenge',        // Replace with your repository name
-    BRANCH: 'main'                        // Change to 'master' if your repo uses master
+    BRANCH: 'main'                       // Change to 'master' if your repo uses master
 };
 
 // ==========================================
@@ -131,127 +131,11 @@ function renderGames() {
 
             <div class="mt-2">
                 ${isMyClaim ? `
-                    <button onclick="releaseGame('${game.id}')" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-flag-checkered"></i> Mark as Done & Release
+                    <button onclick="unclaimGame('${game.id}')" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-upload"></i> Mark as Done
                     </button>
                     <div class="text-center text-xs text-slate-400 mt-2">
                         Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span>
                     </div>
                 ` : canClaim ? `
-                    <button onclick="claimGame('${game.id}')" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-play"></i> Claim Game
-                    </button>
-                ` : `
-                    <button disabled class="w-full bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-lock"></i> ${currentPlayer === '' ? 'Select Player Above' : 'Currently Unavailable'}
-                    </button>
-                `}
-            </div>
-
-            ${game.logs && game.logs.length > 0 ? `
-                <div class="mt-4 border-t border-slate-700 pt-3">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Session Logs</h3>
-                    <div class="max-h-32 overflow-y-auto scrollbar-hide space-y-1">
-                        ${game.logs.slice().reverse().map(log => `
-                            <div class="text-xs flex justify-between text-slate-300 bg-slate-800/50 p-2 rounded">
-                                <span><span class="text-ap-accent">${log.player}</span></span>
-                                <span>${formatTime(log.duration_ms)}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
-        `;
-        container.appendChild(card);
-    });
-}
-
-function renderLink(url, icon, label, isPrimary = false) {
-    if (!url || url.trim() === '') return '';
-    const bgClass = isPrimary 
-        ? 'bg-ap-accent/20 text-ap-accent border-ap-accent/30 hover:bg-ap-accent/30' 
-        : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white hover:border-slate-500';
-    return `
-        <a href="${url}" target="_blank" class="flex items-center gap-2 p-2 rounded border ${bgClass} transition-all">
-            <i class="fa-solid ${icon}"></i>
-            <span>${label}</span>
-        </a>
-    `;
-}
-
-// ==========================================
-// ACTIONS
-// ==========================================
-async function claimGame(gameId) {
-    if (!currentPlayer) return alert('Please select your name first.');
-    if (!confirm(`Claim ${games.find(g => g.id === gameId).name} as ${currentPlayer}?`)) return;
-    await updateGame(gameId, 'claim');
-}
-
-async function releaseGame(gameId) {
-    if (!confirm('Mark this game as done and release it for the next player?')) return;
-    await updateGame(gameId, 'release');
-}
-
-async function updateGame(gameId, action) {
-    const btn = event.target.closest('button'); // Safely get the button element
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
-    btn.disabled = true;
-
-    try {
-        const res = await fetch('/api/update-game', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ gameId, action, playerName: currentPlayer })
-        });
-        
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed to update');
-        
-        alert(data.message);
-        await loadData();
-    } catch (err) {
-        alert('Error: ' + err.message);
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
-}
-
-// ==========================================
-// GLOBAL TIMER
-// ==========================================
-function updateGlobalTimer() {
-    const now = Date.now();
-    const start = new Date(settings.start_time).getTime();
-    const end = new Date(settings.end_time).getTime();
-    
-    const timerEl = $('global-timer');
-    const statusEl = $('timer-status');
-
-    if (now < start) {
-        timerEl.textContent = formatTime(start - now);
-        statusEl.textContent = 'Starts In';
-        statusEl.className = 'text-xs text-yellow-400 uppercase tracking-widest';
-    } else if (now >= start && now <= end) {
-        timerEl.textContent = formatTime(now - start);
-        statusEl.textContent = 'Event Live';
-        statusEl.className = 'text-xs text-green-400 uppercase tracking-widest';
-    } else {
-        timerEl.textContent = formatTime(now - end);
-        statusEl.textContent = 'Event Ended';
-        statusEl.className = 'text-xs text-red-400 uppercase tracking-widest';
-    }
-}
-
-// Initialize
-setInterval(updateGlobalTimer, 1000);
-setInterval(() => {
-    if (games.some(g => g.current_player === currentPlayer)) {
-        renderGames();
-    }
-}, 1000);
-
-loadData();
-setInterval(loadData, 10000);
+                   
