@@ -42,7 +42,6 @@ async function loadData() {
         games = await gamesRes.json();
         players = await playersRes.json();
 
-        populatePlayerSelect();
         renderPlayers();
     } catch (err) {
         console.error('Failed to load data:', err);
@@ -58,47 +57,15 @@ async function loadData() {
 // ==========================================
 // RENDERING
 // ==========================================
-function populatePlayerSelect() {
-    const container = $('player-select-container');
-    const currentNameEl = $('current-player-name');
-    
-    container.innerHTML = '';
-    
-    // Update current player display
-    if (currentPlayer) {
-        currentNameEl.textContent = currentPlayer;
-    } else {
-        currentNameEl.textContent = 'No player selected';
-    }
-    
-    players.forEach(player => {
-        const btn = document.createElement('button');
-        const isSelected = player === currentPlayer;
-        
-        btn.className = `px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
-            isSelected 
-                ? 'bg-ap-accent text-white' 
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-        }`;
-        
-        btn.innerHTML = `
-            <i class="fa-solid ${isSelected ? 'fa-check-circle' : 'fa-user'}"></i>
-            <span>${player}</span>
-        `;
-        
-        btn.addEventListener('click', () => {
-            currentPlayer = player;
-            localStorage.setItem('ap_async_player', currentPlayer);
-            populatePlayerSelect();
-        });
-        
-        container.appendChild(btn);
-    });
-}
-
 function renderPlayers() {
     const container = $('players-container');
     container.innerHTML = '';
+
+    // Update current player display in header
+    const currentNameEl = $('current-player-name');
+    if (currentNameEl) {
+        currentNameEl.textContent = currentPlayer || 'No player selected';
+    }
 
     // Calculate stats for each player
     const playerStats = players.map(playerName => {
@@ -154,7 +121,8 @@ function renderPlayers() {
 
     playerStats.forEach(stat => {
         const card = document.createElement('div');
-        card.className = 'glass rounded-xl p-6 flex flex-col gap-4';
+        const isSelected = stat.name === currentPlayer;
+        card.className = `glass rounded-xl p-6 flex flex-col gap-4 cursor-pointer transition-all ${isSelected ? 'border-2 border-ap-accent' : 'hover:border-ap-accent/50'}`;
         
         const hasCurrentGame = stat.currentGame !== null;
         
@@ -165,7 +133,7 @@ function renderPlayers() {
                         <i class="fa-solid fa-user text-2xl text-ap-accent"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-bold text-white">${stat.name}</h2>
+                        <h2 class="text-2xl font-bold text-white">${stat.name} ${isSelected ? '<span class="text-xs text-ap-accent ml-2">(Selected)</span>' : ''}</h2>
                         <p class="text-sm text-slate-400">${stat.gamesPlayed} Game${stat.gamesPlayed !== 1 ? 's' : ''} Played</p>
                     </div>
                 </div>
@@ -200,6 +168,12 @@ function renderPlayers() {
                 </div>
             `}
         `;
+        
+        card.addEventListener('click', () => {
+            currentPlayer = stat.name;
+            localStorage.setItem('ap_async_player', currentPlayer);
+            renderPlayers();
+        });
         
         container.appendChild(card);
     });

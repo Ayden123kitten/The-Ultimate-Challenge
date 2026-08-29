@@ -46,6 +46,11 @@
             </div>
             
             <nav class="flex items-center gap-4">
+                <div id="current-player-display" class="flex items-center gap-2 text-sm">
+                    <span class="text-slate-400">Playing as:</span>
+                    <span id="current-player-name" class="font-semibold text-ap-accent">No player selected</span>
+                </div>
+                <div class="w-px h-5 bg-slate-600"></div>
                 <a href="/" class="text-slate-400 hover:text-white transition-colors flex items-center gap-2">
                     <i class="fa-solid fa-arrow-left"></i>
                     <span>Back to Games</span>
@@ -56,18 +61,6 @@
 
     <!-- Main Content -->
     <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
-        <div class="mb-6 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-            <h2 class="text-lg font-bold text-white mb-3">Select Your Player</h2>
-            <p class="text-sm text-slate-400 mb-4">Click the button containing your name to change who you are.</p>
-            <div id="player-select-container" class="flex flex-wrap gap-2">
-                <!-- Player select buttons will be injected here -->
-            </div>
-            <div id="current-player-display" class="mt-4 pt-4 border-t border-slate-700">
-                <span class="text-slate-400">Currently playing as: </span>
-                <span id="current-player-name" class="font-bold text-ap-accent">No player selected</span>
-            </div>
-        </div>
-        
         <div id="players-container" class="space-y-6">
             <!-- Players will be injected here -->
             <div class="text-center py-20 text-slate-500">

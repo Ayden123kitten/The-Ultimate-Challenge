@@ -50,12 +50,12 @@ export default async function handler(req, res) {
                 return res.status(409).json({ error: 'Game is already claimed by someone else.' });
             }
             
-            // Check if player is already playing another game
-            const playerAlreadyPlaying = games.find(g => g.current_player === playerName);
+            // Check if this player is already playing another game
+            const playerAlreadyPlaying = games.find(g => g.current_player === playerName && g.id !== gameId);
             if (playerAlreadyPlaying) {
-                return res.status(409).json({ error: `You are already playing "${playerAlreadyPlaying.name}". Finish it first!` });
+                return res.status(409).json({ error: 'You are already playing another game. Please unclaim it first.' });
             }
-
+            
             game.current_player = playerName;
             game.claimed_at = Date.now();
         } 
