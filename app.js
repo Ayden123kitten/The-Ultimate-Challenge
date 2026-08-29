@@ -2,8 +2,8 @@
 // CONFIGURATION: EDIT THESE VALUES
 // ==========================================
 const CONFIG = {
-    GITHUB_OWNER: 'YOUR_GITHUB_USERNAME', // Replace with your GitHub username
-    GITHUB_REPO: 'YOUR_REPO_NAME',        // Replace with your repository name
+    GITHUB_OWNER: 'Ayden123kitten', // Replace with your GitHub username
+    GITHUB_REPO: 'The-Ultimate-Challenge',        // Replace with your repository name
     BRANCH: 'main'                        // Change to 'master' if your repo uses master
 };
 
