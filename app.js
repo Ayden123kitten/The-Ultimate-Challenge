@@ -260,18 +260,25 @@ async function updateGame(gameId, action, e) {
 // GLOBAL TIMER
 // ==========================================
 function updateGlobalTimer() {
-    const now = Date.now();
-    const start = new Date(settings.start_time).getTime();
-    const end = new Date(settings.end_time).getTime();
-    
     const timerEl = $('global-timer');
     const statusEl = $('timer-status');
+
+    // If start_time is empty, show nothing
+    if (!settings.start_time || settings.start_time.trim() === '') {
+        timerEl.textContent = '';
+        statusEl.textContent = '';
+        return;
+    }
+
+    const now = Date.now();
+    const start = new Date(settings.start_time).getTime();
+    const end = settings.end_time && settings.end_time.trim() !== '' ? new Date(settings.end_time).getTime() : null;
 
     if (now < start) {
         timerEl.textContent = formatTime(start - now);
         statusEl.textContent = 'Starts In';
         statusEl.className = 'text-xs text-yellow-400 uppercase tracking-widest';
-    } else if (now >= start && now <= end) {
+    } else if (end === null || (now >= start && now <= end)) {
         timerEl.textContent = formatTime(now - start);
         statusEl.textContent = 'Event Live';
         statusEl.className = 'text-xs text-green-400 uppercase tracking-widest';
