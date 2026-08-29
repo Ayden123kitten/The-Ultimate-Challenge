@@ -1,3 +1,18 @@
-```json
+```gitignore
+# Logs and temp files
+*.log
+*.tmp
+*.swp
 
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Original rules preserved
+*.log
 ```

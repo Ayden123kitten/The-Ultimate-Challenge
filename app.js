@@ -108,6 +108,7 @@ function renderGames() {
 
         const hasRules = game.rules && game.rules.trim() !== '';
         const hasCoverImage = game.cover_image && game.cover_image.trim() !== '';
+        const hasExtraInfo = game.extra_information && game.extra_information.trim() !== '';
         
         const links = [
             { url: game.apworld_link, icon: 'fa-globe', label: 'APWorld' },
@@ -145,6 +146,12 @@ function renderGames() {
             ${hasRules ? `
                 <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700">
                     <span class="text-ap-accent font-semibold">Rules:</span> ${game.rules}
+                </div>
+            ` : ''}
+
+            ${hasExtraInfo ? `
+                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700">
+                    <span class="text-ap-accent font-semibold">Information:</span> ${game.extra_information}
                 </div>
             ` : ''}
 
