@@ -32,23 +32,20 @@ async function loadData() {
     try {
         const baseRawUrl = `https://raw.githubusercontent.com/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/${CONFIG.BRANCH}/data`;
         
-        console.log('Fetching from:', baseRawUrl);
-        
         const [gamesRes, playersRes, settingsRes] = await Promise.all([
-            fetch(`${baseRawUrl}/games.json?t=${Date.now()}`),
+            fetch(`/api/get-games?t=${Date.now()}`), // Use API to bypass raw CDN cache
             fetch(`${baseRawUrl}/players.json?t=${Date.now()}`),
             fetch(`${baseRawUrl}/settings.json?t=${Date.now()}`)
         ]);
 
-        if (!gamesRes.ok) throw new Error(`Games file: ${gamesRes.status} ${gamesRes.statusText}`);
-        if (!playersRes.ok) throw new Error(`Players file: ${playersRes.status} ${playersRes.statusText}`);
-        if (!settingsRes.ok) throw new Error(`Settings file: ${settingsRes.status} ${settingsRes.statusText}`);
+        if (!gamesRes.ok) throw new Error(`Games API: ${gamesRes.status}`);
+        if (!playersRes.ok) throw new Error(`Players file: ${playersRes.status}`);
+        if (!settingsRes.ok) throw new Error(`Settings file: ${settingsRes.status}`);
 
         games = await gamesRes.json();
         players = await playersRes.json();
         settings = await settingsRes.json();
 
-        console.log('Loaded games:', games.length);
         populatePlayerSelect();
         renderGames();
         updateGlobalTimer();
@@ -104,7 +101,6 @@ function renderGames() {
         }
         const totalTimeMs = game.total_time_ms + currentSessionMs;
 
-        // Conditional rendering checks
         const hasRules = game.rules && game.rules.trim() !== '';
         const hasCoverImage = game.cover_image && game.cover_image.trim() !== '';
         
@@ -157,14 +153,14 @@ function renderGames() {
 
             <div class="mt-2">
                 ${isMyClaim ? `
-                    <button onclick="unclaimGame('${game.id}')" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <button onclick="unclaimGame('${game.id}', event)" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <i class="fa-solid fa-upload"></i> Unclaim Game (Save Uploaded)
                     </button>
                     <div class="text-center text-xs text-slate-400 mt-2">
                         Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span>
                     </div>
                 ` : canClaim ? `
-                    <button onclick="claimGame('${game.id}')" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <button onclick="claimGame('${game.id}', event)" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <i class="fa-solid fa-play"></i> Claim Game
                     </button>
                 ` : `
@@ -208,19 +204,19 @@ function renderLink(url, icon, label, isPrimary = false) {
 // ==========================================
 // ACTIONS
 // ==========================================
-async function claimGame(gameId) {
+async function claimGame(gameId, e) {
     if (!currentPlayer) return alert('Please select your name first.');
     if (!confirm(`Claim ${games.find(g => g.id === gameId).name} as ${currentPlayer}?`)) return;
-    await updateGame(gameId, 'claim');
+    await updateGame(gameId, 'claim', e);
 }
 
-async function unclaimGame(gameId) {
+async function unclaimGame(gameId, e) {
     if (!confirm('Have you finished playing and uploaded your save file to Google Drive?\n\nOnce you unclaim, the next player can start!')) return;
-    await updateGame(gameId, 'unclaim');
+    await updateGame(gameId, 'unclaim', e);
 }
 
-async function updateGame(gameId, action) {
-    const btn = event.target.closest('button');
+async function updateGame(gameId, action, e) {
+    const btn = e.target.closest('button');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
     btn.disabled = true;
@@ -235,8 +231,28 @@ async function updateGame(gameId, action) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to update');
         
-        alert(data.message);
-        await loadData();
+        // OPTIMISTIC UI UPDATE: Instantly update local state so the UI changes immediately
+        const game = games.find(g => g.id === gameId);
+        if (game) {
+            if (action === 'claim') {
+                game.current_player = currentPlayer;
+                game.claimed_at = Date.now();
+            } else if (action === 'unclaim') {
+                const duration = Date.now() - game.claimed_at;
+                game.total_time_ms += duration;
+                game.logs.push({
+                    player: currentPlayer,
+                    start: game.claimed_at,
+                    end: Date.now(),
+                    duration_ms: duration
+                });
+                game.current_player = null;
+                game.claimed_at = null;
+            }
+        }
+        
+        renderGames(); // Instantly reflect changes in the UI
+        
     } catch (err) {
         alert('Error: ' + err.message);
     } finally {
