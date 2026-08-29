@@ -1,10 +1,10 @@
 // ==========================================
-// CONFIGURATION: EDIT THESE VALUES
+// CONFIGURATION
 // ==========================================
 const CONFIG = {
-    GITHUB_OWNER: 'Ayden123kitten', // Replace with your GitHub username
-    GITHUB_REPO: 'The-Ultimate-Challenge',        // Replace with your repository name
-    BRANCH: 'main'                       // Change to 'master' if your repo uses master
+    GITHUB_OWNER: 'Ayden123kitten',
+    GITHUB_REPO: 'The-Ultimate-Challenge',
+    BRANCH: 'main'                        
 };
 
 // ==========================================
@@ -32,22 +32,37 @@ async function loadData() {
     try {
         const baseRawUrl = `https://raw.githubusercontent.com/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/${CONFIG.BRANCH}/data`;
         
+        console.log('Fetching from:', baseRawUrl);
+        
         const [gamesRes, playersRes, settingsRes] = await Promise.all([
             fetch(`${baseRawUrl}/games.json?t=${Date.now()}`),
             fetch(`${baseRawUrl}/players.json?t=${Date.now()}`),
             fetch(`${baseRawUrl}/settings.json?t=${Date.now()}`)
         ]);
 
+        if (!gamesRes.ok) throw new Error(`Games file: ${gamesRes.status} ${gamesRes.statusText}`);
+        if (!playersRes.ok) throw new Error(`Players file: ${playersRes.status} ${playersRes.statusText}`);
+        if (!settingsRes.ok) throw new Error(`Settings file: ${settingsRes.status} ${settingsRes.statusText}`);
+
         games = await gamesRes.json();
         players = await playersRes.json();
         settings = await settingsRes.json();
 
+        console.log('Loaded games:', games.length);
         populatePlayerSelect();
         renderGames();
         updateGlobalTimer();
     } catch (err) {
         console.error('Failed to load data:', err);
-        $('games-container').innerHTML = `<div class="col-span-full text-center text-red-400">Error loading data. Check console and CONFIG settings.</div>`;
+        $('games-container').innerHTML = `
+            <div class="col-span-full text-center text-red-400 p-8">
+                <i class="fa-solid fa-circle-exclamation text-4xl mb-4"></i>
+                <p class="text-lg font-bold">Error loading games</p>
+                <p class="text-sm mt-2">${err.message}</p>
+                <p class="text-xs mt-4 text-slate-500">
+                    Check that CONFIG in app.js has your correct GitHub username and repo name.
+                </p>
+            </div>`;
     }
 }
 
@@ -91,12 +106,15 @@ function renderGames() {
 
         // Conditional rendering checks
         const hasRules = game.rules && game.rules.trim() !== '';
+        const hasCoverImage = game.cover_image && game.cover_image.trim() !== '';
+        
         const links = [
             { url: game.apworld_link, icon: 'fa-globe', label: 'APWorld' },
             { url: game.mod_link, icon: 'fa-puzzle-piece', label: 'Mod' },
             { url: game.mod_setup_guide_link, icon: 'fa-book', label: 'Setup Guide' },
             { url: game.tracker_link, icon: 'fa-map', label: 'Tracker' },
-            { url: game.support_thread_link, icon: 'fa-comments', label: 'Support' },
+            { url: game.game_info_link, icon: 'fa-circle-info', label: 'Game Info' },
+            { url: game.support_link, icon: 'fa-circle-question', label: 'Support' },
             { url: game.save_file_link, icon: 'fa-download', label: 'Save File', primary: true }
         ].filter(l => l.url && l.url.trim() !== '');
 
@@ -104,6 +122,14 @@ function renderGames() {
         card.className = 'glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50';
         
         card.innerHTML = `
+            ${hasCoverImage ? `
+                <div class="relative w-full h-48 rounded-lg overflow-hidden mb-2">
+                    <img src="${game.cover_image}" alt="${game.name}" 
+                         class="w-full h-full object-cover"
+                         onerror="this.parentElement.style.display='none'">
+                </div>
+            ` : ''}
+            
             <div class="flex justify-between items-start">
                 <div>
                     <h2 class="text-xl font-bold text-white">${game.name}</h2>
@@ -132,10 +158,126 @@ function renderGames() {
             <div class="mt-2">
                 ${isMyClaim ? `
                     <button onclick="unclaimGame('${game.id}')" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-upload"></i> Mark as Done
+                        <i class="fa-solid fa-upload"></i> Unclaim Game (Save Uploaded)
                     </button>
                     <div class="text-center text-xs text-slate-400 mt-2">
                         Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span>
                     </div>
                 ` : canClaim ? `
-                   
+                    <button onclick="claimGame('${game.id}')" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-play"></i> Claim Game
+                    </button>
+                ` : `
+                    <button disabled class="w-full bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-lock"></i> ${currentPlayer === '' ? 'Select Player Above' : 'Currently Unavailable'}
+                    </button>
+                `}
+            </div>
+
+            ${game.logs && game.logs.length > 0 ? `
+                <div class="mt-4 border-t border-slate-700 pt-3">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Session Logs</h3>
+                    <div class="max-h-32 overflow-y-auto scrollbar-hide space-y-1">
+                        ${game.logs.slice().reverse().map(log => `
+                            <div class="text-xs flex justify-between text-slate-300 bg-slate-800/50 p-2 rounded">
+                                <span><span class="text-ap-accent">${log.player}</span></span>
+                                <span>${formatTime(log.duration_ms)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        `;
+        container.appendChild(card);
+    });
+}
+
+function renderLink(url, icon, label, isPrimary = false) {
+    if (!url || url.trim() === '') return '';
+    const bgClass = isPrimary 
+        ? 'bg-ap-accent/20 text-ap-accent border-ap-accent/30 hover:bg-ap-accent/30' 
+        : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white hover:border-slate-500';
+    return `
+        <a href="${url}" target="_blank" class="flex items-center gap-2 p-2 rounded border ${bgClass} transition-all">
+            <i class="fa-solid ${icon}"></i>
+            <span>${label}</span>
+        </a>
+    `;
+}
+
+// ==========================================
+// ACTIONS
+// ==========================================
+async function claimGame(gameId) {
+    if (!currentPlayer) return alert('Please select your name first.');
+    if (!confirm(`Claim ${games.find(g => g.id === gameId).name} as ${currentPlayer}?`)) return;
+    await updateGame(gameId, 'claim');
+}
+
+async function unclaimGame(gameId) {
+    if (!confirm('Have you finished playing and uploaded your save file to Google Drive?\n\nOnce you unclaim, the next player can start!')) return;
+    await updateGame(gameId, 'unclaim');
+}
+
+async function updateGame(gameId, action) {
+    const btn = event.target.closest('button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/api/update-game', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gameId, action, playerName: currentPlayer })
+        });
+        
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to update');
+        
+        alert(data.message);
+        await loadData();
+    } catch (err) {
+        alert('Error: ' + err.message);
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+// ==========================================
+// GLOBAL TIMER
+// ==========================================
+function updateGlobalTimer() {
+    const now = Date.now();
+    const start = new Date(settings.start_time).getTime();
+    const end = new Date(settings.end_time).getTime();
+    
+    const timerEl = $('global-timer');
+    const statusEl = $('timer-status');
+
+    if (now < start) {
+        timerEl.textContent = formatTime(start - now);
+        statusEl.textContent = 'Starts In';
+        statusEl.className = 'text-xs text-yellow-400 uppercase tracking-widest';
+    } else if (now >= start && now <= end) {
+        timerEl.textContent = formatTime(now - start);
+        statusEl.textContent = 'Event Live';
+        statusEl.className = 'text-xs text-green-400 uppercase tracking-widest';
+    } else {
+        timerEl.textContent = formatTime(now - end);
+        statusEl.textContent = 'Event Ended';
+        statusEl.className = 'text-xs text-red-400 uppercase tracking-widest';
+    }
+}
+
+// Initialize
+setInterval(updateGlobalTimer, 1000);
+setInterval(() => {
+    if (games.some(g => g.current_player === currentPlayer)) {
+        renderGames();
+    }
+}, 1000);
+
+loadData();
+setInterval(loadData, 10000);
