@@ -123,16 +123,14 @@ function renderGames() {
         card.className = 'glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50';
         
         card.innerHTML = `
-            ${hasCoverImage ? `
-                <div class="relative w-full h-48 rounded-lg overflow-hidden mb-2">
+            <div class="flex items-start gap-4">
+                ${hasCoverImage ? `
                     <img src="${game.cover_image}" alt="${game.name}" 
-                         class="w-full h-full object-cover"
-                         onerror="this.parentElement.style.display='none'">
-                </div>
-            ` : ''}
-            
-            <div class="flex justify-between items-start">
-                <div>
+                         class="game-logo"
+                         onerror="this.style.display='none'">
+                ` : '<div class="game-logo"></div>'}
+                
+                <div class="flex-grow">
                     <h2 class="text-xl font-bold text-white">${game.name}</h2>
                     <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold ${isClaimed ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
                         ${isClaimed ? `Playing: ${game.current_player}` : 'Available'}
@@ -156,7 +154,7 @@ function renderGames() {
                 </div>
             ` : ''}
 
-            <div class="mt-2">
+            <div class="mt-auto">
                 ${isMyClaim ? `
                     <button onclick="unclaimGame('${game.id}', event)" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <i class="fa-solid fa-upload"></i> Mark as Done
