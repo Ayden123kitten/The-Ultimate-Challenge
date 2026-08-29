@@ -12,6 +12,7 @@ const CONFIG = {
 // ==========================================
 let games = [];
 let players = [];
+let currentPlayer = localStorage.getItem('ap_async_player') || '';
 
 const $ = (id) => document.getElementById(id);
 
@@ -41,6 +42,7 @@ async function loadData() {
         games = await gamesRes.json();
         players = await playersRes.json();
 
+        populatePlayerSelect();
         renderPlayers();
     } catch (err) {
         console.error('Failed to load data:', err);
@@ -56,6 +58,44 @@ async function loadData() {
 // ==========================================
 // RENDERING
 // ==========================================
+function populatePlayerSelect() {
+    const container = $('player-select-container');
+    const currentNameEl = $('current-player-name');
+    
+    container.innerHTML = '';
+    
+    // Update current player display
+    if (currentPlayer) {
+        currentNameEl.textContent = currentPlayer;
+    } else {
+        currentNameEl.textContent = 'No player selected';
+    }
+    
+    players.forEach(player => {
+        const btn = document.createElement('button');
+        const isSelected = player === currentPlayer;
+        
+        btn.className = `px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-2 ${
+            isSelected 
+                ? 'bg-ap-accent text-white' 
+                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+        }`;
+        
+        btn.innerHTML = `
+            <i class="fa-solid ${isSelected ? 'fa-check-circle' : 'fa-user'}"></i>
+            <span>${player}</span>
+        `;
+        
+        btn.addEventListener('click', () => {
+            currentPlayer = player;
+            localStorage.setItem('ap_async_player', currentPlayer);
+            populatePlayerSelect();
+        });
+        
+        container.appendChild(btn);
+    });
+}
+
 function renderPlayers() {
     const container = $('players-container');
     container.innerHTML = '';
