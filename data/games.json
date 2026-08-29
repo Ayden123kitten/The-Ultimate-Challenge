@@ -1,0 +1,17 @@
+[
+  {
+    "id": "actraiser",
+    "name": "ActRaiser",
+    "rules": "",
+    "apworld_link": "https://github.com/Happyhappyism/Archipelago/releases?q=%22ActRaiser%22&expanded=true",
+    "mod_link": "",
+    "mod_setup_guide_link": "https://rentry.co/actraiserv0-1",
+    "tracker_link": "",
+    "support_thread_link": "https://discord.com/channels/731205301247803413/1113529234800005181",
+    "save_file_link": "https://drive.google.com/drive/folders/1Uxg7F8IOuH9orSdvrjR1bj-jWkuObilD?usp=drive_link",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": []
+  }
+]
