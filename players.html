@@ -61,6 +61,19 @@
 
     <!-- Main Content -->
     <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
+        <!-- Search Bar -->
+        <div class="mb-6">
+            <div class="relative">
+                <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+                <input 
+                    type="text" 
+                    id="players-search" 
+                    placeholder="Search players..." 
+                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg pl-12 pr-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                >
+            </div>
+        </div>
+        
         <div id="players-container" class="space-y-6">
             <!-- Players will be injected here -->
             <div class="text-center py-20 text-slate-500">

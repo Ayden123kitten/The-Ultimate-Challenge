@@ -57,6 +57,8 @@ async function loadData() {
 // ==========================================
 // RENDERING
 // ==========================================
+let searchQuery = '';
+
 function renderPlayers() {
     const container = $('players-container');
     container.innerHTML = '';
@@ -118,8 +120,17 @@ function renderPlayers() {
 
     // Sort players by total time (descending)
     playerStats.sort((a, b) => b.totalTimeMs - a.totalTimeMs);
+    
+    // Filter players based on search query
+    let filteredStats = playerStats;
+    if (searchQuery.trim() !== '') {
+        const query = searchQuery.toLowerCase();
+        filteredStats = playerStats.filter(stat => 
+            stat.name.toLowerCase().includes(query)
+        );
+    }
 
-    playerStats.forEach(stat => {
+    filteredStats.forEach(stat => {
         const card = document.createElement('div');
         const isSelected = stat.name === currentPlayer;
         card.className = `glass rounded-xl p-6 flex flex-col gap-4 cursor-pointer transition-all ${isSelected ? 'border-2 border-ap-accent' : 'hover:border-ap-accent/50'}`;
@@ -186,6 +197,15 @@ function renderPlayers() {
             </div>
         `;
     }
+}
+
+// Search functionality
+const searchInput = $('players-search');
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderPlayers();
+    });
 }
 
 // Initialize

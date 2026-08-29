@@ -79,11 +79,21 @@ function populatePlayerSelect() {
 // ==========================================
 // RENDERING
 // ==========================================
+let searchQuery = '';
+
 function renderGames() {
     const container = $('games-container');
     container.innerHTML = '';
 
-    const sortedGames = [...games].sort((a, b) => a.name.localeCompare(b.name));
+    let sortedGames = [...games].sort((a, b) => a.name.localeCompare(b.name));
+    
+    // Filter games based on search query
+    if (searchQuery.trim() !== '') {
+        const query = searchQuery.toLowerCase();
+        sortedGames = sortedGames.filter(game => 
+            game.name.toLowerCase().includes(query)
+        );
+    }
 
     sortedGames.forEach(game => {
         const isClaimed = game.current_player !== null;
@@ -296,6 +306,15 @@ setInterval(() => {
         renderGames();
     }
 }, 1000);
+
+// Search functionality
+const searchInput = $('games-search');
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value;
+        renderGames();
+    });
+}
 
 loadData();
 setInterval(loadData, 10000);
