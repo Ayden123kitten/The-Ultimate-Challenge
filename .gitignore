@@ -1,42 +1,53 @@
-# Examples
-## Source only - no ignores needed
-src/main.py
-README.md
-config.json
-
-## Project with artifacts
+```gitignore
 # Compiled and build artifacts
 *.pyc
 __pycache__/
 *.o
 *.obj
-dist/
-build/
-target/
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
 # Dependencies
-.venv/
-venv/
 node_modules/
-.mypy_cache/
-.pytest_cache/
+venv/
+.venv/
+.env
+.env.local
+.env.*
+
 # Logs and temp files
 *.log
 *.tmp
 *.swp
-# Environment
-.env
-.env.local
-*.env.*
+*.swo
+
 # Editors
 .vscode/
 .idea/
-# OS files
+
+# System files
 .DS_Store
 Thumbs.db
+
 # Coverage
 coverage/
 htmlcov/
 .coverage
+
+# Build directories
+dist/
+build/
+target/
+.gradle/
+
+# Python specific
+.mypy_cache/
+.pytest_cache/
+
 # Compressed files
 *.zip
 *.gz
@@ -60,5 +71,4 @@ htmlcov/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-# Original rules preserved
-*.log
+```
