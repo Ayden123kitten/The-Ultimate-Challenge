@@ -262,7 +262,7 @@ async function updateGame(gameId, action, e) {
 function updateGlobalTimer() {
     const now = Date.now();
     const start = new Date(settings.start_time).getTime();
-    const end = new Date(settings.end_time).getTime();
+    const end = settings.end_time && settings.end_time.trim() !== '' ? new Date(settings.end_time).getTime() : null;
     
     const timerEl = $('global-timer');
     const statusEl = $('timer-status');
@@ -271,7 +271,7 @@ function updateGlobalTimer() {
         timerEl.textContent = formatTime(start - now);
         statusEl.textContent = 'Starts In';
         statusEl.className = 'text-xs text-yellow-400 uppercase tracking-widest';
-    } else if (now >= start && now <= end) {
+    } else if (end === null || (now >= start && now <= end)) {
         timerEl.textContent = formatTime(now - start);
         statusEl.textContent = 'Event Live';
         statusEl.className = 'text-xs text-green-400 uppercase tracking-widest';
