@@ -11,9 +11,16 @@
     "game_info_link": "",
     "support_link": "https://discord.com/channels/731205301247803413/1113529234800005181",
     "save_file_link": "https://drive.google.com/drive/folders/1Uxg7F8IOuH9orSdvrjR1bj-jWkuObilD?usp=drive_link",
-    "current_player": "Ayden",
-    "claimed_at": 1788039490872,
-    "total_time_ms": 0,
-    "logs": []
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 17292,
+    "logs": [
+      {
+        "player": "Ayden",
+        "start": 1788039490872,
+        "end": 1788039508164,
+        "duration_ms": 17292
+      }
+    ]
   }
 ]
