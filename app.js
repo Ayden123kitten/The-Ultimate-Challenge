@@ -260,12 +260,19 @@ async function updateGame(gameId, action, e) {
 // GLOBAL TIMER
 // ==========================================
 function updateGlobalTimer() {
+    const timerEl = $('global-timer');
+    const statusEl = $('timer-status');
+
+    // If start_time is empty, show nothing
+    if (!settings.start_time || settings.start_time.trim() === '') {
+        timerEl.textContent = '';
+        statusEl.textContent = '';
+        return;
+    }
+
     const now = Date.now();
     const start = new Date(settings.start_time).getTime();
     const end = settings.end_time && settings.end_time.trim() !== '' ? new Date(settings.end_time).getTime() : null;
-    
-    const timerEl = $('global-timer');
-    const statusEl = $('timer-status');
 
     if (now < start) {
         timerEl.textContent = formatTime(start - now);
