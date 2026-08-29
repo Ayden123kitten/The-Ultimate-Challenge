@@ -1,45 +1,43 @@
-#Compiled and binary files
-*.pyc
-*.class
-*.o
-*.exe
-*.dll
-*.so
-*.a
-*.obj
-*.out
+# Examples
+## Source only - no ignores needed
+src/main.py
+README.md
+config.json
 
-#Dependencies
-node_modules/
-venv/
-.venv/
+## Project with artifacts
+# Compiled and build artifacts
+*.pyc
 __pycache__/
+*.o
+*.obj
 dist/
 build/
 target/
-.gradle/
-
-#Editor/IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
+# Dependencies
+.venv/
+venv/
+node_modules/
+.mypy_cache/
+.pytest_cache/
+# Logs and temp files
+*.log
 *.tmp
-
-#System files
-.DS_Store
-Thumbs.db
+*.swp
+# Environment
 .env
 .env.local
 *.env.*
-
-#Logs and coverage
-*.log
+# Editors
+.vscode/
+.idea/
+# OS files
+.DS_Store
+Thumbs.db
+# Coverage
 coverage/
 htmlcov/
 .coverage
-
-#Compressed files
+# Compressed files
 *.zip
 *.gz
 *.tar
@@ -62,3 +60,5 @@ htmlcov/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+# Original rules preserved
+*.log
