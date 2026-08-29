@@ -126,10 +126,12 @@ function renderGames() {
         card.innerHTML = `
             <div class="flex items-start gap-4">
                 ${hasCoverImage ? `
-                    <img src="${game.cover_image}" alt="${game.name}" 
-                         class="game-logo"
-                         onerror="this.style.display='none'">
-                ` : '<div class="game-logo"></div>'}
+                    <div class="cover-art-container">
+                        <img src="${game.cover_image}" alt="${game.name}" 
+                             class="cover-art-logo"
+                             onerror="this.style.display='none'">
+                    </div>
+                ` : '<div class="cover-art-container"></div>'}
                 
                 <div class="flex-grow">
                     <h2 class="text-xl font-bold text-white">${game.name}</h2>
