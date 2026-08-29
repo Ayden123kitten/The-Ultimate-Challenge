@@ -64,21 +64,16 @@ async function loadData() {
 }
 
 function populatePlayerSelect() {
-    const select = $('player-select');
-    select.innerHTML = '<option value="">Select Player...</option>';
-    players.forEach(player => {
-        const option = document.createElement('option');
-        option.value = player;
-        option.textContent = player;
-        if (player === currentPlayer) option.selected = true;
-        select.appendChild(option);
-    });
+    const currentNameEl = $('current-player-name');
     
-    select.addEventListener('change', (e) => {
-        currentPlayer = e.target.value;
-        localStorage.setItem('ap_async_player', currentPlayer);
-        renderGames();
-    });
+    // Update current player display on both pages (if element exists)
+    if (currentNameEl) {
+        if (currentPlayer) {
+            currentNameEl.textContent = currentPlayer;
+        } else {
+            currentNameEl.textContent = 'No player selected';
+        }
+    }
 }
 
 // ==========================================
@@ -165,7 +160,7 @@ function renderGames() {
                     </button>
                 ` : `
                     <button disabled class="w-full bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-lock"></i> ${currentPlayer === '' ? 'Select Player Above' : 'Currently Unavailable'}
+                        <i class="fa-solid fa-lock"></i> ${currentPlayer === '' ? 'Select Player on Players Page' : 'Currently Unavailable'}
                     </button>
                 `}
             </div>
@@ -205,7 +200,7 @@ function renderLink(url, icon, label, isPrimary = false) {
 // ACTIONS
 // ==========================================
 async function claimGame(gameId, e) {
-    if (!currentPlayer) return alert('Please select your name first.');
+    if (!currentPlayer) return alert('Please select your name from the Players page first.');
     if (!confirm(`Claim ${games.find(g => g.id === gameId).name} as ${currentPlayer}?`)) return;
     await updateGame(gameId, 'claim', e);
 }

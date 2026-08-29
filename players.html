@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Stats - The Ultimate Challenge</title>
+    <title>Players - The Ultimate Challenge</title>
     <link rel="icon" type="image/png" href="/favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -40,7 +40,7 @@
                     <i class="fa-solid fa-gamepad text-3xl text-ap-accent"></i>
                     <div>
                         <h1 class="text-2xl font-bold text-white tracking-tight">The Ultimate Challenge</h1>
-                        <p class="text-xs text-slate-400">Player Statistics</p>
+                        <p class="text-xs text-slate-400">Players</p>
                     </div>
                 </a>
             </div>
@@ -56,6 +56,18 @@
 
     <!-- Main Content -->
     <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
+        <div class="mb-6 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+            <h2 class="text-lg font-bold text-white mb-3">Select Your Player</h2>
+            <p class="text-sm text-slate-400 mb-4">Click the button next to your name to set yourself as the current player.</p>
+            <div id="player-select-container" class="flex flex-wrap gap-2">
+                <!-- Player select buttons will be injected here -->
+            </div>
+            <div id="current-player-display" class="mt-4 pt-4 border-t border-slate-700">
+                <span class="text-slate-400">Currently playing as: </span>
+                <span id="current-player-name" class="font-bold text-ap-accent">No player selected</span>
+            </div>
+        </div>
+        
         <div id="players-container" class="space-y-6">
             <!-- Players will be injected here -->
             <div class="text-center py-20 text-slate-500">
