@@ -154,7 +154,7 @@ function renderGames() {
             <div class="mt-2">
                 ${isMyClaim ? `
                     <button onclick="unclaimGame('${game.id}', event)" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-upload"></i> Unclaim Game (Save Uploaded)
+                        <i class="fa-solid fa-upload"></i> Mark as Done
                     </button>
                     <div class="text-center text-xs text-slate-400 mt-2">
                         Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span>
@@ -211,7 +211,7 @@ async function claimGame(gameId, e) {
 }
 
 async function unclaimGame(gameId, e) {
-    if (!confirm('Have you finished playing and uploaded your save file to Google Drive?\n\nOnce you unclaim, the next player can start!')) return;
+    if (!confirm('Have you finished playing and uploaded your save file to Google Drive?\n\nOnce you mark it as done, the next player can start!')) return;
     await updateGame(gameId, 'unclaim', e);
 }
 
