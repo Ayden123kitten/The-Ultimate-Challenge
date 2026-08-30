@@ -45,11 +45,11 @@
                     </div>
                 </a>
             </div>
-            
+
             <nav class="flex items-center gap-4">
                 <div id="current-player-display" class="flex items-center gap-2 text-sm">
                     <span class="text-slate-400">Playing as:</span>
-                    <span id="current-player-name" class="font-semibold text-ap-accent">No player selected</span>
+                    <span id="current-player-name" class="font-semibold text-ap-accent">Not logged in</span>
                 </div>
                 <div class="w-px h-5 bg-slate-600"></div>
                 <a href="/" class="text-slate-400 hover:text-white transition-colors flex items-center gap-2">
@@ -62,19 +62,22 @@
 
     <!-- Main Content -->
     <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
+        <!-- Auth panel: login / signup / logged-in state -->
+        <div id="auth-panel" class="mb-8"></div>
+
         <!-- Search Bar -->
         <div class="mb-6">
             <div class="relative">
                 <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-                <input 
-                    type="text" 
-                    id="players-search" 
-                    placeholder="Search players..." 
+                <input
+                    type="text"
+                    id="players-search"
+                    placeholder="Search players..."
                     class="w-full bg-slate-800/50 border border-slate-700 rounded-lg pl-12 pr-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
                 >
             </div>
         </div>
-        
+
         <div id="players-container" class="space-y-6">
             <!-- Players will be injected here -->
             <div class="text-center py-20 text-slate-500">
@@ -88,6 +91,7 @@
         <p>Powered by GitHub & Vercel • Data is stored directly in the repository</p>
     </footer>
 
+    <script src="auth.js"></script>
     <script src="players.js"></script>
 </body>
 </html>
