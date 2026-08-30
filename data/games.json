@@ -57,25 +57,6 @@
     "logs": []
   },
   {
-    "id": "gd",
-    "name": "Geometry Dash",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/0950ca92a4dcf426067cfd2246bb5ff3.png",
-    "apworld_version": "1.0.0-alpha.11",
-    "rules": "",
-    "extra_information": "",
-    "apworld_link": "https://github.com/matorblal-byte/ArchipelagoGD2/releases/tag/v1.0.0-alpha.11",
-    "mod_link": "https://github.com/matorblal-byte/ArchipelagoGD2/releases/tag/v1.0.0-alpha.11",
-    "mod_setup_guide_link": "https://github.com/matorblal-byte/ArchipelagoGD2/releases/tag/v1.0.0-alpha.11",
-    "tracker_link": "",
-    "game_info_link": "",
-    "support_link": "https://discord.com/channels/731205301247803413/1195348290754072640",
-    "save_file_link": "https://drive.google.com/drive/folders/1om_Uj1iIEhO4PU1iTgdrDcsA6M172c72?usp=drive_link",
-    "current_player": null,
-    "claimed_at": null,
-    "total_time_ms": 0,
-    "logs": []
-  },
-  {
     "id": "pdmm",
     "name": "Hatsune Miku: Project DIVA Mega Mix+",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/72b7d885d0da927fbe2636f5ef2d77bb.png",
