@@ -1,1 +1,1 @@
-(api/signup.js is a source file, so no need to add anything to .gitignore)
+Nothing should be ignored since only source files (.js files) are being modified and there are no build artifacts, dependencies, or temporary files in the changes.
