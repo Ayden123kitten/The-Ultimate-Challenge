@@ -358,5 +358,25 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": []
+  },
+  {
+    "id": "animalwell",
+    "name": "ANIMAL WELL",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/e79bae5ded854800e149e947dc05d97f.png",
+    "apworld_version": "0.5.4",
+    "mod_version": "",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/ScipioWright/Archipelago-SW/releases/tag/0.5.4",
+    "mod_link": "",
+    "mod_setup_guide_link": "https://github.com/ScipioWright/Archipelago-SW/blob/animal-well/worlds/animal_well/docs/setup_en.md",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1238463626344665119",
+    "save_file_link": "https://drive.google.com/drive/folders/1vJPxoz7bAT1jRKTJy_6soRx7GNVyhEe9?usp=drive_link",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": []
   }
 ]
