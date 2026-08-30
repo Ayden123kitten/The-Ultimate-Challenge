@@ -76,6 +76,25 @@
     "logs": []
   },
   {
+    "id": "pdmm",
+    "name": "Hatsune Miku: Project DIVA Mega Mix+",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/72b7d885d0da927fbe2636f5ef2d77bb.png",
+    "apworld_version": "1.5.1B",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/Cynichill/DivaAPworld/releases/latest",
+    "mod_link": "https://gamebanana.com/mods/514140",
+    "mod_setup_guide_link": "https://github.com/Cynichill/DivaAPworld/blob/main/docs/setup_en.md",
+    "tracker_link": "https://github.com/Armipotent/HarmonyOfDissonancePoptracker/releases/tag/v1.1.8",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1241134454391443580",
+    "save_file_link": "https://drive.google.com/drive/folders/1Uxg7F8IOuH9orSdvrjR1bj-jWkuObilD?usp=drive_link",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": []
+  },
+  {
     "id": "mariokartdd",
     "name": "Mario Kart: Double Dash!!",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/69d658d0b2859e32cd4dc3b970c8496c.png",
