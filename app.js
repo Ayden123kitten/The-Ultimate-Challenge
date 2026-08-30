@@ -124,7 +124,7 @@ function renderGames() {
         card.className = 'glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50';
         
         card.innerHTML = `
-            <div class="flex items-start gap-4">
+            <div class="game-card-header">
                 ${hasCoverImage ? `
                     <div class="cover-art-container">
                         <img src="${game.cover_image}" alt="${game.name}" 
@@ -133,13 +133,13 @@ function renderGames() {
                     </div>
                 ` : '<div class="cover-art-container"></div>'}
                 
-                <div class="flex-grow">
+                <div class="game-card-title">
                     <h2 class="text-xl font-bold text-white">${game.name}</h2>
                     <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold ${isClaimed ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
                         ${isClaimed ? `Playing: ${game.current_player}` : 'Available'}
                     </span>
                 </div>
-                <div class="text-right">
+                <div class="game-card-time">
                     <div class="text-xs text-slate-400 uppercase">Total Time</div>
                     <div class="text-lg font-mono font-bold text-ap-accent">${formatTime(totalTimeMs)}</div>
                 </div>
