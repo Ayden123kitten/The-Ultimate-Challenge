@@ -145,8 +145,8 @@ function renderPlayers() {
         };
     });
 
-    // Sort players by total time (descending)
-    playerStats.sort((a, b) => b.totalTimeMs - a.totalTimeMs);
+    // Sort players alphabetically by name
+    playerStats.sort((a, b) => a.name.localeCompare(b.name));
     
     // Filter players based on search query
     let filteredStats = playerStats;
