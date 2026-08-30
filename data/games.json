@@ -338,5 +338,25 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": []
+  },
+  {
+    "id": "roguelegacy",
+    "name": "Rogue Legacy",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/ad51c2da96522b43ff838bca1f6cdc57.png",
+    "apworld_version": "",
+    "mod_version": "1.1.0",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://discord.com/channels/731205301247803413/929585237695029268/1471932962537738425",
+    "mod_link": "https://github.com/ThePhar/RogueLegacyRandomizer/releases/tag/1.1.0",
+    "mod_setup_guide_link": "https://github.com/ThePhar/RogueLegacyRandomizer#install-instructions-for-most-users",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/929585237695029268",
+    "save_file_link": "https://drive.google.com/drive/folders/1UEZKMpYsC57jgf0AHOj6T4yAwl4Xa8jV?usp=drive_link",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": []
   }
 ]
