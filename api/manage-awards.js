@@ -28,7 +28,7 @@ export default async function handler(req, res) {
         const decoded = jwt.verify(authToken, jwtSecret);
         const playerName = decoded.name;
 
-        // Check if user is a moderator
+        // Check if user is a moderator and get their permissions
         const modFilePath = 'data/moderators.json';
         const modApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${modFilePath}?ref=${branch}`;
 
@@ -40,21 +40,43 @@ export default async function handler(req, res) {
         });
 
         let moderators = [];
+        let admin = null;
+        let userPermissions = {};
+        let isAdmin = false;
         if (modRes.ok) {
             const modFileData = await modRes.json();
             const modContent = Buffer.from(modFileData.content, 'base64').toString('utf-8');
-            moderators = JSON.parse(modContent).moderators || [];
+            const modData = JSON.parse(modContent);
+            admin = modData.admin || null;
+            moderators = modData.moderators || [];
+            
+            // Check if user is admin
+            isAdmin = admin === playerName;
+            
+            // Find user's moderator record and get permissions
+            const modRecord = moderators.find(m => m.name === playerName);
+            if (modRecord && modRecord.permissions) {
+                userPermissions = modRecord.permissions;
+            }
         }
 
-        const isModerator = moderators.includes(playerName);
+        const isModerator = isAdmin || moderators.some(m => m.name === playerName);
 
         if (!isModerator) {
             return res.status(403).json({ error: 'Access denied. Moderators only.' });
         }
 
+        // Helper function to check permission
+        const hasPermission = (permission) => {
+            return isAdmin || userPermissions[permission] === true;
+        };
+
         const { action, awardData, assignAwardData } = req.body;
 
         if (action === 'addAward') {
+            if (!hasPermission('manageAwards')) {
+                return res.status(403).json({ error: 'Access denied. Missing manageAwards permission.' });
+            }
             const awardsFilePath = 'data/awards.json';
             const awardsApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${awardsFilePath}?ref=${branch}`;
 
@@ -102,6 +124,9 @@ export default async function handler(req, res) {
         }
 
         if (action === 'assignAward') {
+            if (!hasPermission('manageAwards')) {
+                return res.status(403).json({ error: 'Access denied. Missing manageAwards permission.' });
+            }
             const playersFilePath = 'data/players.json';
             const playersApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${playersFilePath}?ref=${branch}`;
 
