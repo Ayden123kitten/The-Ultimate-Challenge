@@ -38,5 +38,10 @@
     "name": "mastercrashers",
     "password_hash": "$2b$10$sVVwMVN7RdJ7A5K1mEnCMui8dX7usouGWTbLCFjJj6V8z.7oncsdm",
     "pfp_link": ""
+  },
+  {
+    "name": "stonks",
+    "password_hash": "$2b$10$KGpgG8WWmAO2/z3r.EzQ/.fMA.oIS0.1fUtvQM4B7AzYsuMHHINDq",
+    "pfp_link": "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.kym-cdn.com%2Fphotos%2Fimages%2Fnewsfeed%2F001%2F499%2F826%2F2f0.png&f=1&nofb=1&ipt=fcab782a4909014bd7d6cffb6eb868ef42d083c2073bea6406de14174037acb9"
   }
 ]
