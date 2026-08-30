@@ -18,7 +18,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "pws",
@@ -39,7 +40,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "adgac",
@@ -60,7 +62,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "castlevaniahod",
@@ -81,7 +84,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "pdmm",
@@ -102,7 +106,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "mariokartdd",
@@ -123,7 +128,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "terraria",
@@ -144,7 +150,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "riftofthenecrodancer",
@@ -165,7 +172,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "osu",
@@ -186,7 +194,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "twilightprincess",
@@ -207,7 +216,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "twistycube",
@@ -228,7 +238,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "vampiresurvivors",
@@ -249,7 +260,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "mcdig",
@@ -270,7 +282,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "ktane",
@@ -291,7 +304,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "buckshot",
@@ -312,7 +326,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "horse",
@@ -333,7 +348,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "unfairflips",
@@ -354,7 +370,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "roguelegacy",
@@ -375,7 +392,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "animalwell",
@@ -396,7 +414,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "donutcounty",
@@ -417,7 +436,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "ppds",
@@ -438,9 +458,10 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
-{
+  {
     "id": "deadcells",
     "name": "Dead Cells",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/abd1c782880cc59759f4112fda0b8f98.png",
@@ -459,9 +480,10 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
-{
+  {
     "id": "crosscode",
     "name": "CrossCode",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/ce518001633ca4e1f2ae4b02f4dcb11f.png",
@@ -480,9 +502,10 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
-{
+  {
     "id": "celeste",
     "name": "Celeste",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/2eace51d8f796d04991c831a07059758.png",
@@ -501,9 +524,10 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
-{
+  {
     "id": "pizzatower",
     "name": "Pizza Tower",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/23a6f2db69037bdf11a989b02b9c43e3.png",
@@ -522,9 +546,10 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
-{
+  {
     "id": "riskofrain1",
     "name": "Risk of Rain 1",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/bb40a9b872c75a7090a06f97ca66e275.png",
@@ -543,9 +568,10 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
-{
+  {
     "id": "riskofrainreturns",
     "name": "Risk of Rain Returns",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/f571e1865bfa986776983c23b1525910.png",
@@ -564,9 +590,10 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
-  },  
-{
+    "completed": false,
+    "yaml_slot_name": ""
+  },
+  {
     "id": "riskofrain2",
     "name": "Risk of Rain 2",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/2f10c1578a0706e06b6d7db6f0b4a6af.png",
@@ -585,9 +612,10 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
-{
+  {
     "id": "ultrakill",
     "name": "ULTRAKILL",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/ad5cd874127a962c3974bdab37630317.png",
@@ -606,9 +634,10 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
-{
+  {
     "id": "cloverpit",
     "name": "CloverPit",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/a3ccc16bb1bee505c9b3746dcd734026.png",
@@ -621,13 +650,14 @@
     "mod_setup_guide_link": "https://github.com/Syntheal/CloverPit.Archipelago",
     "tracker_link": "",
     "game_info_link": "",
-    "support_link": "https://discord.com/channels/731205301247803413/1423372513957908662⁠",
+    "support_link": "https://discord.com/channels/731205301247803413/1423372513957908662\u2060",
     "save_file_link": "https://drive.google.com/drive/folders/19lotdbWTckqU4hlXbkzB9cPV26wl0tmm",
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "deltarune",
@@ -648,7 +678,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "portal2",
@@ -669,7 +700,8 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   },
   {
     "id": "peak",
@@ -690,7 +722,7 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": [],
-    "completed": false
+    "completed": false,
+    "yaml_slot_name": ""
   }
 ]
-
