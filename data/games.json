@@ -2,11 +2,11 @@
   {
     "id": "actraiser",
     "name": "ActRaiser",
-    "cover_image": "https://cdn2.steamgriddb.com/thumb/b5c24ab1ddc1aecd658a6cd39eb2362d.jpg",
+    "cover_image": "https://cdn2.steamgriddb.com/logo/9eac560d661140becf2386e61f0c3aa7.png",
     "apworld_version": "",
     "rules": "",
     "extra_information": "",
-    "apworld_link": "https://github.com/Happyhappyism/Archipelago/releases?q=%22ActRaiser%22&expanded=true",
+    "apworld_link": "https://github.com/Happyhappyism/Archipelago/releases/tag/apraiser_v134",
     "mod_link": "",
     "mod_setup_guide_link": "https://rentry.co/actraiserv0-1",
     "tracker_link": "",
