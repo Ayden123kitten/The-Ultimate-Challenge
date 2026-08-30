@@ -94,4 +94,23 @@
     "total_time_ms": 0,
     "logs": []
   }
+  {
+    "id": "Terraria",
+    "name": "Terraria",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/a7b8e43297034e90611ce98d9b6efcfe.png",
+    "apworld_version": "Core Game",
+    "rules": "You must play with Infernum installed, as it makes the game harder without breaking logic.",
+    "extra_information": "The only mods allowed are Calamity, Calamity Infernum, Magic Storage and OreExcavate.",
+    "apworld_link": "",
+    "mod_link": "https://steamcommunity.com/sharedfiles/filedetails/?id=2922217554",
+    "mod_setup_guide_link": "https://archipelago.gg/tutorial/Terraria/setup_en",
+    "tracker_link": "",
+    "game_info_link": "https://archipelago.gg/tutorial/Terraria/setup_en",
+    "support_link": "https://discord.com/channels/731205301247803413/1148330488482767008",
+    "save_file_link": "https://drive.google.com/drive/folders/1Uxg7F8IOuH9orSdvrjR1bj-jWkuObilD?usp=drive_link",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": []
+  }
 ]
