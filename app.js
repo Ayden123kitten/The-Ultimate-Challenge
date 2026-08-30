@@ -471,7 +471,7 @@ let isModerator = false;
                 const modBtn = document.createElement('button');
                 modBtn.id = 'moderator-toggle-btn';
                 modBtn.className = 'text-slate-400 hover:text-ap-accent transition-colors flex items-center gap-2 text-sm';
-                modBtn.innerHTML = '<i class="fa-solid fa-shield-halved"></i><span class="text-sm">Moderator</span>';
+                modBtn.innerHTML = '<i class="fa-solid fa-shield-halved"></i><span class="text-sm">Moderation</span>';
                 modBtn.onclick = openModeratorModal;
                 header.appendChild(modBtn);
             }
