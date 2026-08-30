@@ -14,6 +14,7 @@ let games = [];
 let players = []; // [{ name, pfp_link, has_password }]
 let currentPlayer = AUTH.getName();
 let currentAuthTab = 'login'; // Track which auth tab is active: 'login' or 'signup'
+let authPanelRendered = false; // Track if auth panel has been rendered
 
 const $ = (id) => document.getElementById(id);
 
@@ -64,6 +65,11 @@ function renderAuthPanel() {
     const currentNameEl = $('current-player-name');
     if (currentNameEl) currentNameEl.textContent = currentPlayer || 'Not logged in';
 
+    // Don't re-render if already rendered and not logged in (preserves input values)
+    if (authPanelRendered && !AUTH.isLoggedIn()) return;
+
+    authPanelRendered = true;
+
     if (AUTH.isLoggedIn()) {
         panel.innerHTML = `
             <div class="glass rounded-xl p-6 flex items-center justify-between">
@@ -90,8 +96,13 @@ function renderAuthPanel() {
             <form id="login-form" class="space-y-3">
                 <input id="login-name" type="text" placeholder="Player name" autocomplete="username"
                     class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent">
-                <input id="login-password" type="password" placeholder="Password" autocomplete="current-password"
-                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent">
+                <div class="relative">
+                    <input id="login-password" type="password" placeholder="Password" autocomplete="current-password"
+                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent">
+                    <button type="button" id="login-toggle-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
                 <button type="submit" class="w-full bg-ap-accent/80 hover:bg-ap-accent text-slate-900 font-bold py-2 rounded-lg transition-colors">
                     Log In
                 </button>
@@ -101,8 +112,13 @@ function renderAuthPanel() {
             <form id="signup-form" class="space-y-3 hidden">
                 <input id="signup-name" type="text" placeholder="Choose a player name" autocomplete="username"
                     class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent">
-                <input id="signup-password" type="password" placeholder="Choose a password (6+ characters)" autocomplete="new-password"
-                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent">
+                <div class="relative">
+                    <input id="signup-password" type="password" placeholder="Choose a password (6+ characters)" autocomplete="new-password"
+                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent">
+                    <button type="button" id="signup-toggle-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
                 <input id="signup-pfp" type="url" placeholder="Profile picture link (optional)"
                     class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent">
                 <p class="text-xs text-slate-500">
@@ -148,6 +164,24 @@ function renderAuthPanel() {
         loginTab.className = 'flex-1 py-2 rounded-lg font-semibold bg-slate-800 text-slate-400';
         signupForm.classList.remove('hidden');
         loginForm.classList.add('hidden');
+    });
+
+    // Toggle password visibility for login form
+    const loginToggleBtn = $('login-toggle-password');
+    const loginPasswordInput = $('login-password');
+    loginToggleBtn.addEventListener('click', () => {
+        const isPassword = loginPasswordInput.type === 'password';
+        loginPasswordInput.type = isPassword ? 'text' : 'password';
+        loginToggleBtn.querySelector('i').className = isPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+    });
+
+    // Toggle password visibility for signup form
+    const signupToggleBtn = $('signup-toggle-password');
+    const signupPasswordInput = $('signup-password');
+    signupToggleBtn.addEventListener('click', () => {
+        const isPassword = signupPasswordInput.type === 'password';
+        signupPasswordInput.type = isPassword ? 'text' : 'password';
+        signupToggleBtn.querySelector('i').className = isPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
     });
 
     loginForm.addEventListener('submit', async (e) => {
