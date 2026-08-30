@@ -494,6 +494,7 @@ function openModeratorModal() {
                 <form id="add-game-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" id="game-name" placeholder="Game Name *" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white" required>
                     <input type="text" id="game-id" placeholder="Game ID (unique) *" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white" required>
+                    <input type="text" id="game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-logo" placeholder="Logo URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-apworld-link" placeholder="Apworld Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="text" id="game-apworld-version" placeholder="Apworld Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
@@ -520,6 +521,7 @@ function openModeratorModal() {
                 <div id="edit-game-form-container" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" id="edit-game-name" placeholder="Game Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="text" id="edit-game-id" placeholder="Game ID" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white" disabled>
+                    <input type="text" id="edit-game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-logo" placeholder="Logo URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-apworld-link" placeholder="Apworld Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="text" id="edit-game-apworld-version" placeholder="Apworld Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
@@ -615,6 +617,7 @@ function openModeratorModal() {
                 id: $('game-id').value.trim(),
                 name: $('game-name').value.trim(),
                 logo: $('game-logo').value.trim(),
+                yaml_slot_name: $('game-yaml-slot-name').value.trim(),
                 apworld_link: $('game-apworld-link').value.trim(),
                 apworld_version: $('game-apworld-version').value.trim(),
                 mod_link: $('game-mod-link').value.trim(),
@@ -664,6 +667,7 @@ function openModeratorModal() {
             
             $('edit-game-name').value = game.name;
             $('edit-game-id').value = game.id;
+            $('edit-game-yaml-slot-name').value = game.yaml_slot_name || '';
             $('edit-game-logo').value = game.logo || '';
             $('edit-game-apworld-link').value = game.apworld_link || '';
             $('edit-game-apworld-version').value = game.apworld_version || '';
@@ -738,6 +742,7 @@ async function saveEditedGame() {
     
     const gameData = {
         name: $('edit-game-name').value.trim(),
+        yaml_slot_name: $('edit-game-yaml-slot-name').value.trim(),
         logo: $('edit-game-logo').value.trim(),
         apworld_link: $('edit-game-apworld-link').value.trim(),
         apworld_version: $('edit-game-apworld-version').value.trim(),

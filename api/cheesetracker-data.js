@@ -20,7 +20,8 @@ export async function GET() {
                 completedChecks: game.cheesetracker_completed_checks || 0,
                 percentage: game.cheesetracker_total_checks > 0 
                     ? Math.round((game.cheesetracker_completed_checks / game.cheesetracker_total_checks) * 100) 
-                    : 0
+                    : 0,
+                yamlSlotName: game.yaml_slot_name || ''
             };
         });
         
