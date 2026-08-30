@@ -418,5 +418,26 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false
+  },
+  {
+    "id": "ppds",
+    "name": "Placid Plastic Duck Simulator",
+    "logo": "https://shared.steamstatic.com/store_item_assets/steam/apps/1999360/logo_2x.png?t=1753193022",
+    "apworld_version": "0.3.2",
+    "mod_version": "0.3.2",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/SWCreeperKing/PPDSArchipelago/releases/tag/v0.3.2",
+    "mod_link": "https://github.com/SWCreeperKing/PPDSArchipelago/releases/tag/v0.3.2",
+    "mod_setup_guide_link": "https://github.com/SWCreeperKing/PPDSArchipelago#how-to-install",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1104785671262056559",
+    "save_file_link": "https://drive.google.com/drive/folders/1wtXgCi68GAe9XiatKxzNDRucyOPqYHxZ?usp=drive_link",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": [],
+    "completed": false
   }
 ]
