@@ -1,3 +1,16 @@
 {
-  "moderators": ["Ayden"]
+  "admin": "Ayden",
+  "moderators": [
+    {
+      "name": "Ayden",
+      "permissions": {
+        "manageModerators": true,
+        "manageGames": true,
+        "managePlayers": true,
+        "manageRoles": true,
+        "manageAwards": true,
+        "manageSettings": true
+      }
+    }
+  ]
 }
