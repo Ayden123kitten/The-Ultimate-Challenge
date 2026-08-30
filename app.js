@@ -113,7 +113,7 @@ function renderGames() {
         const hasSaveFilePaths = game.save_file_paths && typeof game.save_file_paths === 'object';
         
         const links = [
-            { url: game.apworld_link, icon: 'fa-globe', label: `APWorld${hasApworldVersion ? ` v${game.apworld_version}` : ''}` },
+            { url: game.apworld_link, icon: 'fa-globe', label: `Apworld${hasApworldVersion ? ` (v${game.apworld_version})` : ''}` },
             { url: game.mod_link, icon: 'fa-puzzle-piece', label: 'Mod' },
             { url: game.mod_setup_guide_link, icon: 'fa-book', label: 'Setup Guide' },
             { url: game.tracker_link, icon: 'fa-map', label: 'Tracker' },
