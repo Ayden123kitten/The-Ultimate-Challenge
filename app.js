@@ -14,6 +14,7 @@ let games = [];
 let players = [];
 let settings = {};
 let currentPlayer = localStorage.getItem('ap_async_player') || '';
+let filterStatus = 'all'; // 'all', 'in-progress', 'completed'
 
 const $ = (id) => document.getElementById(id);
 
@@ -85,7 +86,20 @@ function renderGames() {
     const container = $('games-container');
     container.innerHTML = '';
 
+    // Update total games count
+    const totalGamesEl = $('total-games-count');
+    if (totalGamesEl) {
+        totalGamesEl.textContent = games.length;
+    }
+
     let sortedGames = [...games].sort((a, b) => a.name.localeCompare(b.name));
+    
+    // Filter games based on completion status
+    if (filterStatus === 'in-progress') {
+        sortedGames = sortedGames.filter(game => !game.completed);
+    } else if (filterStatus === 'completed') {
+        sortedGames = sortedGames.filter(game => game.completed);
+    }
     
     // Filter games based on search query
     if (searchQuery.trim() !== '') {
@@ -168,7 +182,11 @@ function renderGames() {
             ` : ''}
 
             <div class="mt-auto">
-                ${isMyClaim ? `
+                ${game.completed ? `
+                    <button disabled class="w-full bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i> Completed
+                    </button>
+                ` : isMyClaim ? `
                     <button onclick="unclaimGame('${game.id}', event)" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <i class="fa-solid fa-upload"></i> Mark as Done
                     </button>
@@ -228,7 +246,7 @@ async function claimGame(gameId, e) {
 
 async function unclaimGame(gameId, e) {
     if (!confirm('Have you finished playing and uploaded your save file to Google Drive?\n\nOnce you mark it as done, the next player can start!')) return;
-    await updateGame(gameId, 'unclaim', e);
+    await updateGame(gameId, 'complete', e);
 }
 
 async function updateGame(gameId, action, e) {
@@ -253,7 +271,7 @@ async function updateGame(gameId, action, e) {
             if (action === 'claim') {
                 game.current_player = currentPlayer;
                 game.claimed_at = Date.now();
-            } else if (action === 'unclaim') {
+            } else if (action === 'complete') {
                 const duration = Date.now() - game.claimed_at;
                 game.total_time_ms += duration;
                 game.logs.push({
@@ -264,6 +282,7 @@ async function updateGame(gameId, action, e) {
                 });
                 game.current_player = null;
                 game.claimed_at = null;
+                game.completed = true;
             }
         }
         
@@ -323,6 +342,15 @@ const searchInput = $('games-search');
 if (searchInput) {
     searchInput.addEventListener('input', (e) => {
         searchQuery = e.target.value;
+        renderGames();
+    });
+}
+
+// Filter functionality
+const filterSelect = $('games-filter');
+if (filterSelect) {
+    filterSelect.addEventListener('change', (e) => {
+        filterStatus = e.target.value;
         renderGames();
     });
 }

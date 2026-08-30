@@ -17,7 +17,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "pws",
@@ -37,7 +38,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "adgac",
@@ -57,7 +59,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "castlevaniahod",
@@ -77,7 +80,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "pdmm",
@@ -97,7 +101,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "mariokartdd",
@@ -117,7 +122,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "terraria",
@@ -137,7 +143,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "riftofthenecrodancer",
@@ -157,7 +164,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "osu",
@@ -177,7 +185,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "twilightprincess",
@@ -197,7 +206,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "twistycube",
@@ -217,7 +227,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "vampiresurvivors",
@@ -237,7 +248,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "mcdig",
@@ -257,7 +269,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "ktane",
@@ -277,7 +290,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "buckshot",
@@ -297,7 +311,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "horse",
@@ -317,7 +332,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "unfairflips",
@@ -337,7 +353,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "roguelegacy",
@@ -357,7 +374,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "animalwell",
@@ -377,7 +395,8 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   },
   {
     "id": "donutcounty",
@@ -397,6 +416,7 @@
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
-    "logs": []
+    "logs": [],
+    "completed": false
   }
 ]
