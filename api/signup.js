@@ -2,6 +2,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export default async function handler(req, res) {
+    // Set JSON content type for all responses
+    res.setHeader('Content-Type', 'application/json');
+    
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -9,6 +12,23 @@ export default async function handler(req, res) {
     const { name, password, pfpLink } = req.body;
     if (!name || !password) {
         return res.status(400).json({ error: 'Name and password are required.' });
+    }
+
+    // Validate password - must be at least 6 characters
+    if (password.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
+    }
+
+    // Validate name - only allow alphanumeric characters, spaces, underscores, and hyphens
+    const nameRegex = /^[a-zA-Z0-9 _-]+$/;
+    if (!nameRegex.test(name.trim())) {
+        return res.status(400).json({ error: 'Name can only contain letters, numbers, spaces, underscores, and hyphens.' });
+    }
+
+    // Validate password - only allow printable ASCII characters to avoid encoding issues
+    const passwordRegex = /^[\x20-\x7E]+$/;
+    if (!passwordRegex.test(password)) {
+        return res.status(400).json({ error: 'Password contains invalid characters. Please use only standard keyboard characters.' });
     }
 
     const token = process.env.GITHUB_TOKEN;
