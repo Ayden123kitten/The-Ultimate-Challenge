@@ -93,9 +93,9 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": []
-  }
+  },
   {
-    "id": "Terraria",
+    "id": "terraria",
     "name": "Terraria",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/a7b8e43297034e90611ce98d9b6efcfe.png",
     "apworld_version": "Core Game",
