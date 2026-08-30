@@ -576,6 +576,56 @@ function showPlayerModal(stat) {
         content.appendChild(settingsSection);
     }
 
+    // Awards Section
+    const playerAwards = (playerObj && playerObj.awards) ? playerObj.awards : [];
+    
+    if (playerAwards.length > 0) {
+        const awardsSection = document.createElement('div');
+        awardsSection.style.cssText = `margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
+        const awardsTitle = document.createElement('h3');
+        awardsTitle.textContent = 'Awards';
+        awardsTitle.style.cssText = `border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; font-size: 1.2rem; color: var(--text-color);`;
+        awardsSection.appendChild(awardsTitle);
+        
+        const awardsList = document.createElement('div');
+        awardsList.style.cssText = `display: flex; flex-direction: column; gap: 10px;`;
+        
+        playerAwards.forEach(award => {
+            const awardItem = document.createElement('div');
+            awardItem.style.cssText = `
+                display: flex; align-items: center; gap: 12px;
+                background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px;
+            `;
+            
+            // Render icon - check if it's a FontAwesome class or emoji
+            let iconHtml = '';
+            if (award.icon && award.icon.startsWith('fa-')) {
+                iconHtml = `<i class="${award.icon}" style="font-size: 1.5rem; color: var(--ap-accent); min-width: 24px;"></i>`;
+            } else {
+                iconHtml = `<span style="font-size: 1.5rem; min-width: 24px;">${award.icon || '🏆'}</span>`;
+            }
+            
+            const awardInfo = document.createElement('div');
+            awardInfo.style.cssText = `flex: 1;`;
+            
+            const awardName = document.createElement('div');
+            awardName.innerHTML = `${iconHtml} <strong style="color: var(--ap-accent);">${award.name}</strong>`;
+            awardName.style.cssText = `display: flex; align-items: center; gap: 8px; margin-bottom: 4px;`;
+            
+            const awardDesc = document.createElement('div');
+            awardDesc.textContent = award.description || '';
+            awardDesc.style.cssText = `font-size: 0.85rem; color: var(--text-muted);`;
+            
+            awardInfo.appendChild(awardName);
+            awardInfo.appendChild(awardDesc);
+            awardItem.appendChild(awardInfo);
+            awardsList.appendChild(awardItem);
+        });
+        
+        awardsSection.appendChild(awardsList);
+        content.appendChild(awardsSection);
+    }
+
     // Stats Grid
     const statsGrid = document.createElement('div');
     statsGrid.style.cssText = `
