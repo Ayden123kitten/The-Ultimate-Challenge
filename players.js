@@ -68,7 +68,7 @@ async function loadData() {
     } catch (err) {
         console.error('Failed to load data:', err);
         $('players-container').innerHTML = `
-            <div class="text-center text-red-400 p-8">
+            <div class="col-span-full text-center text-red-400 p-8">
                 <i class="fa-solid fa-circle-exclamation text-4xl mb-4"></i>
                 <p class="text-lg font-bold">Error loading player stats</p>
                 <p class="text-sm mt-2">${err.message}</p>
@@ -347,8 +347,8 @@ function renderPlayers() {
     filteredStats.forEach(stat => {
         const card = document.createElement('div');
         const isSelected = stat.name === currentPlayer;
-        card.className = `glass rounded-xl p-6 transition-all cursor-pointer ${isSelected ? 'border-2 border-ap-accent' : ''}`;
-        card.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 10px;';
+        card.className = `glass rounded-xl p-4 transition-all cursor-pointer hover:shadow-lg ${isSelected ? 'border-2 border-ap-accent' : ''}`;
+        card.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 10px; aspect-ratio: 1; justify-content: center;';
         
         card.onmouseover = function() {
             this.style.transform = 'translateY(-4px)';
@@ -363,14 +363,14 @@ function renderPlayers() {
         // Calculate overall rank (by games played as primary metric)
         const overallRank = getRank(stat.name, 'games');
         let rankBadge = '';
-        if (overallRank === 1) rankBadge = '<span class="text-yellow-400 text-2xl">🥇</span>';
-        else if (overallRank === 2) rankBadge = '<span class="text-gray-300 text-2xl">🥈</span>';
-        else if (overallRank === 3) rankBadge = '<span class="text-orange-400 text-2xl">🥉</span>';
-        else rankBadge = `<span class="text-slate-400 font-bold text-lg">#${overallRank}</span>`;
+        if (overallRank === 1) rankBadge = '<span class="text-yellow-400 text-lg">🥇</span>';
+        else if (overallRank === 2) rankBadge = '<span class="text-gray-300 text-lg">🥈</span>';
+        else if (overallRank === 3) rankBadge = '<span class="text-orange-400 text-lg">🥉</span>';
+        else rankBadge = `<span class="text-slate-400 font-bold text-sm">#${overallRank}</span>`;
 
         const avatar = stat.pfpLink
-            ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--ap-accent); background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
-            : `<div style="width: 80px; height: 80px; border-radius: 50%; background: var(--ap-accent)/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 2rem; color: var(--ap-accent);"></i></div>`;
+            ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--ap-accent); background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
+            : `<div style="width: 60px; height: 60px; border-radius: 50%; background: var(--ap-accent)/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: var(--ap-accent);"></i></div>`;
         
         // Get player roles from players array
         const playerObj = players.find(p => p.name === stat.name);
@@ -395,12 +395,12 @@ function renderPlayers() {
         card.innerHTML = `
             <div style="position: relative;">
                 ${avatar}
-                <div style="position: absolute; bottom: -5px; right: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+                <div style="position: absolute; bottom: -5px; right: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
                     ${rankBadge}
                 </div>
             </div>
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 5px; width: 100%;">
-                <h2 style="margin: 0; font-size: 1.1rem; color: var(--text-color); cursor: pointer; text-decoration: underline; text-underline-offset: 4px;">${stat.name} ${isSelected ? '<span style="font-size: 0.7rem; color: var(--ap-accent);">(You)</span>' : ''}</h2>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
+                <h2 style="margin: 0; font-size: 0.95rem; color: var(--text-color); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: var(--ap-accent);">(You)</span>' : ''}</h2>
                 ${rolesHtml}
             </div>
         `;
@@ -410,7 +410,7 @@ function renderPlayers() {
 
     if (players.length === 0) {
         container.innerHTML = `
-            <div class="text-center text-slate-500 py-20">
+            <div class="col-span-full text-center text-slate-500 py-20">
                 <i class="fa-solid fa-users-slash text-4xl mb-4"></i>
                 <p>No players found</p>
             </div>
@@ -460,7 +460,7 @@ function showPlayerModal(stat) {
         background: none;
         border: none;
         color: var(--text-muted);
-        font-size: 2rem;
+        font-size: 1.5rem;
         cursor: pointer;
         line-height: 1;
     `;
@@ -471,8 +471,8 @@ function showPlayerModal(stat) {
     header.style.cssText = `display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;`;
     
     const avatar = stat.pfpLink
-        ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--ap-accent);">`
-        : `<div style="width: 80px; height: 80px; border-radius: 50%; background: var(--ap-accent)/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 2rem; color: var(--ap-accent);"></i></div>`;
+        ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--ap-accent);">`
+        : `<div style="width: 60px; height: 60px; border-radius: 50%; background: var(--ap-accent)/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: var(--ap-accent);"></i></div>`;
 
     const info = document.createElement('div');
     const h2 = document.createElement('h2');
