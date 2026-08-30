@@ -532,7 +532,7 @@ function openModeratorModal() {
                 <h3 class="text-lg font-bold text-white mb-4">Edit Game</h3>
                 <select id="edit-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
                     <option value="">Select a game...</option>
-                    ${games.map(g => `<option value="${g.id}">${g.name}</option>`).join('')}
+                    ${games.slice().sort((a, b) => a.name.localeCompare(b.name)).map(g => `<option value="${g.id}">${g.name}</option>`).join('')}
                 </select>
                 <div id="edit-game-form-container" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" id="edit-game-name" placeholder="Game Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
@@ -559,7 +559,7 @@ function openModeratorModal() {
                 <h3 class="text-lg font-bold text-white mb-4">Edit Player</h3>
                 <select id="edit-player-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
                     <option value="">Select a player...</option>
-                    ${players.map(p => `<option value="${p.name}">${p.name}</option>`).join('')}
+                    ${players.slice().sort((a, b) => a.name.localeCompare(b.name)).map(p => `<option value="${p.name}">${p.name}</option>`).join('')}
                 </select>
                 <div id="edit-player-form-container" class="hidden space-y-4">
                     <input type="text" id="edit-player-new-name" placeholder="New Name (optional)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
@@ -573,7 +573,7 @@ function openModeratorModal() {
                 <h3 class="text-lg font-bold text-white mb-4">Edit Game Logs</h3>
                 <select id="edit-log-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
                     <option value="">Select a game...</option>
-                    ${games.map(g => `<option value="${g.id}">${g.name} (${g.logs?.length || 0} logs)</option>`).join('')}
+                    ${games.slice().sort((a, b) => a.name.localeCompare(b.name)).map(g => `<option value="${g.id}">${g.name} (${g.logs?.length || 0} logs)</option>`).join('')}
                 </select>
                 <div id="edit-logs-container" class="hidden space-y-2 max-h-64 overflow-y-auto"></div>
             </div>
@@ -594,7 +594,7 @@ function openModeratorModal() {
                         <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Roles</h4>
                         <select id="role-player-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
                             <option value="">Select a player...</option>
-                            ${players.map(p => `<option value="${p.name}">${p.name}</option>`).join('')}
+                            ${players.slice().sort((a, b) => a.name.localeCompare(b.name)).map(p => `<option value="${p.name}">${p.name}</option>`).join('')}
                         </select>
                         <select id="role-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
                             <option value="">Select a role...</option>
@@ -929,7 +929,7 @@ openModeratorModal = async function() {
     const roleSelect = $('role-select');
     if (roleSelect) {
         roleSelect.innerHTML = '<option value="">Select a role...</option>' + 
-            availableRoles.map(r => `<option value="${r.name}">${r.name}</option>`).join('');
+            availableRoles.slice().sort((a, b) => a.name.localeCompare(b.name)).map(r => `<option value="${r.name}">${r.name}</option>`).join('');
     }
 };
 
