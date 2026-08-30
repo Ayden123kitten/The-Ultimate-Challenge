@@ -110,7 +110,6 @@ function renderGames() {
         const hasCoverImage = game.logo && game.logo.trim() !== '';
         const hasExtraInfo = game.extra_information && game.extra_information.trim() !== '';
         const hasApworldVersion = game.apworld_version && game.apworld_version.trim() !== '';
-        const hasSaveFilePaths = game.save_file_paths && typeof game.save_file_paths === 'object';
         
         const links = [
             { url: game.apworld_link, icon: 'fa-globe', label: `Apworld${hasApworldVersion ? ` (v${game.apworld_version})` : ''}` },
@@ -158,17 +157,6 @@ function renderGames() {
             ${hasExtraInfo ? `
                 <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700">
                     <span class="text-ap-accent font-semibold">Information:</span> ${game.extra_information}
-                </div>
-            ` : ''}
-
-            ${hasSaveFilePaths ? `
-                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700">
-                    <span class="text-ap-accent font-semibold">Save File Paths:</span>
-                    <div class="mt-2 space-y-1">
-                        ${game.save_file_paths.windows ? `<div class="text-xs"><span class="font-semibold">Windows:</span> ${game.save_file_paths.windows.join(', ')}</div>` : ''}
-                        ${game.save_file_paths.macos ? `<div class="text-xs"><span class="font-semibold">macOS:</span> ${game.save_file_paths.macos.join(', ')}</div>` : ''}
-                        ${game.save_file_paths.linux ? `<div class="text-xs"><span class="font-semibold">Linux:</span> ${game.save_file_paths.linux.join(', ')}</div>` : ''}
-                    </div>
                 </div>
             ` : ''}
 
