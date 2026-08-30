@@ -619,6 +619,24 @@ function openModeratorModal() {
                     <button onclick="updateCheesetrackerSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Cheesetracker Settings</button>
                 </div>
             </div>
+            
+            <!-- Event Time Settings Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4">Event Time Settings</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
+                        <input type="datetime-local" id="event-start-time-input" value="${settings.start_time || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                        <p class="text-xs text-slate-400 mt-2">Set when the event starts. Before this time, a countdown will be shown.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Event End Time (optional)</label>
+                        <input type="datetime-local" id="event-end-time-input" value="${settings.end_time || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                        <p class="text-xs text-slate-400 mt-2">Set when the event ends. Leave empty for an ongoing event.</p>
+                    </div>
+                    <button onclick="updateEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Event Time Settings</button>
+                </div>
+            </div>
         </div>
     `;
     
@@ -930,6 +948,31 @@ async function updateCheesetrackerSettings() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         alert('Cheesetracker settings saved successfully!');
+        loadData();
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+async function updateEventTimeSettings() {
+    const startTime = $('event-start-time-input').value;
+    const endTime = $('event-end-time-input').value;
+    
+    try {
+        const res = await fetch('/api/moderator-actions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+            body: JSON.stringify({
+                action: 'updateSettings',
+                settingsData: { 
+                    start_time: startTime,
+                    end_time: endTime
+                }
+            })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        alert('Event time settings saved successfully!');
         loadData();
     } catch (err) {
         alert('Error: ' + err.message);

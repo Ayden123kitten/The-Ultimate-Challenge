@@ -370,6 +370,54 @@ export default async function handler(req, res) {
             return res.status(200).json({ message: 'Role assigned successfully!' });
         }
 
+        if (action === 'updateSettings') {
+            const settingsFilePath = 'data/settings.json';
+            const settingsApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${settingsFilePath}?ref=${branch}`;
+
+            const settingsGetRes = await fetch(settingsApiUrl, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            let settings = {};
+            let sha = null;
+            if (settingsGetRes.ok) {
+                const settingsFileData = await settingsGetRes.json();
+                sha = settingsFileData.sha;
+                const settingsContent = Buffer.from(settingsFileData.content, 'base64').toString('utf-8');
+                settings = JSON.parse(settingsContent);
+            }
+
+            // Merge the new settings with existing settings
+            settings = { ...settings, ...settingsData };
+
+            const newSettingsContent = Buffer.from(JSON.stringify(settings, null, 2)).toString('base64');
+            
+            const putRes = await fetch(settingsApiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Update settings`,
+                    content: newSettingsContent,
+                    sha: sha,
+                    branch: branch
+                })
+            });
+
+            if (!putRes.ok) {
+                const errData = await putRes.json();
+                throw new Error(errData.message || 'Failed to update settings');
+            }
+
+            return res.status(200).json({ message: 'Settings updated successfully!' });
+        }
+
         return res.status(400).json({ error: 'Invalid action' });
 
     } catch (error) {
