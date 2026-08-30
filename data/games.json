@@ -15,8 +15,56 @@
     "save_file_link": "https://drive.google.com/drive/folders/1Uxg7F8IOuH9orSdvrjR1bj-jWkuObilD?usp=drive_link",
     "save_file_paths": {
       "windows": ["BizHawk\\SNES\\SaveRAM\\"],
-      "macos": ["~/BizHawk/Snes/SaveRAM/"],
+      "macos": ["~/BizHawk/Snes/SaveRAM"],
       "linux": ["~/BizHawk/Snes/SaveRAM/"]
+    },
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": []
+  },
+  {
+    "id": "adgac",
+    "name": "A Difficult Game About Climbing",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/f04412f6d2a0085175cb8e036c116358.png",
+    "apworld_version": "0.1.2",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/BlastSlimey/GrabbingChecks/releases/tag/0.1.2",
+    "mod_link": "https://github.com/BlastSlimey/GrabbingChecks/releases/tag/0.1.2",
+    "mod_setup_guide_link": "https://github.com/BlastSlimey/Archipelago/blob/difficult_climbing/worlds/difficult_climbing/docs/en_A%20Difficult%20Game%20About%20Climbing.md",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://www.google.com/url?q=https://discord.com/channels/731205301247803413/1336857648464920586&sa=D&source=editors&ust=1788057631195900&usg=AOvVaw1P7E56JZ2oRhwDchwozLHs",
+    "save_file_link": "https://drive.google.com/drive/folders/1BHb6OHuRWzsWhJwXInJP8EVszwIPF1w9?usp=drive_link",
+    "save_file_paths": {
+      "windows": ["AppData\\LocalLow\\Pontypants\\A Difficult Game About Climbing\\"],
+      "macos": ["~/Library/Application Support/Pontypants/A Difficult Game About Climbing"],
+      "linux": ["~/BizHawk/Snes/SaveRAM/"]
+    },
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": []
+  },
+  {
+    "id": "mariokartdd",
+    "name": "Mario Kart: Double Dash!!",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/69d658d0b2859e32cd4dc3b970c8496c.png",
+    "apworld_version": "1.0.1",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/aXu-AP/archipelago-double-dash/releases/tag/v1.0.1",
+    "mod_link": "",
+    "mod_setup_guide_link": "https://github.com/aXu-AP/archipelago-double-dash/blob/main/docs/en_Setup.md",
+    "tracker_link": "https://github.com/Razerock/double-dash-ap-tracker/releases/tag/1.0.12",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1510190832987406457",
+    "save_file_link": "https://drive.google.com/drive/folders/1Uxg7F8IOuH9orSdvrjR1bj-jWkuObilD?usp=drive_link",
+    "save_file_paths": {
+      "windows": ["Documents\\Dolphin Emulator\\GC\\"],
+      "macos": ["~/Library/Application Support/Dolphin/GC"],
+      "linux": ["~/.steam/steam/steamapps/compatdata/2497920/pfx/drive_c/users/steamuser/AppData/LocalLow/Pontypants/A Difficult Game About Climbing/"]
     },
     "current_player": null,
     "claimed_at": null,
