@@ -133,15 +133,17 @@ function renderGames() {
                     </div>
                 ` : '<div class="cover-art-container"></div>'}
                 
-                <div class="game-card-title">
-                    <h2 class="text-xl font-bold text-white">${game.name}</h2>
-                    <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold ${isClaimed ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
-                        ${isClaimed ? `Playing: ${game.current_player}` : 'Available'}
-                    </span>
-                </div>
-                <div class="game-card-time">
-                    <div class="text-xs text-slate-400 uppercase">Total Time</div>
-                    <div class="text-lg font-mono font-bold text-ap-accent">${formatTime(totalTimeMs)}</div>
+                <div class="game-card-title-time-row">
+                    <div class="game-card-title">
+                        <h2 class="text-xl font-bold text-white">${game.name}</h2>
+                        <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold ${isClaimed ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
+                            ${isClaimed ? `Playing: ${game.current_player}` : 'Available'}
+                        </span>
+                    </div>
+                    <div class="game-card-time">
+                        <div class="text-xs text-slate-400 uppercase">Total Time</div>
+                        <div class="text-lg font-mono font-bold text-ap-accent">${formatTime(totalTimeMs)}</div>
+                    </div>
                 </div>
             </div>
 
