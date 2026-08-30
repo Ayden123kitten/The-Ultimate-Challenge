@@ -378,5 +378,25 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": []
+  },
+  {
+    "id": "donutcounty",
+    "name": "Donut County",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/04ffe297e862ba3e4a25b62b6a06105e.png",
+    "apworld_version": "0.1.1",
+    "mod_version": "0.1.1",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/1e1001/DonutCountyAP/releases/tag/v0.1.1",
+    "mod_link": "https://github.com/1e1001/DonutCountyAP/releases/tag/v0.1.1",
+    "mod_setup_guide_link": "https://github.com/1e1001/DonutCountyAP/blob/main/donutcounty/docs/en_setup.md",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1364668628351455384",
+    "save_file_link": "https://drive.google.com/drive/folders/1K-uJSeW6dpn4iaFt54hd9eJ7JjZjz00I?usp=drive_link",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": []
   }
 ]
