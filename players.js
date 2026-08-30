@@ -168,7 +168,7 @@ function renderPlayers() {
         card.innerHTML = `
             <div class="flex justify-between items-start">
                 <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 rounded-full bg-ap-accent/20 flex items-center justify-center overflow-hidden relative group">
+                    <div class="w-16 h-16 rounded-full ${playerImage ? '' : 'bg-ap-accent/20'} flex items-center justify-center overflow-hidden relative group">
                         ${playerImage 
                             ? `<img src="${playerImage}" alt="${stat.name}" class="w-full h-full object-cover">`
                             : `<i class="fa-solid fa-user text-2xl text-ap-accent"></i>`
