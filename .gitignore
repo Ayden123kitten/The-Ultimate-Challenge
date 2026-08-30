@@ -1,1 +1,347 @@
-Nothing should be ignored based on the provided file changes. The only modified file is `players.js`, which is a source code file and should not be added to .gitignore.
+```gitignore
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+dist/
+build/
+target/
+
+# Dependencies
+.venv/
+venv/
+node_modules/
+.pip-tools/
+.tox/
+.coverage
+coverage/
+htmlcov/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+
+# Python specific
+*.pyc
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+*.pyo
+*.pyd
+
+# Node.js specific
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Java specific
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
+build/
+
+# C/C++ specific
+*.o
+*.a
+*.so
+*.dll
+*.exe
+*.out
+
+# Go specific
+*.o
+*.a
+*.so
+*.exe
+*.test
+*.prof
+vendor/
+
+# Ruby specific
+*.gem
+*.rbc
+.bundle/
+vendor/bundle/
+vendor/cache/
+vendor/gems/
+vendor/ruby/
+
+# Rust specific
+target/
+Cargo.lock
+
+# Zig specific
+zig-cache/
+zig-out/
+
+# Julia specific
+julia-*/
+
+# Test and coverage
+.coverage
+coverage/
+htmlcov/
+.nyc_output/
+istanbul/
+.mocha.opts
+.jest/
+jest/
+
+# Browsers
+.sass-cache/
+.nuxt/
+.next/
+.vuepress/dist/
+public/dist/
+
+# Database
+*.db
+*.db-journal
+
+# Backup files
+*~
+*.bak
+*.backup
+
+# IDE specific
+.vs/
+.vsc/
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+nbproject/
+*.iml
+*.ipr
+*.iws
+
+# Temporary files
+tmp/
+temp/
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+*.stackdump
+
+# Configuration
+config/
+secrets/
+credentials/
+*.key
+*.pem
+*.crt
+*.cert
+*.p12
+*.jks
+
+# Local development
+local/
+dev/
+debug/
+*.local
+*.development
+*.dev
+
+# Build tools
+.sconsign.dblite
+._build/
+api/
+apidoc/
+docs/_build/
+_site/
+_public/
+
+# Package managers
+package-lock.json
+yarn.lock
+Gemfile.lock
+Pipfile.lock
+poetry.lock
+composer.lock
+
+# Docker
+.dockerenv
+.dockerinit
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Cache directories
+.cache/
+.cargo/
+.go/
+.node-gyp/
+.python-version
+
+# Mobile development
+*.ipa
+*.apk
+*.aab
+*.aar
+platforms/
+plugins/
+hooks/
+
+# Unity
+Library/
+Temp/
+Obj/
+Build/
+Logs/
+*.unityproj
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.cache
+*.lock
+*.meta
+cachefolder/
+
+# Unreal Engine
+[Bb]in/
+[Ii]nt/
+*.uasset
+*.umap
+*.uplugin
+*.uproject
+Saved/
+Intermediate/
+DerivedDataCache/
+Index/
+*.Target.cs
+*.Editor.Target.cs
+*.Build.cs
+Binaries/
+Plugins/
+
+# C#
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+[pP]ackages/
+*.VC.db
+*.VC.VC.opendb
+[Bb]uild/
+[Dd]eploy/
+*.nupkg
+[Nn]uget/
+[Nn]uGet.Config
+[Ee]xported[Ii]ndex/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Tt]est[Rr]esult*/
+[Tt]est[Rr]esults/
+[Pp]ackages/
+[.][Dd]otSettings.user
+usr/
+[Aa]ssets/[Vv]endor/
+[Aa]ssets/[Aa]ssetStoreTools/
+[Aa]ssets/[Pp]lugins/[Ee]ditor/[Jj]et[Bb]rains/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Cc]oreResources/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Gg]raphicsShaders/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Rr]endering/[Mm]odularShaders/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Rr]endering/[Ss]haderLibrary/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Cc]haracters/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Vv]ehicles/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Cc]ameras/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ee]ffects/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Tt]errain/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Tt]errainScripts/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Uu]tilities/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Pp]rototyping/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Bb]ase/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Dd]esktop/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Mm]obile/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ss]hadow/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Uu]nderwater/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]lanar [Rr]eflection/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Ss]imple/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Ss]pecular/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Ss]urface/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ss]imple/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ss]pecular/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ss]urface/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Uu]nderwater/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ww]ater [Pp]lanar [Rr]eflection/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ww]ater [Pp]ro [Ff]ull/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ww]ater [Pp]ro [Ff]ull/[Ss]imple/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ww]ater [Pp]ro [Ff]ull/[Ss]pecular/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ww]ater [Pp]ro [Ff]ull/[Ss]urface/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ww]ater [Pp]ro [Ff]ull/[Uu]nderwater/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ww]ater [Pp]ro [Ff]ull/[Ww]ater [Pp]lanar [Rr]eflection/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ww]ater [Pp]ro [Ff]ull/[Ww]ater [Pp]ro [Ff]ull/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ww]ater [Pp]ro [Ff]ull/[Ww]ater [Pp]ro [Ff]ull/[Ss]imple/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ww]ater [Pp]ro [Ff]ull/[Ww]ater [Pp]ro [Ff]ull/[Ss]pecular/
+[Aa]ssets/[Rr]esources/[Ss]haders/[Bb]uilt-[Ii]n/[Ee]ditor/[Uu]nityStandardAssets/[Ww]ater/[Ss]haders/[Ww]ater [Pp]ro [Ff]ull/[Tt]essellated [Ww]ater [Pp]ro [Ff]ull/[Ww]ater [Pp]ro [Ff]ull/[Ss]urface/
+[Aa]s
+```

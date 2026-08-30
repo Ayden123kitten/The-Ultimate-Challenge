@@ -110,10 +110,11 @@ function renderGames() {
         const hasCoverImage = game.logo && game.logo.trim() !== '';
         const hasExtraInfo = game.extra_information && game.extra_information.trim() !== '';
         const hasApworldVersion = game.apworld_version && game.apworld_version.trim() !== '';
+        const hasModVersion = game.mod_version && game.mod_version.trim() !== '';
         
         const links = [
             { url: game.apworld_link, icon: 'fa-globe', label: `Apworld${hasApworldVersion ? ` (v${game.apworld_version})` : ''}` },
-            { url: game.mod_link, icon: 'fa-puzzle-piece', label: 'Mod' },
+            { url: game.mod_link, icon: 'fa-puzzle-piece', label: `Mod${hasModVersion ? ` (v${game.mod_version})` : ''}` },
             { url: game.mod_setup_guide_link, icon: 'fa-book', label: 'Setup Guide' },
             { url: game.tracker_link, icon: 'fa-map', label: 'Tracker' },
             { url: game.game_info_link, icon: 'fa-circle-info', label: 'Game Info' },
