@@ -215,13 +215,13 @@ function renderLeaderboard() {
                     <span class="font-semibold text-white">${stat.name}</span>
                 </div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right">
+            <td class="px-6 py-4 whitespace-nowrap text-center">
                 ${metricValue}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right hidden md:table-cell">
+            <td class="px-6 py-4 whitespace-nowrap text-center hidden md:table-cell">
                 <span class="text-slate-300">${formatTime(stat.avgTimePerGame)}</span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-right hidden lg:table-cell">
+            <td class="px-6 py-4 whitespace-nowrap text-center hidden lg:table-cell">
                 <span class="text-slate-300">${formatTime(stat.totalTimeMs)}</span>
             </td>
         `;
