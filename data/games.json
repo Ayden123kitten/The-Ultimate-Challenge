@@ -628,5 +628,26 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false
+  },
+  {
+    "id": "deltarune",
+    "name": "DELTRUNE",
+    "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDzW8bjxg64HunuHYJsK_oNugGupwV8C-tph1-LXNvfw&s=10",
+    "apworld_version": "2.1.3",
+    "mod_version": "2.1.3",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/theemeraldsword85/DELTARUNEAP/releases",
+    "mod_link": "",
+    "mod_setup_guide_link": "https://github.com/theemeraldsword85/DELTARUNEAP",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1481971897024516250",
+    "save_file_link": "https://drive.google.com/drive/u/0/folders/1nlOOMSU8PUIH0sr465J7yOyqUAUf1yA2",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": [],
+    "completed": false
   }
 ]
