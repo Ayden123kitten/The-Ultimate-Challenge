@@ -86,10 +86,11 @@ function renderGames() {
     const container = $('games-container');
     container.innerHTML = '';
 
-    // Update total games count
+    // Update total games count (completed / total)
     const totalGamesEl = $('total-games-count');
     if (totalGamesEl) {
-        totalGamesEl.textContent = games.length;
+        const completedCount = games.filter(game => game.completed).length;
+        totalGamesEl.textContent = `${completedCount}/${games.length}`;
     }
 
     let sortedGames = [...games].sort((a, b) => a.name.localeCompare(b.name));
