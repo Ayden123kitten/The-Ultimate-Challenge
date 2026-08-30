@@ -1,4 +1,1 @@
-```javascript
-// No build artifacts, dependencies, or temporary files detected in changes
-// Source code and data files only (.js, .json) should not be ignored
-```
+(api/update-profile.js and settings.html are source/config files, no build artifacts, dependencies, or temp files in the changes)

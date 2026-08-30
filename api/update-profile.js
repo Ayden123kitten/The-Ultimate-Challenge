@@ -21,13 +21,13 @@ export default function handler(req, res) {
     try {
         let players = JSON.parse(fs.readFileSync(playersFile, 'utf8'));
         
-        const playerIndex = players.findIndex(p => p.username === username);
+        const playerIndex = players.findIndex(p => p.name === username);
         if (playerIndex === -1) {
             return res.status(404).json({ error: 'Player not found' });
         }
 
         // Update allowed fields
-        const allowedFields = ['profile_pic', 'bio', 'pronouns', 'discord', 'website'];
+        const allowedFields = ['pfp_link', 'bio', 'pronouns', 'discord'];
         allowedFields.forEach(field => {
             if (data[field] !== undefined) {
                 players[playerIndex][field] = data[field];
