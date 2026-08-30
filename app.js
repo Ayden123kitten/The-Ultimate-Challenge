@@ -116,12 +116,32 @@ function updateCompletedGamesCount() {
 // ==========================================
 let searchQuery = '';
 let gamesSortOption = 'az';
+let gamesFilterOption = 'all';
 
 function renderGames() {
     const container = $('games-container');
     container.innerHTML = '';
 
-    let sortedGames = [...games];
+    let filteredGames = [...games];
+
+    // Apply filtering
+    if (gamesFilterOption === 'in-progress') {
+        filteredGames = filteredGames.filter(game => game.current_player !== null);
+    } else if (gamesFilterOption === 'completed') {
+        filteredGames = filteredGames.filter(game => {
+            if (game.completed === true) return true;
+            const ctData = cheesetrackerData[game.id] || {};
+            const totalChecks = ctData.totalChecks || game.cheesetracker_total_checks || 0;
+            const completedChecks = ctData.completedChecks || game.cheesetracker_completed_checks || 0;
+            return totalChecks > 0 && completedChecks >= totalChecks;
+        });
+    } else if (gamesFilterOption === 'core') {
+        filteredGames = filteredGames.filter(game => game.mod_version === 'Core');
+    } else if (gamesFilterOption === 'custom') {
+        filteredGames = filteredGames.filter(game => game.mod_version && game.mod_version !== 'Core');
+    }
+
+    let sortedGames = filteredGames;
 
     // Apply sorting
     if (gamesSortOption === 'az') {
@@ -142,22 +162,6 @@ function renderGames() {
         });
     } else if (gamesSortOption === 'total-time') {
         sortedGames.sort((a, b) => b.total_time_ms - a.total_time_ms);
-    } else if (gamesSortOption === 'core') {
-        sortedGames.sort((a, b) => {
-            const aIsCore = a.mod_version === 'Core';
-            const bIsCore = b.mod_version === 'Core';
-            if (aIsCore && !bIsCore) return -1;
-            if (!aIsCore && bIsCore) return 1;
-            return 0;
-        });
-    } else if (gamesSortOption === 'custom') {
-        sortedGames.sort((a, b) => {
-            const aIsCustom = a.mod_version && a.mod_version !== 'Core';
-            const bIsCustom = b.mod_version && b.mod_version !== 'Core';
-            if (aIsCustom && !bIsCustom) return -1;
-            if (!aIsCustom && bIsCustom) return 1;
-            return 0;
-        });
     }
 
     if (searchQuery.trim() !== '') {
@@ -446,6 +450,15 @@ const sortSelect = $('games-sort');
 if (sortSelect) {
     sortSelect.addEventListener('change', (e) => {
         gamesSortOption = e.target.value;
+        renderGames();
+    });
+}
+
+// Filter functionality
+const filterSelect = $('games-filter');
+if (filterSelect) {
+    filterSelect.addEventListener('change', (e) => {
+        gamesFilterOption = e.target.value;
         renderGames();
     });
 }
