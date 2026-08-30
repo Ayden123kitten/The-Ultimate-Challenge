@@ -193,7 +193,7 @@ function renderGames() {
         const hasCheesetracker = settings.cheesetracker_url && totalChecks > 0;
 
         const links = [
-            { url: game.apworld_link, icon: 'fa-globe', label: `Apworld${hasApworldVersion ? ` (v${game.apworld_version})` : ''}` },
+            { url: game.apworld_link, icon: 'fa-globe', label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === 'Core' ? 'Core' : 'v' + game.apworld_version})` : ''}` },
             { url: game.mod_link, icon: 'fa-puzzle-piece', label: `Mod${hasModVersion ? ` (${game.mod_version === 'Core' ? '' : 'v'}${game.mod_version})` : ''}` },
             { url: game.mod_setup_guide_link, icon: 'fa-book', label: 'Setup Guide' },
             { url: game.tracker_link, icon: 'fa-map', label: 'Tracker' },
