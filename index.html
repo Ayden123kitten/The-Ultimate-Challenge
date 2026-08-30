@@ -70,13 +70,6 @@
 
                 <!-- Navigation & User Info -->
                 <div class="flex items-center gap-4 flex-wrap justify-center">
-                    <!-- Progress Badge -->
-                    <div class="hidden lg:flex items-center gap-2 bg-slate-800/50 rounded-lg px-3 py-2 border border-slate-700">
-                        <i class="fa-solid fa-gamepad text-ap-accent"></i>
-                        <span class="text-sm text-slate-400">Completed:</span>
-                        <span id="total-games-count" class="font-bold text-ap-accent">0/20</span>
-                    </div>
-                    
                     <!-- Nav Links -->
                     <nav class="flex items-center gap-2">
                         <a href="/players.html" class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all">
@@ -94,6 +87,13 @@
                     </nav>
                     
                     <div class="w-px h-6 bg-slate-600 hidden lg:block"></div>
+                    
+                    <!-- Progress Badge -->
+                    <div class="hidden lg:flex items-center gap-2 bg-slate-800/50 rounded-lg px-3 py-2 border border-slate-700">
+                        <i class="fa-solid fa-gamepad text-ap-accent"></i>
+                        <span class="text-sm text-slate-400">Completed:</span>
+                        <span id="total-games-count" class="font-bold text-ap-accent">0/20</span>
+                    </div>
                     
                     <!-- Current Player -->
                     <div id="current-player-display" class="hidden lg:flex items-center gap-2 bg-gradient-to-r from-slate-800/50 to-slate-800/30 rounded-lg px-3 py-2 border border-slate-700">
