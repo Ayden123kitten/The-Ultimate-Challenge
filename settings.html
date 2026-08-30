@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Settings - AP Tracker</title>
+    <title>Player Settings - The Ultimate Challenge</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .settings-container {
@@ -60,13 +60,10 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="nav-brand"><a href="index.html">AP Tracker</a></div>
+        <div class="nav-brand"><a href="index.html">The Ultimate Challenge</a></div>
         <div class="nav-links">
-            <a href="index.html">Games</a>
             <a href="players.html">Players</a>
             <a href="/leaderboard.html">Leaderboard</a>
-            <a href="#" id="auth-link">Login</a>
-            <a href="settings.html" id="settings-link" style="display:none;">Settings</a>
         </div>
     </nav>
 
@@ -74,7 +71,7 @@
         <h2>Profile Settings</h2>
         <form id="settings-form">
             <div class="form-group">
-                <label for="profile-pic">Profile Picture URL</label>
+                <label for="profile-pic">Profile Picture</label>
                 <input type="url" id="profile-pic" name="profile_pic" placeholder="https://example.com/avatar.jpg">
                 <img id="pic-preview" class="preview-image" alt="Preview">
             </div>
@@ -86,19 +83,14 @@
 
             <div class="form-group">
                 <label for="pronouns">Pronouns</label>
-                <input type="text" id="pronouns" name="pronouns" placeholder="e.g., they/them">
+                <input type="text" id="pronouns" name="pronouns" placeholder="they/them">
             </div>
 
             <div class="form-group">
                 <label for="discord">Discord Username</label>
-                <input type="text" id="discord" name="discord" placeholder="user#1234 or username">
+                <input type="text" id="discord" name="discord" placeholder="username">
             </div>
-
-            <div class="form-group">
-                <label for="website">Website Username / URL</label>
-                <input type="text" id="website" name="website" placeholder="e.g., @username or https://...">
-            </div>
-
+            
             <button type="submit" class="btn-save">Save Changes</button>
         </form>
     </div>
