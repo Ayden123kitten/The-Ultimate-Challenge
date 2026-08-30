@@ -107,11 +107,13 @@ function renderGames() {
         const totalTimeMs = game.total_time_ms + currentSessionMs;
 
         const hasRules = game.rules && game.rules.trim() !== '';
-        const hasCoverImage = game.cover_image && game.cover_image.trim() !== '';
+        const hasCoverImage = game.logo && game.logo.trim() !== '';
         const hasExtraInfo = game.extra_information && game.extra_information.trim() !== '';
+        const hasApworldVersion = game.apworld_version && game.apworld_version.trim() !== '';
+        const hasSaveFilePaths = game.save_file_paths && typeof game.save_file_paths === 'object';
         
         const links = [
-            { url: game.apworld_link, icon: 'fa-globe', label: 'APWorld' },
+            { url: game.apworld_link, icon: 'fa-globe', label: `APWorld${hasApworldVersion ? ` v${game.apworld_version}` : ''}` },
             { url: game.mod_link, icon: 'fa-puzzle-piece', label: 'Mod' },
             { url: game.mod_setup_guide_link, icon: 'fa-book', label: 'Setup Guide' },
             { url: game.tracker_link, icon: 'fa-map', label: 'Tracker' },
@@ -127,7 +129,7 @@ function renderGames() {
             <div class="game-card-header">
                 ${hasCoverImage ? `
                     <div class="cover-art-container">
-                        <img src="${game.cover_image}" alt="${game.name}" 
+                        <img src="${game.logo}" alt="${game.name}" 
                              class="cover-art-logo"
                              onerror="this.style.display='none'">
                     </div>
@@ -156,6 +158,17 @@ function renderGames() {
             ${hasExtraInfo ? `
                 <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700">
                     <span class="text-ap-accent font-semibold">Information:</span> ${game.extra_information}
+                </div>
+            ` : ''}
+
+            ${hasSaveFilePaths ? `
+                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700">
+                    <span class="text-ap-accent font-semibold">Save File Paths:</span>
+                    <div class="mt-2 space-y-1">
+                        ${game.save_file_paths.windows ? `<div class="text-xs"><span class="font-semibold">Windows:</span> ${game.save_file_paths.windows.join(', ')}</div>` : ''}
+                        ${game.save_file_paths.macos ? `<div class="text-xs"><span class="font-semibold">macOS:</span> ${game.save_file_paths.macos.join(', ')}</div>` : ''}
+                        ${game.save_file_paths.linux ? `<div class="text-xs"><span class="font-semibold">Linux:</span> ${game.save_file_paths.linux.join(', ')}</div>` : ''}
+                    </div>
                 </div>
             ` : ''}
 
