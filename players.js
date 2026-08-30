@@ -13,6 +13,7 @@ const CONFIG = {
 let games = [];
 let players = []; // [{ name, pfp_link, has_password }]
 let currentPlayer = AUTH.getName();
+let currentAuthTab = 'login'; // Track which auth tab is active: 'login' or 'signup'
 
 const $ = (id) => document.getElementById(id);
 
@@ -120,7 +121,21 @@ function renderAuthPanel() {
     const loginForm = $('login-form');
     const signupForm = $('signup-form');
 
+    // Set initial tab state based on currentAuthTab
+    if (currentAuthTab === 'signup') {
+        signupTab.className = 'flex-1 py-2 rounded-lg font-semibold bg-ap-accent/20 text-ap-accent';
+        loginTab.className = 'flex-1 py-2 rounded-lg font-semibold bg-slate-800 text-slate-400';
+        signupForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+    } else {
+        loginTab.className = 'flex-1 py-2 rounded-lg font-semibold bg-ap-accent/20 text-ap-accent';
+        signupTab.className = 'flex-1 py-2 rounded-lg font-semibold bg-slate-800 text-slate-400';
+        loginForm.classList.remove('hidden');
+        signupForm.classList.add('hidden');
+    }
+
     loginTab.addEventListener('click', () => {
+        currentAuthTab = 'login';
         loginTab.className = 'flex-1 py-2 rounded-lg font-semibold bg-ap-accent/20 text-ap-accent';
         signupTab.className = 'flex-1 py-2 rounded-lg font-semibold bg-slate-800 text-slate-400';
         loginForm.classList.remove('hidden');
@@ -128,6 +143,7 @@ function renderAuthPanel() {
     });
 
     signupTab.addEventListener('click', () => {
+        currentAuthTab = 'signup';
         signupTab.className = 'flex-1 py-2 rounded-lg font-semibold bg-ap-accent/20 text-ap-accent';
         loginTab.className = 'flex-1 py-2 rounded-lg font-semibold bg-slate-800 text-slate-400';
         signupForm.classList.remove('hidden');
