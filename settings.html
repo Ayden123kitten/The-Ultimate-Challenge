@@ -111,7 +111,7 @@
             const picPreview = document.getElementById('pic-preview');
             
             // Check auth and load data
-            const user = localStorage.getItem('ap_user');
+            const user = localStorage.getItem('ap_async_player');
             if (!user) {
                 window.location.href = 'index.html'; // Redirect if not logged in
                 return;
