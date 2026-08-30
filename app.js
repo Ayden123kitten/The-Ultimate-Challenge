@@ -48,6 +48,7 @@ async function loadData() {
         settings = await settingsRes.json();
 
         populatePlayerSelect();
+        updateCompletedGamesCount();
         renderGames();
         updateGlobalTimer();
     } catch (err) {
@@ -74,6 +75,15 @@ function populatePlayerSelect() {
     const logoutBtn = $('logout-btn');
     if (logoutBtn) {
         logoutBtn.style.display = currentPlayer ? 'inline-flex' : 'none';
+    }
+}
+
+function updateCompletedGamesCount() {
+    const totalGames = games.length;
+    const completedGames = games.filter(g => g.completed === true).length;
+    const countEl = $('total-games-count');
+    if (countEl) {
+        countEl.textContent = `${completedGames}/${totalGames}`;
     }
 }
 
@@ -227,7 +237,7 @@ async function claimGame(gameId, e) {
 
 async function unclaimGame(gameId, e) {
     if (!confirm('Have you finished playing and uploaded your save file to Google Drive?\n\nOnce you mark it as done, the next player can start!')) return;
-    await updateGame(gameId, 'unclaim', e);
+    await updateGame(gameId, 'complete', e);
 }
 
 async function updateGame(gameId, action, e) {
@@ -268,7 +278,7 @@ async function updateGame(gameId, action, e) {
             if (action === 'claim') {
                 game.current_player = currentPlayer;
                 game.claimed_at = Date.now();
-            } else if (action === 'unclaim') {
+            } else if (action === 'complete') {
                 const duration = Date.now() - game.claimed_at;
                 game.total_time_ms += duration;
                 game.logs.push({
@@ -279,9 +289,11 @@ async function updateGame(gameId, action, e) {
                 });
                 game.current_player = null;
                 game.claimed_at = null;
+                game.completed = true;
             }
         }
 
+        updateCompletedGamesCount();
         renderGames();
 
     } catch (err) {
@@ -331,6 +343,9 @@ setInterval(() => {
         renderGames();
     }
 }, 1000);
+
+// Also periodically update completed games count in case data is refreshed
+setInterval(updateCompletedGamesCount, 5000);
 
 // Search functionality
 const searchInput = $('games-search');
