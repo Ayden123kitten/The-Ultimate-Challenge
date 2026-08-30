@@ -649,6 +649,48 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false
+  },
+  {
+    "id": "portal2",
+    "name": "Portal 2",
+    "logo": "https://cdn2.steamgriddb.com/logo/4d974dad853e25462f34e31e39a0e626.png",
+    "apworld_version": "0.7.2",
+    "mod_version": "0.7.0",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/GlassToadstool/Archipelago/releases/tag/0.7.2",
+    "mod_link": "hhttps://github.com/GlassToadstool/Portal2ArchipelagoMod/releases/tag/0.7.0",
+    "mod_setup_guide_link": "https://github.com/GlassToadstool/Portal2ArchipelagoMod",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1482824356035039446",
+    "save_file_link": "https://drive.google.com/drive/folders/1ojO9CJ5QLMGWSSRb63--kcQyeggYGENA",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": [],
+    "completed": false
+  },
+  {
+    "id": "peak",
+    "name": "PEAK",
+    "logo": "https://cdn2.steamgriddb.com/logo/afa231f3e7eac6ec356036aef14c5c82.png",
+    "apworld_version": "2.1.3+hotfix1",
+    "mod_version": "2.1.3",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/Mickemoose/peak-archipelago/releases/tag/0.6.1",
+    "mod_link": "https://thunderstore.io/c/peak/p/PeakArchipelago/PEAKPELAGO/",
+    "mod_setup_guide_link": "https://github.com/Mickemoose/peak-archipelago/blob/main/GUIDE.md",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "",
+    "save_file_link": "https://drive.google.com/drive/folders/1ojO9CJ5QLMGWSSRb63--kcQyeggYGENA",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": [],
+    "completed": false
   }
 ]
 
