@@ -397,7 +397,7 @@ function updateGlobalTimer() {
     const statusEl = $('timer-status');
 
     if (!settings.start_time || settings.start_time.trim() === '') {
-        timerEl.textContent = '';
+        timerEl.textContent = '00:00:00';
         statusEl.textContent = '';
         return;
     }
