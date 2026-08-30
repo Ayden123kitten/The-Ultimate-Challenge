@@ -45,7 +45,7 @@ export default async function handler(req, res) {
             moderators = JSON.parse(content).moderators || [];
         }
 
-        const isModerator = moderators.includes(playerName);
+        const isModerator = moderators.some(m => m.name === playerName);
 
         return res.status(200).json({ isModerator });
     } catch (error) {

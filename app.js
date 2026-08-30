@@ -479,17 +479,19 @@ let isModerator = false;
         // Show settings link for logged-in users
         const settingsLink = $('settings-nav-link-index');
         if (settingsLink) settingsLink.style.display = 'flex';
+        const settingsLinkMobile = $('settings-nav-link-index-mobile');
+        if (settingsLinkMobile) settingsLinkMobile.style.display = 'flex';
         
         // Add moderator button to header if user is a moderator
         if (isModerator) {
-            const header = document.querySelector('header .max-w-7xl .flex.items-center.gap-3')?.parentElement;
-            if (header) {
+            const navSection = document.querySelector('header .max-w-7xl .flex.items-center.gap-4.flex-wrap');
+            if (navSection) {
                 const modBtn = document.createElement('button');
                 modBtn.id = 'moderator-toggle-btn';
-                modBtn.className = 'text-slate-400 hover:text-ap-accent transition-colors flex items-center gap-2 text-sm';
-                modBtn.innerHTML = '<i class="fa-solid fa-shield-halved"></i><span class="text-sm">Moderation</span>';
+                modBtn.className = 'group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-ap-accent transition-all';
+                modBtn.innerHTML = '<i class="fa-solid fa-shield-halved group-hover:text-ap-accent transition-colors"></i><span class="text-sm font-medium hidden xl:inline">Moderation</span>';
                 modBtn.onclick = openModeratorModal;
-                header.appendChild(modBtn);
+                navSection.appendChild(modBtn);
             }
         }
     }
