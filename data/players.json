@@ -28,5 +28,10 @@
     "name": "teaftea",
     "password_hash": "$2b$10$aquZOveBG.5n6QmEWXzrfuoTOWTlF.uLN6ZMEHrRyabn4ZAQO9hkS",
     "pfp_link": ""
+  },
+  {
+    "name": "Amasingearth",
+    "password_hash": "$2b$10$.mOhQCMBnJPQjZIdZZ29hO8Rk.cjQcfY8cMiVG9ZmUI6yMFlSDSMm",
+    "pfp_link": "https://i.pinimg.com/1200x/78/2e/3f/782e3f8f8d493a0a05e11ab7c7a833d8.jpg"
   }
 ]
