@@ -1,7 +1,22 @@
 [
-  { "name": "Ayden", "image": "" },
-  { "name": "Blink", "image": "" },
-  { "name": "LORD X", "image": "" },
-  { "name": "TeraKord", "image": "" },
-  { "name": "Sylvie", "image": "" }
+  {
+    "name": "Ayden",
+    "image": "https://files.catbox.moe/eb68bt.png"
+  },
+  {
+    "name": "Blink",
+    "image": ""
+  },
+  {
+    "name": "LORD X",
+    "image": ""
+  },
+  {
+    "name": "TeraKord",
+    "image": ""
+  },
+  {
+    "name": "Sylvie",
+    "image": ""
+  }
 ]
