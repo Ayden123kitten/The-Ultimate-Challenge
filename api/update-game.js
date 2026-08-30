@@ -113,7 +113,7 @@ export default async function handler(req, res) {
             game.current_player = playerName;
             game.claimed_at = Date.now();
         } 
-        else if (action === 'unclaim') {
+        else if (action === 'complete') {
             if (game.current_player !== playerName) {
                 return res.status(403).json({ error: 'You are not the current player of this game.' });
             }
@@ -129,6 +129,7 @@ export default async function handler(req, res) {
             
             game.current_player = null;
             game.claimed_at = null;
+            game.completed = true;
         } else {
             return res.status(400).json({ error: 'Invalid action' });
         }
@@ -144,7 +145,7 @@ export default async function handler(req, res) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                message: `Async Update: ${action === 'claim' ? 'Claimed' : 'Unclaimed'} ${game.name} by ${playerName}`,
+                message: `Async Update: ${action === 'claim' ? 'Claimed' : (action === 'complete' ? 'Completed' : 'Unclaimed')} ${game.name} by ${playerName}`,
                 content: newContent,
                 sha: fileData.sha,
                 branch: branch
@@ -160,7 +161,7 @@ export default async function handler(req, res) {
         }
 
         return res.status(200).json({ 
-            message: action === 'claim' ? 'Game claimed successfully!' : 'Game unclaimed and logged successfully!' 
+            message: action === 'claim' ? 'Game claimed successfully!' : (action === 'complete' ? 'Game completed successfully!' : 'Game unclaimed and logged successfully!') 
         });
 
     } catch (error) {
