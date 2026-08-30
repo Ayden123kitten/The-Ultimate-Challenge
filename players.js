@@ -24,6 +24,22 @@ function formatTime(ms) {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
+async function savePlayers() {
+    try {
+        const response = await fetch('/api/update-game.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'players', data: players })
+        });
+        if (!response.ok) throw new Error(`Save failed: ${response.status}`);
+        return true;
+    } catch (err) {
+        console.error('Failed to save players:', err);
+        alert('Failed to save player data: ' + err.message);
+        return false;
+    }
+}
+
 // ==========================================
 // DATA FETCHING
 // ==========================================
@@ -40,7 +56,15 @@ async function loadData() {
         if (!playersRes.ok) throw new Error(`Players file: ${playersRes.status}`);
 
         games = await gamesRes.json();
-        players = await playersRes.json();
+        const playersData = await playersRes.json();
+        
+        // Handle both old format (array of strings) and new format (array of objects)
+        players = playersData.map(p => {
+            if (typeof p === 'string') {
+                return { name: p, image: '' };
+            }
+            return { name: p.name, image: p.image || '' };
+        });
 
         renderPlayers();
     } catch (err) {
@@ -70,7 +94,9 @@ function renderPlayers() {
     }
 
     // Calculate stats for each player
-    const playerStats = players.map(playerName => {
+    const playerStats = players.map(playerObj => {
+        const playerName = playerObj.name;
+        const playerImage = playerObj.image || '';
         const playerGames = games.filter(g => g.logs && g.logs.some(log => log.player === playerName));
         const currentGame = games.find(g => g.current_player === playerName);
         
@@ -111,6 +137,7 @@ function renderPlayers() {
 
         return {
             name: playerName,
+            image: playerImage,
             totalTimeMs,
             gamesPlayed: playerGames.length,
             currentGame: currentGame ? currentGame.name : null,
@@ -136,12 +163,19 @@ function renderPlayers() {
         card.className = `glass rounded-xl p-6 flex flex-col gap-4 cursor-pointer transition-all ${isSelected ? 'border-2 border-ap-accent' : 'hover:border-ap-accent/50'}`;
         
         const hasCurrentGame = stat.currentGame !== null;
+        const playerImage = stat.image && stat.image.trim() !== '' ? stat.image : null;
         
         card.innerHTML = `
             <div class="flex justify-between items-start">
                 <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 rounded-full bg-ap-accent/20 flex items-center justify-center">
-                        <i class="fa-solid fa-user text-2xl text-ap-accent"></i>
+                    <div class="w-16 h-16 rounded-full bg-ap-accent/20 flex items-center justify-center overflow-hidden relative group">
+                        ${playerImage 
+                            ? `<img src="${playerImage}" alt="${stat.name}" class="w-full h-full object-cover">`
+                            : `<i class="fa-solid fa-user text-2xl text-ap-accent"></i>`
+                        }
+                        <button class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center" onclick="event.stopPropagation(); editPlayerImage('${stat.name}')">
+                            <i class="fa-solid fa-camera text-white text-lg"></i>
+                        </button>
                     </div>
                     <div>
                         <h2 class="text-2xl font-bold text-white">${stat.name} ${isSelected ? '<span class="text-xs text-ap-accent ml-2">(Selected)</span>' : ''}</h2>
@@ -207,6 +241,21 @@ if (searchInput) {
         renderPlayers();
     });
 }
+
+// Edit player image function
+window.editPlayerImage = async (playerName) => {
+    const player = players.find(p => p.name === playerName);
+    if (!player) return;
+    
+    const currentImage = player.image || '';
+    const newImage = prompt('Enter image URL for ' + playerName + ':', currentImage);
+    
+    if (newImage !== null) {
+        player.image = newImage.trim();
+        await savePlayers();
+        renderPlayers();
+    }
+};
 
 // Initialize
 loadData();
