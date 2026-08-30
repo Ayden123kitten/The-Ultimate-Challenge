@@ -1,99 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Settings - The Ultimate Challenge</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Settings - The Ultimate Challenge</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        ap: {
+                            bg: '#0f172a',
+                            card: '#1e293b',
+                            accent: '#38bdf8',
+                            success: '#22c55e',
+                            danger: '#ef4444'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .settings-container {
-            max-width: 600px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-            color: #333;
-        }
-        .form-group input, 
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        .btn-save {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .btn-save:hover {
-            background-color: #218838;
-        }
-        .preview-image {
-            max-width: 100px;
-            max-height: 100px;
-            margin-top: 10px;
-            border-radius: 50%;
-            display: none;
-        }
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .game-logo { width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; }
     </style>
 </head>
-<body>
-    <nav class="navbar">
-        <div class="nav-brand"><a href="index.html">The Ultimate Challenge</a></div>
-        <div class="nav-links">
-            <a href="players.html">Players</a>
-            <a href="/leaderboard.html">Leaderboard</a>
+<body class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 glass border-b border-slate-700">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                    <img src="/favicon.png" alt="Game Logo" class="game-logo" style="width: 48px; height: 48px;">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white tracking-tight">The Ultimate Challenge</h1>
+                        <p class="text-xs text-slate-400">Settings</p>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="flex items-center gap-4">
+                <div id="current-player-display" class="flex items-center gap-2 text-sm">
+                    <span class="text-slate-400">Playing as:</span>
+                    <span id="current-player-name" class="font-semibold text-ap-accent">Not logged in</span>
+                </div>
+                <div class="w-px h-5 bg-slate-600"></div>
+                <a href="/" class="text-slate-400 hover:text-white transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Games</span>
+                </a>
+            </nav>
         </div>
-    </nav>
+    </header>
 
-    <div class="settings-container">
-        <h2>Profile Settings</h2>
-        <form id="settings-form">
-            <div class="form-group">
-                <label for="profile-pic">Profile Picture</label>
-                <input type="url" id="profile-pic" name="profile_pic" placeholder="https://example.com/avatar.jpg">
-                <img id="pic-preview" class="preview-image" alt="Preview">
-            </div>
+    <!-- Main Content -->
+    <main class="flex-grow max-w-3xl mx-auto px-4 py-8 w-full">
+        <div class="glass rounded-xl p-8">
+            <h2 class="text-2xl font-bold text-white mb-6">Profile Settings</h2>
+            <form id="settings-form" class="space-y-6">
+                <div>
+                    <label for="profile-pic" class="block text-sm font-medium text-slate-300 mb-2">Profile Picture URL</label>
+                    <input 
+                        type="url" 
+                        id="profile-pic" 
+                        name="profile_pic" 
+                        placeholder="https://example.com/avatar.jpg"
+                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                    >
+                    <img id="pic-preview" class="preview-image mt-3 w-24 h-24 rounded-full object-cover hidden" alt="Preview">
+                </div>
 
-            <div class="form-group">
-                <label for="bio">Bio</label>
-                <textarea id="bio" name="bio" placeholder="Tell us about yourself..."></textarea>
-            </div>
+                <div>
+                    <label for="bio" class="block text-sm font-medium text-slate-300 mb-2">Bio</label>
+                    <textarea 
+                        id="bio" 
+                        name="bio" 
+                        placeholder="Tell us about yourself..."
+                        rows="4"
+                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors resize-vertical"
+                    ></textarea>
+                </div>
 
-            <div class="form-group">
-                <label for="pronouns">Pronouns</label>
-                <input type="text" id="pronouns" name="pronouns" placeholder="they/them">
-            </div>
+                <div>
+                    <label for="pronouns" class="block text-sm font-medium text-slate-300 mb-2">Pronouns</label>
+                    <input 
+                        type="text" 
+                        id="pronouns" 
+                        name="pronouns" 
+                        placeholder="they/them"
+                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                    >
+                </div>
 
-            <div class="form-group">
-                <label for="discord">Discord Username</label>
-                <input type="text" id="discord" name="discord" placeholder="username">
-            </div>
-            
-            <button type="submit" class="btn-save">Save Changes</button>
-        </form>
-    </div>
+                <div>
+                    <label for="discord" class="block text-sm font-medium text-slate-300 mb-2">Discord Username</label>
+                    <input 
+                        type="text" 
+                        id="discord" 
+                        name="discord" 
+                        placeholder="username"
+                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                    >
+                </div>
+
+                <button type="submit" class="w-full bg-ap-success hover:bg-green-600 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-800 py-6 text-center text-slate-500 text-sm">
+        <p>Powered by GitHub & Vercel • Data is stored directly in the <a href="https://github.com/Ayden123kitten/The-Ultimate-Challenge" class="underline">repository</a></p>
+    </footer>
 
     <script src="auth.js"></script>
     <script>
@@ -126,7 +151,7 @@
                     
                     if(currentPlayer.profile_pic) {
                         picPreview.src = currentPlayer.profile_pic;
-                        picPreview.style.display = 'block';
+                        picPreview.classList.remove('hidden');
                     }
                 }
             } catch (err) {
@@ -137,9 +162,9 @@
             picInput.addEventListener('input', (e) => {
                 if(e.target.value) {
                     picPreview.src = e.target.value;
-                    picPreview.style.display = 'block';
+                    picPreview.classList.remove('hidden');
                 } else {
-                    picPreview.style.display = 'none';
+                    picPreview.classList.add('hidden');
                 }
             });
 
