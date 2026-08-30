@@ -36,49 +36,100 @@
         .game-card-title-time-row { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 1rem; }
         .game-card-title { flex: 1; text-align: left; }
         .game-card-time { flex-shrink: 0; text-align: right; }
+        /* Mobile menu transition */
+        #mobile-menu { transition: all 0.3s ease-in-out; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- Header & Global Timer -->
-    <header class="sticky top-0 z-50 glass border-b border-slate-700">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <img src="/favicon.png" alt="Game Logo" class="game-logo" style="width: 48px; height: 48px;">
-                <div>
-                    <h1 class="text-2xl font-bold text-white tracking-tight">The Ultimate Challenge</h1>
-                    <p class="text-xs text-slate-400">Hardest Settings • Single Slot • Shared Saves</p>
+    <header class="sticky top-0 z-50 glass border-b border-slate-700 shadow-lg shadow-black/20">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+                <!-- Logo & Title Section -->
+                <div class="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-start">
+                    <div class="flex items-center gap-3">
+                        <img src="/favicon.png" alt="Game Logo" class="game-logo rounded-lg shadow-md" style="width: 52px; height: 52px;">
+                        <div>
+                            <h1 class="text-2xl font-bold text-white tracking-tight">The Ultimate Challenge</h1>
+                            <p class="text-xs text-slate-400">Hardest Settings • Single Slot • Shared Saves</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-btn" class="lg:hidden text-slate-400 hover:text-white transition-colors p-2">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Global Timer - Centerpiece -->
+                <div class="flex flex-col items-center bg-slate-800/50 rounded-xl px-6 py-3 border border-slate-700 shadow-inner">
+                    <div id="global-timer" class="text-4xl font-mono font-bold text-ap-accent tracking-wider">00:00:00</div>
+                    <div id="timer-status" class="text-xs text-slate-400 uppercase tracking-widest mt-1">Loading...</div>
+                </div>
+
+                <!-- Navigation & User Info -->
+                <div class="flex items-center gap-4 flex-wrap justify-center">
+                    <!-- Progress Badge -->
+                    <div class="hidden lg:flex items-center gap-2 bg-slate-800/50 rounded-lg px-3 py-2 border border-slate-700">
+                        <i class="fa-solid fa-gamepad text-ap-accent"></i>
+                        <span class="text-sm text-slate-400">Completed:</span>
+                        <span id="total-games-count" class="font-bold text-ap-accent">0/20</span>
+                    </div>
+                    
+                    <!-- Nav Links -->
+                    <nav class="flex items-center gap-2">
+                        <a href="/players.html" class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all">
+                            <i class="fa-solid fa-users group-hover:text-ap-accent transition-colors"></i>
+                            <span class="text-sm font-medium hidden xl:inline">Players</span>
+                        </a>
+                        <a href="/leaderboard.html" class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all">
+                            <i class="fa-solid fa-trophy group-hover:text-yellow-400 transition-colors"></i>
+                            <span class="text-sm font-medium hidden xl:inline">Leaderboard</span>
+                        </a>
+                        <a href="/settings.html" id="settings-nav-link-index" class="group hidden flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all" style="display:none;">
+                            <i class="fa-solid fa-gear group-hover:text-slate-300 transition-colors"></i>
+                            <span class="text-sm font-medium hidden xl:inline">Settings</span>
+                        </a>
+                    </nav>
+                    
+                    <div class="w-px h-6 bg-slate-600 hidden lg:block"></div>
+                    
+                    <!-- Current Player -->
+                    <div id="current-player-display" class="hidden lg:flex items-center gap-2 bg-gradient-to-r from-slate-800/50 to-slate-800/30 rounded-lg px-3 py-2 border border-slate-700">
+                        <i class="fa-solid fa-user-circle text-ap-accent"></i>
+                        <span class="text-sm text-slate-400 mr-1">Playing as:</span>
+                        <span id="current-player-name" class="font-semibold text-white">No player selected</span>
+                    </div>
                 </div>
             </div>
             
-            <div class="flex flex-col items-center">
-                <div id="global-timer" class="text-3xl font-mono font-bold text-ap-accent">00:00:00</div>
-                <div id="timer-status" class="text-xs text-slate-400 uppercase tracking-widest">Loading...</div>
-            </div>
-
-            <div class="flex items-center gap-3">
-                <div class="hidden md:flex items-center gap-2 text-sm">
-                    <span class="text-slate-400">Completed:</span>
-                    <span id="total-games-count" class="font-semibold text-ap-accent">0/20</span>
-                </div>
-                <div class="w-px h-5 bg-slate-600"></div>
-                <a href="/players.html" class="text-slate-400 hover:text-ap-accent transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-users"></i>
-                    <span class="text-sm">Players</span>
-                </a>
-                <div class="w-px h-5 bg-slate-600"></div>
-                <a href="/leaderboard.html" class="text-slate-400 hover:text-ap-accent transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-trophy"></i>
-                    <span class="text-sm">Leaderboard</span>
-                </a>
-                <div class="w-px h-5 bg-slate-600"></div>
-                <a href="/settings.html" id="settings-nav-link-index" class="text-slate-400 hover:text-white transition-colors flex items-center gap-2" style="display:none;">
-                    <i class="fa-solid fa-gear"></i>
-                    <span class="text-sm">Settings</span>
-                </a>
-                <div class="w-px h-5 bg-slate-600"></div>
-                <div id="current-player-display" class="hidden md:flex items-center gap-2 text-sm">
-                    <span class="text-slate-400">Playing as:</span>
-                    <span id="current-player-name" class="font-semibold text-ap-accent">No player selected</span>
+            <!-- Mobile Menu (hidden by default) -->
+            <div id="mobile-menu" class="hidden lg:hidden mt-4 pt-4 border-t border-slate-700">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-gamepad text-ap-accent"></i>
+                        <span class="text-sm text-slate-400">Completed:</span>
+                        <span id="total-games-count-mobile" class="font-bold text-ap-accent">0/20</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-4">
+                        <a href="/players.html" class="flex items-center gap-2 text-slate-400 hover:text-ap-accent transition-colors">
+                            <i class="fa-solid fa-users"></i>
+                            <span class="text-sm">Players</span>
+                        </a>
+                        <a href="/leaderboard.html" class="flex items-center gap-2 text-slate-400 hover:text-ap-accent transition-colors">
+                            <i class="fa-solid fa-trophy"></i>
+                            <span class="text-sm">Leaderboard</span>
+                        </a>
+                        <a href="/settings.html" id="settings-nav-link-index-mobile" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors" style="display:none;">
+                            <i class="fa-solid fa-gear"></i>
+                            <span class="text-sm">Settings</span>
+                        </a>
+                    </div>
+                    <div class="flex items-center justify-center gap-2 pt-2 border-t border-slate-700">
+                        <i class="fa-solid fa-user-circle text-ap-accent"></i>
+                        <span class="text-sm text-slate-400">Playing as:</span>
+                        <span id="current-player-name-mobile" class="font-semibold text-white">No player selected</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -153,5 +204,40 @@
 
     <script src="auth.js"></script>
     <script src="app.js"></script>
+    <script>
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            // Sync player name between desktop and mobile displays
+            const playerNameDesktop = document.getElementById('current-player-name');
+            const playerNameMobile = document.getElementById('current-player-name-mobile');
+            
+            if (playerNameDesktop && playerNameMobile) {
+                const observer = new MutationObserver(function(mutations) {
+                    playerNameMobile.textContent = playerNameDesktop.textContent;
+                });
+                observer.observe(playerNameDesktop, { childList: true, subtree: true, characterData: true });
+            }
+            
+            // Sync games count between desktop and mobile displays
+            const gamesCountDesktop = document.getElementById('total-games-count');
+            const gamesCountMobile = document.getElementById('total-games-count-mobile');
+            
+            if (gamesCountDesktop && gamesCountMobile) {
+                const observer = new MutationObserver(function(mutations) {
+                    gamesCountMobile.textContent = gamesCountDesktop.textContent;
+                });
+                observer.observe(gamesCountDesktop, { childList: true, subtree: true, characterData: true });
+            }
+        });
+    </script>
 </body>
 </html>
