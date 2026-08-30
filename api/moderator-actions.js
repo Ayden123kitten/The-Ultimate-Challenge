@@ -28,7 +28,7 @@ export default async function handler(req, res) {
         const decoded = jwt.verify(authToken, jwtSecret);
         const playerName = decoded.name;
 
-        // Check if user is a moderator
+        // Check if user is a moderator and get their permissions
         const modFilePath = 'data/moderators.json';
         const modApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${modFilePath}?ref=${branch}`;
 
@@ -40,21 +40,43 @@ export default async function handler(req, res) {
         });
 
         let moderators = [];
+        let admin = null;
+        let userPermissions = {};
+        let isAdmin = false;
         if (modRes.ok) {
             const modFileData = await modRes.json();
             const modContent = Buffer.from(modFileData.content, 'base64').toString('utf-8');
-            moderators = JSON.parse(modContent).moderators || [];
+            const modData = JSON.parse(modContent);
+            admin = modData.admin || null;
+            moderators = modData.moderators || [];
+            
+            // Check if user is admin
+            isAdmin = admin === playerName;
+            
+            // Find user's moderator record and get permissions
+            const modRecord = moderators.find(m => m.name === playerName);
+            if (modRecord && modRecord.permissions) {
+                userPermissions = modRecord.permissions;
+            }
         }
 
-        const isModerator = moderators.includes(playerName);
+        const isModerator = isAdmin || moderators.some(m => m.name === playerName);
 
         if (!isModerator) {
             return res.status(403).json({ error: 'Access denied. Moderators only.' });
         }
 
+        // Helper function to check permission
+        const hasPermission = (permission) => {
+            return isAdmin || userPermissions[permission] === true;
+        };
+
         const { action, gameId, gameData, playerData, logData, roleData, assignRoleData } = req.body;
 
         if (action === 'addGame') {
+            if (!hasPermission('manageGames')) {
+                return res.status(403).json({ error: 'Access denied. Missing manageGames permission.' });
+            }
             const gamesFilePath = 'data/games.json';
             const gamesApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${gamesFilePath}?ref=${branch}`;
 
@@ -99,6 +121,9 @@ export default async function handler(req, res) {
         }
 
         if (action === 'updateGame') {
+            if (!hasPermission('manageGames')) {
+                return res.status(403).json({ error: 'Access denied. Missing manageGames permission.' });
+            }
             const gamesFilePath = 'data/games.json';
             const gamesApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${gamesFilePath}?ref=${branch}`;
 
@@ -148,6 +173,9 @@ export default async function handler(req, res) {
         }
 
         if (action === 'updatePlayer') {
+            if (!hasPermission('managePlayers')) {
+                return res.status(403).json({ error: 'Access denied. Missing managePlayers permission.' });
+            }
             const playersFilePath = 'data/players.json';
             const playersApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${playersFilePath}?ref=${branch}`;
 
@@ -204,6 +232,9 @@ export default async function handler(req, res) {
         }
 
         if (action === 'updateLog') {
+            if (!hasPermission('manageGames')) {
+                return res.status(403).json({ error: 'Access denied. Missing manageGames permission.' });
+            }
             const gamesFilePath = 'data/games.json';
             const gamesApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${gamesFilePath}?ref=${branch}`;
 
@@ -263,6 +294,9 @@ export default async function handler(req, res) {
         }
 
         if (action === 'addRole') {
+            if (!hasPermission('manageRoles')) {
+                return res.status(403).json({ error: 'Access denied. Missing manageRoles permission.' });
+            }
             const rolesFilePath = 'data/roles.json';
             const rolesApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${rolesFilePath}?ref=${branch}`;
 
@@ -310,6 +344,9 @@ export default async function handler(req, res) {
         }
 
         if (action === 'assignRole') {
+            if (!hasPermission('manageRoles')) {
+                return res.status(403).json({ error: 'Access denied. Missing manageRoles permission.' });
+            }
             const playersFilePath = 'data/players.json';
             const playersApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${playersFilePath}?ref=${branch}`;
 
@@ -371,6 +408,9 @@ export default async function handler(req, res) {
         }
 
         if (action === 'updateSettings') {
+            if (!hasPermission('manageSettings')) {
+                return res.status(403).json({ error: 'Access denied. Missing manageSettings permission.' });
+            }
             const settingsFilePath = 'data/settings.json';
             const settingsApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${settingsFilePath}?ref=${branch}`;
 
@@ -416,6 +456,84 @@ export default async function handler(req, res) {
             }
 
             return res.status(200).json({ message: 'Settings updated successfully!' });
+        }
+
+        if (action === 'manageModerators') {
+            // Only admin can manage moderators
+            if (!isAdmin) {
+                return res.status(403).json({ error: 'Access denied. Admin only.' });
+            }
+
+            const { moderatorData } = req.body;
+
+            const modGetRes = await fetch(modApiUrl, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            let modData = { admin: null, moderators: [] };
+            let modSha = null;
+            if (modGetRes.ok) {
+                const modFileData = await modGetRes.json();
+                modSha = modFileData.sha;
+                const modContent = Buffer.from(modFileData.content, 'base64').toString('utf-8');
+                modData = JSON.parse(modContent);
+            }
+
+            if (moderatorData.action === 'add') {
+                // Check if moderator already exists
+                const existingMod = modData.moderators.find(m => m.name === moderatorData.name);
+                if (existingMod) {
+                    return res.status(400).json({ error: 'Moderator already exists' });
+                }
+                modData.moderators.push({
+                    name: moderatorData.name,
+                    permissions: moderatorData.permissions || {
+                        manageModerators: false,
+                        manageGames: false,
+                        managePlayers: false,
+                        manageRoles: false,
+                        manageAwards: false,
+                        manageSettings: false
+                    }
+                });
+            } else if (moderatorData.action === 'remove') {
+                modData.moderators = modData.moderators.filter(m => m.name !== moderatorData.name);
+            } else if (moderatorData.action === 'updatePermissions') {
+                const modIndex = modData.moderators.findIndex(m => m.name === moderatorData.name);
+                if (modIndex === -1) {
+                    return res.status(404).json({ error: 'Moderator not found' });
+                }
+                modData.moderators[modIndex].permissions = moderatorData.permissions;
+            } else if (moderatorData.action === 'setAdmin') {
+                modData.admin = moderatorData.name;
+            }
+
+            const newModContent = Buffer.from(JSON.stringify(modData, null, 2)).toString('base64');
+            
+            const putRes = await fetch(modApiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Manage moderators`,
+                    content: newModContent,
+                    sha: modSha,
+                    branch: branch
+                })
+            });
+
+            if (!putRes.ok) {
+                const errData = await putRes.json();
+                throw new Error(errData.message || 'Failed to manage moderators');
+            }
+
+            return res.status(200).json({ message: 'Moderators updated successfully!' });
         }
 
         return res.status(400).json({ error: 'Invalid action' });
