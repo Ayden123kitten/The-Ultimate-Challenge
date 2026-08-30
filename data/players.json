@@ -1,26 +1,15 @@
 [
   {
     "name": "Ayden",
-    "image": "https://files.catbox.moe/eb68bt.png"
+    "password_hash": null,
+    "pfp_link": "",
+    "created_at": null
   },
   {
     "name": "Blink",
-    "image": ""
-  },
-  {
-    "name": "LORD X",
-    "image": "https://files.catbox.moe/zabs6d.jpg"
-  },
-  {
-    "name": "TeraKord",
-    "image": "https://files.catbox.moe/kplad4.webp"
-  },
-  {
-    "name": "Sylvie",
-    "image": ""
-  },
-  {
-    "name": "Mastercrasher",
-    "image": ""
+    "password_hash": null,
+    "pfp_link": "",
+    "created_at": null
   }
 ]
+
