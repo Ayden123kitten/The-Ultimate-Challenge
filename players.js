@@ -277,7 +277,7 @@ function renderPlayers() {
         };
     });
 
-    playerStats.sort((a, b) => b.totalTimeMs - a.totalTimeMs);
+    playerStats.sort((a, b) => a.name.localeCompare(b.name));
 
     let filteredStats = playerStats;
     if (searchQuery.trim() !== '') {
