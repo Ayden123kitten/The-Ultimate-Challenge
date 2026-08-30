@@ -13,11 +13,6 @@
     "game_info_link": "",
     "support_link": "https://discord.com/channels/731205301247803413/1113529234800005181",
     "save_file_link": "https://drive.google.com/drive/folders/1Uxg7F8IOuH9orSdvrjR1bj-jWkuObilD?usp=drive_link",
-    "save_file_paths": {
-      "windows": ["BizHawk\\SNES\\SaveRAM\\"],
-      "macos": ["~/BizHawk/Snes/SaveRAM"],
-      "linux": ["~/BizHawk/Snes/SaveRAM/"]
-    },
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
@@ -37,11 +32,6 @@
     "game_info_link": "",
     "support_link": "https://www.google.com/url?q=https://discord.com/channels/731205301247803413/1336857648464920586&sa=D&source=editors&ust=1788057631195900&usg=AOvVaw1P7E56JZ2oRhwDchwozLHs",
     "save_file_link": "https://drive.google.com/drive/folders/1BHb6OHuRWzsWhJwXInJP8EVszwIPF1w9?usp=drive_link",
-    "save_file_paths": {
-      "windows": ["AppData\\LocalLow\\Pontypants\\A Difficult Game About Climbing\\"],
-      "macos": ["~/Library/Application Support/Pontypants/A Difficult Game About Climbing"],
-      "linux": ["~/BizHawk/Snes/SaveRAM/"]
-    },
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
@@ -61,11 +51,6 @@
     "game_info_link": "",
     "support_link": "https://discord.com/channels/731205301247803413/1510190832987406457",
     "save_file_link": "https://drive.google.com/drive/folders/1Uxg7F8IOuH9orSdvrjR1bj-jWkuObilD?usp=drive_link",
-    "save_file_paths": {
-      "windows": ["Documents\\Dolphin Emulator\\GC\\"],
-      "macos": ["~/Library/Application Support/Dolphin/GC"],
-      "linux": ["~/.steam/steam/steamapps/compatdata/2497920/pfx/drive_c/users/steamuser/AppData/LocalLow/Pontypants/A Difficult Game About Climbing/"]
-    },
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
