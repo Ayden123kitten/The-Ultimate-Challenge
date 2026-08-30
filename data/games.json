@@ -439,5 +439,26 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false
+  },
+  {
+    "id": "deadcells",
+    "name": "Dead Cells",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/abd1c782880cc59759f4112fda0b8f98.png",
+    "apworld_version": "0.1.8",
+    "mod_version": "0.1.8",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/Maxlamenace572/DeadCellsArchipelago/releases/tag/0.1.8",
+    "mod_link": "https://github.com/Maxlamenace572/DeadCellsArchipelago/releases/tag/0.1.8",
+    "mod_setup_guide_link": "https://github.com/Maxlamenace572/DeadCellsArchipelago",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1237901328005730405",
+    "save_file_link": "https://drive.google.com/drive/folders/1wtXgCi68GAe9XiatKxzNDRucyOPqYHxZ?usp=drive_link",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": [],
+    "completed": false
   }
 ]
