@@ -245,6 +245,25 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": []
+  },
+  {
+    "id": "ktane",
+    "name": "Keep Talking and Nobody Explodes",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/d47bf0af618a3523a226ed7cada85ce3.png",
+    "apworld_version": "0.3.0c",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/GreenPower713/Archipelago/releases/tag/v0.3.0c",
+    "mod_link": "https://steamcommunity.com/sharedfiles/filedetails/?id=3247225189",
+    "mod_setup_guide_link": "https://github.com/GreenPower713/Archipelago/blob/main/worlds/ktane/docs/setup_en.md",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1058549067107532840",
+    "save_file_link": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": []
   }
 ]
 
