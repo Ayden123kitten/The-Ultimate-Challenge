@@ -471,10 +471,13 @@ if (logoutBtn) {
 
 // Moderator status check and panel setup
 let isModerator = false;
+let isAdmin = false;
 (async () => {
     if (AUTH.isLoggedIn()) {
         isModerator = await AUTH.checkModerator();
+        isAdmin = await AUTH.checkAdmin();
         console.log('Moderator status:', isModerator);
+        console.log('Admin status:', isAdmin);
         
         // Show settings link for logged-in users
         const settingsLink = $('settings-nav-link-index');
@@ -608,6 +611,66 @@ function openModeratorModal() {
                     </div>
                 </div>
             </div>
+            
+            <!-- Manage Moderators Section (Admin Only) -->
+            ${isAdmin ? `
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4">Manage Moderators</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Add/Remove Moderator</h4>
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" id="moderator-name-input" placeholder="Player name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
+                            <button onclick="manageModerator('add')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Moderator</button>
+                            <button onclick="manageModerator('remove')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Remove Moderator</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Set Admin</h4>
+                        <div class="flex gap-2 mb-2">
+                            <select id="admin-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
+                                <option value="">Select a moderator...</option>
+                            </select>
+                            <button onclick="setAdmin()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg">Set as Admin</button>
+                        </div>
+                        <p class="text-xs text-slate-400">Warning: This will transfer admin privileges to the selected moderator. The current admin will remain as a regular moderator unless removed.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Edit Moderator Permissions</h4>
+                        <select id="moderator-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+                            <option value="">Select a moderator...</option>
+                        </select>
+                        <div id="moderator-permissions-container" class="hidden space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-300">
+                                <input type="checkbox" id="perm-manageModerators" class="rounded bg-slate-800 border-slate-700">
+                                Manage Moderators
+                            </label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300">
+                                <input type="checkbox" id="perm-manageGames" class="rounded bg-slate-800 border-slate-700">
+                                Manage Games
+                            </label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300">
+                                <input type="checkbox" id="perm-managePlayers" class="rounded bg-slate-800 border-slate-700">
+                                Manage Players
+                            </label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300">
+                                <input type="checkbox" id="perm-manageRoles" class="rounded bg-slate-800 border-slate-700">
+                                Manage Roles
+                            </label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300">
+                                <input type="checkbox" id="perm-manageAwards" class="rounded bg-slate-800 border-slate-700">
+                                Manage Awards
+                            </label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300">
+                                <input type="checkbox" id="perm-manageSettings" class="rounded bg-slate-800 border-slate-700">
+                                Manage Settings
+                            </label>
+                            <button onclick="updateModeratorPermissions()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full mt-2">Update Permissions</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            ` : ''}
             
             <!-- Cheesetracker Settings Section -->
             <div class="glass rounded-lg p-4">
@@ -933,7 +996,123 @@ openModeratorModal = async function() {
         roleSelect.innerHTML = '<option value="">Select a role...</option>' + 
             availableRoles.slice().sort((a, b) => a.name.localeCompare(b.name)).map(r => `<option value="${r.name}">${r.name}</option>`).join('');
     }
+    
+    // Populate moderator select if admin
+    if (isAdmin) {
+        const modSelect = $('moderator-select');
+        if (modSelect) {
+            await populateModeratorSelect();
+            
+            // Add change listener for moderator select
+            modSelect.addEventListener('change', async () => {
+                const selectedMod = modSelect.value;
+                const permsContainer = $('moderator-permissions-container');
+                if (selectedMod && permsContainer) {
+                    permsContainer.classList.remove('hidden');
+                    // Load current permissions for this moderator
+                    await loadModeratorPermissions(selectedMod);
+                } else if (permsContainer) {
+                    permsContainer.classList.add('hidden');
+                }
+            });
+        }
+    }
 };
+
+async function loadModeratorPermissions(moderatorName) {
+    try {
+        const res = await fetch('/api/get-moderators', {
+            headers: AUTH.authHeader()
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const mod = data.moderators.find(m => m.name === moderatorName);
+            if (mod && mod.permissions) {
+                document.getElementById('perm-manageModerators').checked = mod.permissions.manageModerators || false;
+                document.getElementById('perm-manageGames').checked = mod.permissions.manageGames || false;
+                document.getElementById('perm-managePlayers').checked = mod.permissions.managePlayers || false;
+                document.getElementById('perm-manageRoles').checked = mod.permissions.manageRoles || false;
+                document.getElementById('perm-manageAwards').checked = mod.permissions.manageAwards || false;
+                document.getElementById('perm-manageSettings').checked = mod.permissions.manageSettings || false;
+            }
+        }
+    } catch (err) {
+        console.error('Failed to load moderator permissions:', err);
+    }
+}
+
+async function populateModeratorSelect() {
+    try {
+        const res = await fetch('/api/get-moderators', {
+            headers: AUTH.authHeader()
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const modSelect = $('moderator-select');
+            if (modSelect) {
+                modSelect.innerHTML = '<option value="">Select a moderator...</option>' + 
+                    data.moderators.slice().sort((a, b) => a.name.localeCompare(b.name)).map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+            }
+        }
+    } catch (err) {
+        console.error('Failed to load moderators:', err);
+    }
+}
+
+async function manageModerator(action) {
+    const name = $('moderator-name-input').value.trim();
+    
+    if (!name) return alert('Please enter a player name');
+    
+    try {
+        const res = await fetch('/api/moderator-actions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+            body: JSON.stringify({ 
+                action: 'manageModerators',
+                moderatorData: { name, action }
+            })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        alert(`Moderator ${action === 'add' ? 'added' : 'removed'} successfully!`);
+        $('moderator-name-input').value = '';
+        openModeratorModal(); // Refresh the modal
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+async function updateModeratorPermissions() {
+    const name = $('moderator-select').value;
+    
+    if (!name) return alert('Please select a moderator');
+    
+    const permissions = {
+        manageModerators: document.getElementById('perm-manageModerators').checked,
+        manageGames: document.getElementById('perm-manageGames').checked,
+        managePlayers: document.getElementById('perm-managePlayers').checked,
+        manageRoles: document.getElementById('perm-manageRoles').checked,
+        manageAwards: document.getElementById('perm-manageAwards').checked,
+        manageSettings: document.getElementById('perm-manageSettings').checked
+    };
+    
+    try {
+        const res = await fetch('/api/moderator-actions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+            body: JSON.stringify({ 
+                action: 'manageModerators',
+                moderatorData: { name, action: 'updatePermissions', permissions }
+            })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        alert('Permissions updated successfully!');
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
 
 async function updateCheesetrackerSettings() {
     const url = $('cheesetracker-url-input').value.trim();

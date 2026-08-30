@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 export default async function handler(req, res) {
     res.setHeader('Content-Type', 'application/json');
     
-    if (req.method !== 'POST') {
+    if (req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
@@ -48,12 +48,15 @@ export default async function handler(req, res) {
             moderators = data.moderators || [];
         }
 
-        const isModerator = admin === playerName || moderators.some(m => m.name === playerName);
+        // Only admins can see the full moderator list with permissions
         const isAdmin = admin === playerName;
+        if (!isAdmin) {
+            return res.status(403).json({ error: 'Access denied. Admin only.' });
+        }
 
-        return res.status(200).json({ isModerator, isAdmin });
+        return res.status(200).json({ admin, moderators });
     } catch (error) {
-        console.error('Check moderator error:', error);
+        console.error('Get moderators error:', error);
         return res.status(401).json({ error: 'Invalid token' });
     }
 }
