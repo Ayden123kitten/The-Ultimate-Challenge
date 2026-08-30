@@ -183,6 +183,7 @@ function renderGames() {
         const hasExtraInfo = game.extra_information && game.extra_information.trim() !== '';
         const hasApworldVersion = game.apworld_version && game.apworld_version.trim() !== '';
         const hasModVersion = game.mod_version && game.mod_version.trim() !== '';
+        const showEventTime = settings.start_time && settings.start_time.trim() !== '';
         
         // Cheesetracker data
         const ctData = cheesetrackerData[game.id] || {};
@@ -221,10 +222,12 @@ function renderGames() {
                             ${isClaimed ? `Playing: ${game.current_player}` : 'Available'}
                         </span>
                     </div>
+                    ${showEventTime ? `
                     <div class="game-card-time">
                         <div class="text-xs text-slate-400 uppercase">Total Time</div>
                         <div class="text-lg font-mono font-bold text-ap-accent">${formatTime(totalTimeMs)}</div>
                     </div>
+                    ` : ''}
                 </div>
             </div>
 
