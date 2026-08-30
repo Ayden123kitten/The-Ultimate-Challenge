@@ -4,12 +4,6 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { gameId, action, playerName } = req.body;
-
-    if (!gameId || !action || !playerName) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
-
     const token = process.env.GITHUB_TOKEN;
     const owner = process.env.GITHUB_OWNER;
     const repo = process.env.GITHUB_REPO;
@@ -17,6 +11,66 @@ export default async function handler(req, res) {
 
     if (!token || !owner || !repo) {
         return res.status(500).json({ error: 'Server configuration missing. Contact admin.' });
+    }
+
+    // Handle players update
+    if (req.body.type === 'players') {
+        const { data: playersData } = req.body;
+        const filePath = 'data/players.json';
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=${branch}`;
+
+        try {
+            // 1. Fetch current file to get its SHA
+            const getRes = await fetch(apiUrl, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+
+            if (!getRes.ok) throw new Error('Failed to fetch current players data from GitHub');
+
+            const fileData = await getRes.json();
+
+            // 2. Commit updated file back to GitHub
+            const newContent = Buffer.from(JSON.stringify(playersData, null, 2)).toString('base64');
+            
+            const putRes = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: 'Update player images',
+                    content: newContent,
+                    sha: fileData.sha,
+                    branch: branch
+                })
+            });
+
+            if (!putRes.ok) {
+                const errData = await putRes.json();
+                if (errData.message.includes('does not match')) {
+                    return res.status(409).json({ error: 'Data was modified by someone else just now. Please refresh and try again.' });
+                }
+                throw new Error(errData.message || 'Failed to save to GitHub');
+            }
+
+            return res.status(200).json({ message: 'Player images updated successfully!' });
+
+        } catch (error) {
+            console.error('API Error:', error);
+            return res.status(500).json({ error: 'Internal server error: ' + error.message });
+        }
+    }
+
+    // Handle game updates
+    const { gameId, action, playerName } = req.body;
+
+    if (!gameId || !action || !playerName) {
+        return res.status(400).json({ error: 'Missing required fields' });
     }
 
     const filePath = 'data/games.json';

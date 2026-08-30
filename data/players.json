@@ -1,7 +1,7 @@
 [
-  "Ayden",
-  "Blink",
-  "LORD X",
-  "TeraKord",
-  "Sylvie"
+  { "name": "Ayden", "image": "" },
+  { "name": "Blink", "image": "" },
+  { "name": "LORD X", "image": "" },
+  { "name": "TeraKord", "image": "" },
+  { "name": "Sylvie", "image": "" }
 ]
