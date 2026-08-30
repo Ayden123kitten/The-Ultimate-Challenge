@@ -283,6 +283,25 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": []
+  },
+  {
+    "id": "horse",
+    "name": "Horse Magnifier",
+    "logo": "https://files.catbox.moe/0nkwyz.png",
+    "apworld_version": "1.0.0",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/DannySchultzDev/Archipelago-Horse-Magnifier-Client/releases/tag/V1.0.0",
+    "mod_link": "https://github.com/DannySchultzDev/Archipelago-Horse-Magnifier-Client/releases/tag/V1.0.0",
+    "mod_setup_guide_link": "https://github.com/DannySchultzDev/Archipelago-Horse-Magnifier-Client",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1538278549084045312",
+    "save_file_link": "https://drive.google.com/drive/folders/1I0EP_oGIJU9fYwYoNnICav_FQ96TjgXq?usp=drive_link",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": []
   }
 ]
 
