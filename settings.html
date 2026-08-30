@@ -60,7 +60,94 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow max-w-3xl mx-auto px-4 py-8 w-full">
+    <main class="flex-grow max-w-5xl mx-auto px-4 py-8 w-full">
+        <!-- Moderator Section -->
+        <div id="moderator-section" class="glass rounded-xl p-8 mb-8" style="display:none;">
+            <h2 class="text-2xl font-bold text-white mb-6"><i class="fa-solid fa-medal text-ap-accent mr-2"></i>Award Management</h2>
+            
+            <!-- Add New Award -->
+            <div class="mb-8 pb-8 border-b border-slate-700">
+                <h3 class="text-lg font-semibold text-white mb-4">Create New Award</h3>
+                <form id="add-award-form" class="space-y-4">
+                    <div>
+                        <label for="award-name" class="block text-sm font-medium text-slate-300 mb-2">Award Name</label>
+                        <input 
+                            type="text" 
+                            id="award-name" 
+                            name="award_name" 
+                            placeholder="e.g., Speed Demon"
+                            required
+                            class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                        >
+                    </div>
+                    
+                    <div>
+                        <label for="award-icon" class="block text-sm font-medium text-slate-300 mb-2">Icon (Emoji or FontAwesome)</label>
+                        <input 
+                            type="text" 
+                            id="award-icon" 
+                            name="award_icon" 
+                            placeholder="e.g., ⚡ or fa-solid fa-bolt"
+                            required
+                            class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                        >
+                        <p class="text-xs text-slate-400 mt-1">Use an emoji (⚡🏆🎯) or FontAwesome class (fa-solid fa-star)</p>
+                    </div>
+                    
+                    <div>
+                        <label for="award-description" class="block text-sm font-medium text-slate-300 mb-2">Description</label>
+                        <textarea 
+                            id="award-description" 
+                            name="award_description" 
+                            placeholder="Describe what this award is for..."
+                            rows="3"
+                            required
+                            class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors resize-vertical"
+                        ></textarea>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-ap-accent hover:bg-sky-600 text-slate-900 font-medium py-3 px-6 rounded-lg transition-colors">
+                        <i class="fa-solid fa-plus mr-2"></i>Create Award
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Assign Award to Player -->
+            <div>
+                <h3 class="text-lg font-semibold text-white mb-4">Assign Award to Player</h3>
+                <form id="assign-award-form" class="space-y-4">
+                    <div>
+                        <label for="award-player" class="block text-sm font-medium text-slate-300 mb-2">Select Player</label>
+                        <select 
+                            id="award-player" 
+                            name="award_player"
+                            required
+                            class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                        >
+                            <option value="">Choose a player...</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="award-select" class="block text-sm font-medium text-slate-300 mb-2">Select Award</label>
+                        <select 
+                            id="award-select" 
+                            name="award_select"
+                            required
+                            class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                        >
+                            <option value="">Choose an award...</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-ap-success hover:bg-green-600 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+                        <i class="fa-solid fa-check mr-2"></i>Assign Award
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Profile Settings -->
         <div class="glass rounded-xl p-8">
             <h2 class="text-2xl font-bold text-white mb-6">Profile Settings</h2>
             <form id="settings-form" class="space-y-6">
@@ -137,10 +224,17 @@
             const settingsLink = document.getElementById('settings-link');
             if(settingsLink) settingsLink.style.display = 'block';
 
+            let isModerator = false;
+            let players = [];
+            let awards = [];
+
             try {
+                // Check moderator status
+                isModerator = await AUTH.checkModerator();
+                
                 const res = await fetch('/api/players');
-                const players = await res.json();
-                const currentPlayer = players.find(p => p.username === user);
+                players = await res.json();
+                const currentPlayer = players.find(p => p.name === user);
 
                 if (currentPlayer) {
                     document.getElementById('profile-pic').value = currentPlayer.profile_pic || '';
@@ -153,6 +247,36 @@
                         picPreview.src = currentPlayer.profile_pic;
                         picPreview.classList.remove('hidden');
                     }
+                }
+                
+                // Load awards for dropdown
+                const awardsRes = await fetch('/api/get-awards');
+                if (awardsRes.ok) {
+                    const awardsData = await awardsRes.json();
+                    awards = awardsData.awards || [];
+                }
+                
+                // Show moderator section if user is a moderator
+                if (isModerator) {
+                    document.getElementById('moderator-section').style.display = 'block';
+                    
+                    // Populate player dropdown
+                    const playerSelect = document.getElementById('award-player');
+                    players.forEach(player => {
+                        const option = document.createElement('option');
+                        option.value = player.name;
+                        option.textContent = player.name;
+                        playerSelect.appendChild(option);
+                    });
+                    
+                    // Populate award dropdown
+                    const awardSelect = document.getElementById('award-select');
+                    awards.forEach(award => {
+                        const option = document.createElement('option');
+                        option.value = JSON.stringify({ name: award.name, icon: award.icon, description: award.description });
+                        option.textContent = `${award.icon} ${award.name}`;
+                        awardSelect.appendChild(option);
+                    });
                 }
             } catch (err) {
                 console.error('Failed to load settings', err);
@@ -194,6 +318,96 @@
                     alert('Failed to save settings.');
                 }
             });
+            
+            // Add Award handler (moderator only)
+            if (isModerator) {
+                const addAwardForm = document.getElementById('add-award-form');
+                addAwardForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const awardData = {
+                        name: document.getElementById('award-name').value,
+                        icon: document.getElementById('award-icon').value,
+                        description: document.getElementById('award-description').value
+                    };
+                    
+                    try {
+                        const res = await fetch('/api/manage-awards', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                ...AUTH.authHeader()
+                            },
+                            body: JSON.stringify({
+                                action: 'addAward',
+                                awardData: awardData
+                            })
+                        });
+                        
+                        if (res.ok) {
+                            alert('Award created successfully!');
+                            addAwardForm.reset();
+                            // Reload awards
+                            const awardsRes = await fetch('/api/get-awards');
+                            if (awardsRes.ok) {
+                                const awardsData = await awardsRes.json();
+                                awards = awardsData.awards || [];
+                                // Refresh award dropdown
+                                const awardSelect = document.getElementById('award-select');
+                                awardSelect.innerHTML = '<option value="">Choose an award...</option>';
+                                awards.forEach(award => {
+                                    const option = document.createElement('option');
+                                    option.value = JSON.stringify({ name: award.name, icon: award.icon, description: award.description });
+                                    option.textContent = `${award.icon} ${award.name}`;
+                                    awardSelect.appendChild(option);
+                                });
+                            }
+                        } else {
+                            const err = await res.json();
+                            alert('Error creating award: ' + err.error);
+                        }
+                    } catch (err) {
+                        alert('Failed to create award.');
+                    }
+                });
+                
+                // Assign Award handler
+                const assignAwardForm = document.getElementById('assign-award-form');
+                assignAwardForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const playerName = document.getElementById('award-player').value;
+                    const awardInfo = JSON.parse(document.getElementById('award-select').value);
+                    
+                    try {
+                        const res = await fetch('/api/manage-awards', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                ...AUTH.authHeader()
+                            },
+                            body: JSON.stringify({
+                                action: 'assignAward',
+                                assignAwardData: {
+                                    playerName: playerName,
+                                    awardName: awardInfo.name,
+                                    icon: awardInfo.icon,
+                                    description: awardInfo.description,
+                                    action: 'add'
+                                }
+                            })
+                        });
+                        
+                        if (res.ok) {
+                            alert('Award assigned successfully!');
+                            assignAwardForm.reset();
+                        } else {
+                            const err = await res.json();
+                            alert('Error assigning award: ' + err.error);
+                        }
+                    } catch (err) {
+                        alert('Failed to assign award.');
+                    }
+                });
+            }
         });
     </script>
 </body>
