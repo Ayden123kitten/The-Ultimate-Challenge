@@ -65,5 +65,20 @@ const AUTH = {
             console.error('Moderator check failed:', error);
             return false;
         }
+    },
+
+    async checkAdmin() {
+        if (!AUTH.isLoggedIn()) return false;
+        try {
+            const res = await fetch('/api/check-moderator', {
+                method: 'POST',
+                headers: AUTH.authHeader()
+            });
+            const data = await res.json();
+            return res.ok && data.isAdmin;
+        } catch (error) {
+            console.error('Admin check failed:', error);
+            return false;
+        }
     }
 };
