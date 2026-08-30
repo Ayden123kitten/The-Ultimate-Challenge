@@ -615,7 +615,7 @@
     "apworld_version": "1.2.2",
     "mod_version": "1.2.2",
     "rules": "Do not use CloverPitAPHints, as it is broken and makes the game easier. Any other mods are fine, as long as the game is not made much easier from them.",
-    "extra_information": "",
+    "extra_information": "If you own it, disable the Unholy Fusion DLC, as it's not yet supported in the version we are using.",
     "apworld_link": "https://github.com/Syntheal/CloverPit.Archipelago/releases/tag/v1.2.2",
     "mod_link": "",
     "mod_setup_guide_link": "https://github.com/Syntheal/CloverPit.Archipelago",
