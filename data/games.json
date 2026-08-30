@@ -112,5 +112,25 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "logs": []
+  }, 
+  {
+    "id": "riftofthenecrodancer",
+    "name": "Rift Of The NecroDancer",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/a22e4383849b4bb63896c5655ac51f4a.png",
+    "apworld_version": "0.16.0",
+    "rules": "",
+    "extra_information": "",
+    "apworld_link": "https://github.com/studkid/RiftArchipelago/releases/tag/v0.16.0",
+    "mod_link": "https://github.com/studkid/RiftArchipelago/releases",
+    "mod_setup_guide_link": "https://github.com/studkid/Archipelago/blob/RotN/worlds/rotn/docs/setup_en.md",
+    "tracker_link": "",
+    "game_info_link": "https://store.steampowered.com/app/2073250/Rift_of_the_NecroDancer/",
+    "support_link": "https://discord.com/channels/731205301247803413/1337112354130759757",
+    "save_file_link": "https://drive.google.com/drive/folders/1Uxg7F8IOuH9orSdvrjR1bj-jWkuObilD?usp=drive_link",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "logs": []
   }
 ]
+
