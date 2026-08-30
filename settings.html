@@ -152,7 +152,7 @@
             <h2 class="text-2xl font-bold text-white mb-6">Profile Settings</h2>
             <form id="settings-form" class="space-y-6">
                 <div>
-                    <label for="profile-pic" class="block text-sm font-medium text-slate-300 mb-2">Profile Picture URL</label>
+                    <label for="profile-pic" class="block text-sm font-medium text-slate-300 mb-2">Profile Picture</label>
                     <input 
                         type="url" 
                         id="profile-pic" 
@@ -237,14 +237,13 @@
                 const currentPlayer = players.find(p => p.name === user);
 
                 if (currentPlayer) {
-                    document.getElementById('profile-pic').value = currentPlayer.profile_pic || '';
+                    document.getElementById('profile-pic').value = currentPlayer.pfp_link || '';
                     document.getElementById('bio').value = currentPlayer.bio || '';
                     document.getElementById('pronouns').value = currentPlayer.pronouns || '';
                     document.getElementById('discord').value = currentPlayer.discord || '';
-                    document.getElementById('website').value = currentPlayer.website || '';
                     
-                    if(currentPlayer.profile_pic) {
-                        picPreview.src = currentPlayer.profile_pic;
+                    if(currentPlayer.pfp_link) {
+                        picPreview.src = currentPlayer.pfp_link;
                         picPreview.classList.remove('hidden');
                     }
                 }
@@ -304,7 +303,12 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             username: user,
-                            data: data
+                            data: {
+                                pfp_link: data.profile_pic,
+                                bio: data.bio,
+                                pronouns: data.pronouns,
+                                discord: data.discord
+                            }
                         })
                     });
 
