@@ -50,5 +50,20 @@ const AUTH = {
     logout() {
         AUTH.clearSession();
         window.location.reload();
+    },
+
+    async checkModerator() {
+        if (!AUTH.isLoggedIn()) return false;
+        try {
+            const res = await fetch('/api/check-moderator', {
+                method: 'POST',
+                headers: AUTH.authHeader()
+            });
+            const data = await res.json();
+            return res.ok && data.isModerator;
+        } catch (error) {
+            console.error('Moderator check failed:', error);
+            return false;
+        }
     }
 };

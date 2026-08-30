@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Settings - AP Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .settings-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input, 
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .btn-save {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-save:hover {
+            background-color: #218838;
+        }
+        .preview-image {
+            max-width: 100px;
+            max-height: 100px;
+            margin-top: 10px;
+            border-radius: 50%;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand"><a href="index.html">AP Tracker</a></div>
+        <div class="nav-links">
+            <a href="index.html">Games</a>
+            <a href="players.html">Players</a>
+            <a href="leaderboard.html">Leaderboard</a>
+            <a href="#" id="auth-link">Login</a>
+            <a href="settings.html" id="settings-link" style="display:none;">Settings</a>
+        </div>
+    </nav>
+
+    <div class="settings-container">
+        <h2>Profile Settings</h2>
+        <form id="settings-form">
+            <div class="form-group">
+                <label for="profile-pic">Profile Picture URL</label>
+                <input type="url" id="profile-pic" name="profile_pic" placeholder="https://example.com/avatar.jpg">
+                <img id="pic-preview" class="preview-image" alt="Preview">
+            </div>
+
+            <div class="form-group">
+                <label for="bio">Bio</label>
+                <textarea id="bio" name="bio" placeholder="Tell us about yourself..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="pronouns">Pronouns</label>
+                <input type="text" id="pronouns" name="pronouns" placeholder="e.g., they/them">
+            </div>
+
+            <div class="form-group">
+                <label for="discord">Discord Username</label>
+                <input type="text" id="discord" name="discord" placeholder="user#1234 or username">
+            </div>
+
+            <div class="form-group">
+                <label for="website">Website Username / URL</label>
+                <input type="text" id="website" name="website" placeholder="e.g., @username or https://...">
+            </div>
+
+            <button type="submit" class="btn-save">Save Changes</button>
+        </form>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const form = document.getElementById('settings-form');
+            const picInput = document.getElementById('profile-pic');
+            const picPreview = document.getElementById('pic-preview');
+            
+            // Check auth and load data
+            const user = localStorage.getItem('ap_user');
+            if (!user) {
+                window.location.href = 'index.html'; // Redirect if not logged in
+                return;
+            }
+
+            const settingsLink = document.getElementById('settings-link');
+            if(settingsLink) settingsLink.style.display = 'block';
+
+            try {
+                const res = await fetch('/api/players');
+                const players = await res.json();
+                const currentPlayer = players.find(p => p.username === user);
+
+                if (currentPlayer) {
+                    document.getElementById('profile-pic').value = currentPlayer.profile_pic || '';
+                    document.getElementById('bio').value = currentPlayer.bio || '';
+                    document.getElementById('pronouns').value = currentPlayer.pronouns || '';
+                    document.getElementById('discord').value = currentPlayer.discord || '';
+                    document.getElementById('website').value = currentPlayer.website || '';
+                    
+                    if(currentPlayer.profile_pic) {
+                        picPreview.src = currentPlayer.profile_pic;
+                        picPreview.style.display = 'block';
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to load settings', err);
+            }
+
+            // Image preview listener
+            picInput.addEventListener('input', (e) => {
+                if(e.target.value) {
+                    picPreview.src = e.target.value;
+                    picPreview.style.display = 'block';
+                } else {
+                    picPreview.style.display = 'none';
+                }
+            });
+
+            // Save handler
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    const res = await fetch('/api/update-profile', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: user,
+                            data: data
+                        })
+                    });
+
+                    if (res.ok) {
+                        alert('Settings saved successfully!');
+                    } else {
+                        const err = await res.json();
+                        alert('Error saving settings: ' + err.error);
+                    }
+                } catch (err) {
+                    alert('Failed to save settings.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
