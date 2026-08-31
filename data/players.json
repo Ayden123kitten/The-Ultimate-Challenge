@@ -62,5 +62,13 @@
     "name": "Casual Mario",
     "password_hash": "$2b$10$ov363dyRiKhq1jz/51wPyu8SvInQyECTGYsNk6M5TlxYMz6mtzR2W",
     "pfp_link": "https://imgur.com/a/xA6OyH1"
+  },
+  {
+    "name": "PDI",
+    "password_hash": "$2b$10$OlpQ0XbzyU8FByFhOhxA8uBTGy18VZy9xFmCfRzCL7PRXcov6GZS2",
+    "pfp_link": "",
+    "bio": "",
+    "pronouns": "",
+    "discord": ""
   }
 ]
