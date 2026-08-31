@@ -672,6 +672,35 @@ function openModeratorModal() {
             </div>
             ` : ''}
             
+            <!-- Manage Awards Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4">Manage Awards</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Create New Award</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="award-name-input" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                            <input type="text" id="award-icon-input" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                            <textarea id="award-description-input" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
+                        </div>
+                        <button onclick="createAward()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg mt-4 w-full">Create Award</button>
+                    </div>
+                    <div class="border-t border-slate-700 pt-4">
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Award</h4>
+                        <select id="award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+                            <option value="">Select an award...</option>
+                        </select>
+                        <select id="award-player-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+                            <option value="">Select a player...</option>
+                        </select>
+                        <div class="flex gap-2">
+                            <button onclick="assignAward('add')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Give Award</button>
+                            <button onclick="assignAward('remove')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Award</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Cheesetracker Settings Section -->
             <div class="glass rounded-lg p-4">
                 <h3 class="text-lg font-bold text-white mb-4">Cheesetracker Integration</h3>
@@ -984,10 +1013,10 @@ async function assignRole(action) {
     }
 }
 
-// Load roles when moderator modal opens
+// Load roles and awards when moderator modal opens
 const originalOpenModeratorModal = openModeratorModal;
 openModeratorModal = async function() {
-    await loadRoles();
+    await Promise.all([loadRoles(), loadAwards()]);
     originalOpenModeratorModal();
     
     // Populate role select
@@ -995,6 +1024,16 @@ openModeratorModal = async function() {
     if (roleSelect) {
         roleSelect.innerHTML = '<option value="">Select a role...</option>' + 
             availableRoles.slice().sort((a, b) => a.name.localeCompare(b.name)).map(r => `<option value="${r.name}">${r.name}</option>`).join('');
+    }
+    
+    // Populate award select
+    populateAwardSelect();
+    
+    // Populate award player select
+    const awardPlayerSelect = $('award-player-select');
+    if (awardPlayerSelect && players.length > 0) {
+        awardPlayerSelect.innerHTML = '<option value="">Select a player...</option>' +
+            players.slice().sort((a, b) => a.name.localeCompare(b.name)).map(p => `<option value="${p.name}">${p.name}</option>`).join('');
     }
     
     // Populate moderator select if admin
@@ -1154,6 +1193,92 @@ async function updateEventTimeSettings() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         alert('Event time settings saved successfully!');
+        loadData();
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+// Award management functions
+let availableAwards = [];
+
+async function loadAwards() {
+    try {
+        const res = await fetch('/api/manage-awards');
+        if (res.ok) {
+            const data = await res.json();
+            availableAwards = data.awards || [];
+        }
+    } catch (err) {
+        console.error('Failed to load awards:', err);
+    }
+}
+
+async function createAward() {
+    const name = $('award-name-input').value.trim();
+    const icon = $('award-icon-input').value.trim();
+    const description = $('award-description-input').value.trim();
+    
+    if (!name) return alert('Please enter an award name');
+    
+    try {
+        const res = await fetch('/api/manage-awards', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+            body: JSON.stringify({
+                action: 'addAward',
+                awardData: { name, icon, description }
+            })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        alert('Award created successfully!');
+        $('award-name-input').value = '';
+        $('award-icon-input').value = '';
+        $('award-description-input').value = '';
+        await loadAwards();
+        populateAwardSelect();
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+function populateAwardSelect() {
+    const awardSelect = $('award-select');
+    if (awardSelect && availableAwards.length > 0) {
+        awardSelect.innerHTML = '<option value="">Select an award...</option>' +
+            availableAwards.slice().sort((a, b) => a.name.localeCompare(b.name)).map(a => `<option value="${a.name}" data-icon="${a.icon || ''}" data-description="${(a.description || '').replace(/"/g, '&quot;')}">${a.name}</option>`).join('');
+    }
+}
+
+async function assignAward(action) {
+    const awardName = $('award-select').value;
+    const playerName = $('award-player-select').value;
+    
+    if (!awardName) return alert('Please select an award');
+    if (!playerName) return alert('Please select a player');
+    
+    const award = availableAwards.find(a => a.name === awardName);
+    if (!award) return alert('Award not found');
+    
+    try {
+        const res = await fetch('/api/manage-awards', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+            body: JSON.stringify({
+                action: 'assignAward',
+                assignAwardData: {
+                    playerName,
+                    awardName,
+                    icon: award.icon,
+                    description: award.description,
+                    action
+                }
+            })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        alert(`Award ${action === 'add' ? 'given' : 'removed'} successfully!`);
         loadData();
     } catch (err) {
         alert('Error: ' + err.message);
