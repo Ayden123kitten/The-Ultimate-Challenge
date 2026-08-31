@@ -278,7 +278,7 @@
   {
     "id": "mcdig",
     "name": "Minecraft Dig",
-    "logo": "https://cdn2.steamgriddb.com/logo/7e6f627ab9304c64a6b2ac3ac7b1d495.png",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
     "apworld_version": "0.0.11",
     "mod_version": "0.0.11",
     "rules": "",
@@ -679,7 +679,7 @@
     "mod_setup_guide_link": "https://github.com/Syntheal/CloverPit.Archipelago",
     "tracker_link": "",
     "game_info_link": "",
-    "support_link": "https://discord.com/channels/731205301247803413/1423372513957908662\u2060",
+    "support_link": "https://discord.com/channels/731205301247803413/1423372513957908662⁠",
     "save_file_link": "https://drive.google.com/drive/folders/19lotdbWTckqU4hlXbkzB9cPV26wl0tmm",
     "current_player": null,
     "claimed_at": null,
@@ -1032,8 +1032,8 @@
     "completed": false,
     "logs": [],
     "slot_count": 1
-   },
-   {
+  },
+  {
     "id": "kirbymirror",
     "name": "Kirby & the Amazing Mirror",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/ca3a856a28df7d77d948949206ff9fdf.png",
@@ -1055,8 +1055,8 @@
     "completed": false,
     "logs": [],
     "slot_count": 1
-   },
-   {
+  },
+  {
     "id": "kirbyairride",
     "name": "Kirby Air Ride",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/b91c0e214d2c012f44bfab098fb99a1c.png",
@@ -1078,5 +1078,5 @@
     "completed": false,
     "logs": [],
     "slot_count": 1
-   }
+  }
 ]
