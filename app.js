@@ -912,6 +912,16 @@ function openModeratorModal() {
                             <input type="text" id="award-icon-input" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                             <textarea id="award-description-input" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                         </div>
+                        <div class="mt-4 p-4 glass rounded-lg">
+                            <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
+                            <div id="award-preview" class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                                <span id="preview-icon" class="text-2xl w-8 text-center"></span>
+                                <div>
+                                    <div id="preview-name" class="font-bold text-white">Award Name</div>
+                                    <div id="preview-description" class="text-xs text-slate-400">Description will appear here</div>
+                                </div>
+                            </div>
+                        </div>
                         <button onclick="createAward()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg mt-4 w-full">Create Award</button>
                     </div>
                     <div class="border-t border-slate-700 pt-4">
@@ -1656,6 +1666,10 @@ openModeratorModal = async function() {
             players.slice().sort((a, b) => a.name.localeCompare(b.name)).map(p => `<option value="${p.name}">${p.name}</option>`).join('');
     }
     
+    // Initialize award preview
+    updateAwardPreview();
+    attachAwardPreviewListeners();
+    
     // Populate moderator select if admin
     if (isAdmin) {
         const modSelect = $('moderator-select');
@@ -1883,10 +1897,44 @@ async function createAward() {
         $('award-name-input').value = '';
         $('award-icon-input').value = '';
         $('award-description-input').value = '';
+        updateAwardPreview();
         await loadAwards();
         populateAwardSelect();
     } catch (err) {
         alert('Error: ' + err.message);
+    }
+}
+
+function updateAwardPreview() {
+    const name = $('award-name-input')?.value.trim() || 'Award Name';
+    const icon = $('award-icon-input')?.value.trim() || '';
+    const description = $('award-description-input')?.value.trim() || 'Description will appear here';
+    
+    const previewName = document.getElementById('preview-name');
+    const previewIcon = document.getElementById('preview-icon');
+    const previewDescription = document.getElementById('preview-description');
+    
+    if (previewName) previewName.textContent = name;
+    if (previewIcon) previewIcon.textContent = icon;
+    if (previewDescription) previewDescription.textContent = description;
+}
+
+function attachAwardPreviewListeners() {
+    const nameInput = $('award-name-input');
+    const iconInput = $('award-icon-input');
+    const descInput = $('award-description-input');
+    
+    if (nameInput) {
+        nameInput.removeEventListener('input', updateAwardPreview);
+        nameInput.addEventListener('input', updateAwardPreview);
+    }
+    if (iconInput) {
+        iconInput.removeEventListener('input', updateAwardPreview);
+        iconInput.addEventListener('input', updateAwardPreview);
+    }
+    if (descInput) {
+        descInput.removeEventListener('input', updateAwardPreview);
+        descInput.addEventListener('input', updateAwardPreview);
     }
 }
 
