@@ -330,20 +330,6 @@ function renderPlayers() {
         filteredStats = playerStats.filter(stat => stat.name.toLowerCase().includes(query));
     }
 
-    // Calculate leaderboard ranks
-    const rankByGames = [...playerStats].sort((a, b) => b.gamesPlayed - a.gamesPlayed);
-    const rankByTime = [...playerStats].sort((a, b) => b.totalTimeMs - a.totalTimeMs);
-    const rankByClaims = [...playerStats].sort((a, b) => b.totalClaims - a.totalClaims);
-
-    const getRank = (name, type) => {
-        let list;
-        if (type === 'games') list = rankByGames;
-        else if (type === 'time') list = rankByTime;
-        else list = rankByClaims;
-        const index = list.findIndex(p => p.name === name);
-        return index === -1 ? '-' : index + 1;
-    };
-
     filteredStats.forEach(stat => {
         const card = document.createElement('div');
         const isSelected = stat.name === currentPlayer;
@@ -359,14 +345,6 @@ function renderPlayers() {
             this.style.boxShadow = 'none';
         };
         card.onclick = () => showPlayerModal(stat);
-
-        // Calculate overall rank (by games played as primary metric)
-        const overallRank = getRank(stat.name, 'games');
-        let rankBadge = '';
-        if (overallRank === 1) rankBadge = '<span class="text-yellow-400 text-lg">🥇</span>';
-        else if (overallRank === 2) rankBadge = '<span class="text-gray-300 text-lg">🥈</span>';
-        else if (overallRank === 3) rankBadge = '<span class="text-orange-400 text-lg">🥉</span>';
-        else rankBadge = `<span class="text-slate-400 font-bold text-sm">#${overallRank}</span>`;
 
         const avatar = stat.pfpLink
             ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
@@ -393,12 +371,7 @@ function renderPlayers() {
 
 
         card.innerHTML = `
-            <div style="position: relative;">
-                ${avatar}
-                <div style="position: absolute; bottom: -5px; right: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
-                    ${rankBadge}
-                </div>
-            </div>
+            ${avatar}
             <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
                 <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ''}</h2>
                 ${rolesHtml}
