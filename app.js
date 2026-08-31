@@ -136,9 +136,9 @@ function renderGames() {
             return totalChecks > 0 && completedChecks >= totalChecks;
         });
     } else if (gamesFilterOption === 'core') {
-        filteredGames = filteredGames.filter(game => game.mod_version === 'Core');
+        filteredGames = filteredGames.filter(game => game.apworld_version === 'Core');
     } else if (gamesFilterOption === 'custom') {
-        filteredGames = filteredGames.filter(game => game.mod_version && game.mod_version !== 'Core');
+        filteredGames = filteredGames.filter(game => game.apworld_version && game.apworld_version !== 'Core');
     }
 
     let sortedGames = filteredGames;
