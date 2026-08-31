@@ -34,11 +34,21 @@
         .cover-art-logo { max-width: 100%; max-height: 200px; object-fit: contain; image-rendering: auto; }
         .game-card-header { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; text-align: center; }
         .game-card-title-time-row { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 1rem; }
-        .game-card-title { flex: 1; text-align: left; }
+        .game-card-title { flex: 1; text-align: left; min-width: 0; }
+        .game-card-title h2 { word-wrap: break-word; overflow-wrap: break-word; hyphens: auto; }
         .game-card-time { flex-shrink: 0; text-align: right; }
         .game-card-title-time-row:not(:has(.game-card-time)) { justify-content: flex-start; }
         /* Mobile menu transition */
         #mobile-menu { transition: all 0.3s ease-in-out; }
+        /* Text wrapping utility */
+        .overflow-wrap-anywhere { overflow-wrap: anywhere; word-break: break-word; }
+        /* Mobile responsive styles */
+        @media (max-width: 640px) {
+            .game-card-title h2 { font-size: 1.1rem; }
+            .game-card-title-time-row { flex-direction: column; align-items: flex-start; }
+            .game-card-time { text-align: left; margin-top: 0.25rem; }
+            .grid { grid-template-columns: 1fr !important; }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">

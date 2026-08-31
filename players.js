@@ -516,13 +516,13 @@ function showPlayerModal(stat) {
     if (hasSettings) {
         if (playerObj.bio) {
             const bioDiv = document.createElement('div');
-            bioDiv.style.cssText = `margin-bottom: 10px;`;
+            bioDiv.style.cssText = `margin-bottom: 10px; overflow-wrap: anywhere; word-break: break-word;`;
             const bioLabel = document.createElement('span');
             bioLabel.textContent = 'Bio: ';
             bioLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
             const bioText = document.createElement('span');
             bioText.textContent = playerObj.bio;
-            bioText.style.cssText = `color: #e2e8f0;`;
+            bioText.style.cssText = `color: #e2e8f0; overflow-wrap: anywhere; word-break: break-word;`;
             bioDiv.appendChild(bioLabel);
             bioDiv.appendChild(bioText);
             settingsSection.appendChild(bioDiv);
@@ -550,7 +550,7 @@ function showPlayerModal(stat) {
             discordLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
             const discordText = document.createElement('span');
             discordText.textContent = playerObj.discord;
-            discordText.style.cssText = `color: #5865F2;`;
+            discordText.style.cssText = `color: #5865F2; overflow-wrap: anywhere; word-break: break-word;`;
             discordDiv.appendChild(discordLabel);
             discordDiv.appendChild(discordText);
             settingsSection.appendChild(discordDiv);
@@ -566,7 +566,7 @@ function showPlayerModal(stat) {
             websiteText.textContent = playerObj.website;
             websiteText.href = playerObj.website.startsWith('http') ? playerObj.website : '#';
             websiteText.target = '_blank';
-            websiteText.style.cssText = `color: #38bdf8; text-decoration: none;`;
+            websiteText.style.cssText = `color: #38bdf8; text-decoration: none; overflow-wrap: anywhere; word-break: break-word;`;
             websiteText.onmouseover = function() { this.style.textDecoration = 'underline'; };
             websiteText.onmouseout = function() { this.style.textDecoration = 'none'; };
             websiteDiv.appendChild(websiteLabel);
@@ -607,7 +607,7 @@ function showPlayerModal(stat) {
             }
             
             const awardInfo = document.createElement('div');
-            awardInfo.style.cssText = `flex: 1;`;
+            awardInfo.style.cssText = `flex: 1; min-width: 0;`;
             
             const awardName = document.createElement('div');
             awardName.innerHTML = `${iconHtml} <strong style="color: #38bdf8;">${award.name}</strong>`;
@@ -615,7 +615,7 @@ function showPlayerModal(stat) {
             
             const awardDesc = document.createElement('div');
             awardDesc.textContent = award.description || '';
-            awardDesc.style.cssText = `font-size: 0.85rem; color: #94a3b8;`;
+            awardDesc.style.cssText = `font-size: 0.85rem; color: #94a3b8; overflow-wrap: anywhere; word-break: break-word;`;
             
             awardInfo.appendChild(awardName);
             awardInfo.appendChild(awardDesc);

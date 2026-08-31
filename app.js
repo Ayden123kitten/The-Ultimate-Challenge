@@ -236,14 +236,14 @@ function renderGames() {
             </div>
 
             ${hasRules ? `
-                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700">
-                    <span class="text-ap-accent font-semibold">Rules:</span> ${game.rules}
+                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden">
+                    <span class="text-ap-accent font-semibold">Rules:</span> <span class="break-words overflow-wrap-anywhere">${game.rules}</span>
                 </div>
             ` : ''}
 
             ${hasExtraInfo ? `
-                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700">
-                    <span class="text-ap-accent font-semibold">Information:</span> ${game.extra_information}
+                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden">
+                    <span class="text-ap-accent font-semibold">Information:</span> <span class="break-words overflow-wrap-anywhere">${game.extra_information}</span>
                 </div>
             ` : ''}
 
@@ -260,7 +260,7 @@ function renderGames() {
             ` : ''}
 
             ${links.length > 0 ? `
-                <div class="grid grid-cols-2 gap-2 text-sm">
+                <div class="grid grid-cols-2 gap-2 text-sm min-w-0">
                     ${links.map(link => renderLink(link.url, link.icon, link.label, link.primary)).join('')}
                 </div>
             ` : ''}
@@ -289,9 +289,9 @@ function renderGames() {
                     <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Session Logs</h3>
                     <div class="max-h-32 overflow-y-auto scrollbar-hide space-y-1">
                         ${game.logs.slice().reverse().map(log => `
-                            <div class="text-xs flex justify-between text-slate-300 bg-slate-800/50 p-2 rounded">
-                                <span><span class="text-ap-accent">${log.player}</span></span>
-                                <span>${formatTime(log.duration_ms)}</span>
+                            <div class="text-xs flex justify-between text-slate-300 bg-slate-800/50 p-2 rounded min-w-0">
+                                <span class="truncate max-w-[60%]"><span class="text-ap-accent">${log.player}</span></span>
+                                <span class="font-mono flex-shrink-0">${formatTime(log.duration_ms)}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -308,9 +308,9 @@ function renderLink(url, icon, label, isPrimary = false) {
         ? 'bg-ap-accent/20 text-ap-accent border-ap-accent/30 hover:bg-ap-accent/30'
         : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white hover:border-slate-500';
     return `
-        <a href="${url}" target="_blank" class="flex items-center gap-2 p-2 rounded border ${bgClass} transition-all">
-            <i class="fa-solid ${icon}"></i>
-            <span>${label}</span>
+        <a href="${url}" target="_blank" class="flex items-center gap-2 p-2 rounded border ${bgClass} transition-all min-w-0">
+            <i class="fa-solid ${icon} flex-shrink-0"></i>
+            <span class="truncate">${label}</span>
         </a>
     `;
 }
