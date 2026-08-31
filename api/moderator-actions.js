@@ -205,6 +205,15 @@ export default async function handler(req, res) {
             if (playerData.pfp_link !== undefined) {
                 players[playerIndex].pfp_link = playerData.pfp_link;
             }
+            if (playerData.bio !== undefined) {
+                players[playerIndex].bio = playerData.bio;
+            }
+            if (playerData.pronouns !== undefined) {
+                players[playerIndex].pronouns = playerData.pronouns;
+            }
+            if (playerData.discord !== undefined) {
+                players[playerIndex].discord = playerData.discord;
+            }
 
             const newPlayersContent = Buffer.from(JSON.stringify(players, null, 2)).toString('base64');
             
