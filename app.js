@@ -487,7 +487,7 @@ let isAdmin = false;
         
         // Add moderator button to header if user is a moderator
         if (isModerator) {
-            const navSection = document.querySelector('header .max-w-7xl .flex.items-center.gap-4.flex-wrap');
+            const navSection = $('nav-container');
             if (navSection) {
                 const modBtn = document.createElement('button');
                 modBtn.id = 'moderator-toggle-btn';
