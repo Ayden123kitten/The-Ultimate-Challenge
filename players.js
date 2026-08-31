@@ -368,9 +368,6 @@ function renderPlayers() {
         };
         card.onclick = () => showPlayerModal(stat);
 
-
-        // Calculate rank badge based on position in sorted list
-        const rankBadge = `<span style="font-size: 0.75rem; font-weight: bold; color: #38bdf8;">#${index + 1}</span>`;
         const avatar = stat.pfpLink
             ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
             : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
@@ -401,9 +398,6 @@ function renderPlayers() {
         card.innerHTML = `
             <div style="position: relative;">
                 ${avatar}
-                <div style="position: absolute; bottom: -5px; right: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
-                    ${rankBadge}
-                </div>
                 ${inlineEditMode && isModerator ? `
                     <button onclick="openPlayerInlineEditor('${stat.name}', event)" style="position: absolute; top: -5px; right: -5px; background: #1e293b; border: 2px solid #38bdf8; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Edit Player">
                         <i class="fa-solid fa-gear" style="color: #38bdf8;"></i>
