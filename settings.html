@@ -215,14 +215,17 @@
             const picPreview = document.getElementById('pic-preview');
             
             // Check auth and load data
-            const user = localStorage.getItem('ap_async_player');
+            const user = AUTH.getName();
             if (!user) {
                 window.location.href = 'index.html'; // Redirect if not logged in
                 return;
             }
 
-            const settingsLink = document.getElementById('settings-link');
-            if(settingsLink) settingsLink.style.display = 'block';
+            // Display logged-in user
+            const currentPlayerNameEl = document.getElementById('current-player-name');
+            if (currentPlayerNameEl) {
+                currentPlayerNameEl.textContent = user;
+            }
 
             let isModerator = false;
             let players = [];
@@ -232,7 +235,7 @@
                 // Check moderator status
                 isModerator = await AUTH.checkModerator();
                 
-                const res = await fetch('/api/players');
+                const res = await fetch('/api/get-data?type=players');
                 players = await res.json();
                 const currentPlayer = players.find(p => p.name === user);
 
@@ -249,7 +252,7 @@
                 }
                 
                 // Load awards for dropdown
-                const awardsRes = await fetch('/api/get-awards');
+                const awardsRes = await fetch('/api/manage-awards');
                 if (awardsRes.ok) {
                     const awardsData = await awardsRes.json();
                     awards = awardsData.awards || [];
@@ -300,9 +303,11 @@
                 try {
                     const res = await fetch('/api/update-profile', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            ...AUTH.authHeader()
+                        },
                         body: JSON.stringify({
-                            username: user,
                             data: {
                                 pfp_link: data.profile_pic,
                                 bio: data.bio,
