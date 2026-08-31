@@ -530,6 +530,13 @@ function openModeratorModal() {
                     <textarea id="game-extra-information" placeholder="Extra Information" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                     <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg md:col-span-2">Add Game</button>
                 </form>
+                <!-- Live Preview -->
+                <div class="mt-6 pt-4 border-t border-slate-700">
+                    <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                    <div id="add-game-preview" class="glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50">
+                        <div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>
+                    </div>
+                </div>
             </div>
             
             <!-- Edit Game Section -->
@@ -557,6 +564,11 @@ function openModeratorModal() {
                     <textarea id="edit-game-extra-information" placeholder="Extra Information" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                     <button onclick="saveEditedGame()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg md:col-span-2">Save Changes</button>
                 </div>
+                <!-- Live Preview -->
+                <div id="edit-game-preview-container" class="hidden mt-6 pt-4 border-t border-slate-700">
+                    <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                    <div id="edit-game-preview" class="glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50"></div>
+                </div>
             </div>
             
             <!-- Edit Player Section -->
@@ -574,6 +586,11 @@ function openModeratorModal() {
                     <input type="text" id="edit-player-discord" placeholder="Discord Username" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
                     <button onclick="saveEditedPlayer()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Changes</button>
                     <button onclick="deletePlayer()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg w-full">Delete Player</button>
+                </div>
+                <!-- Live Preview -->
+                <div id="edit-player-preview-container" class="hidden mt-6 pt-4 border-t border-slate-700">
+                    <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                    <div id="edit-player-preview" class="glass rounded-xl p-6 flex items-center gap-4"></div>
                 </div>
             </div>
             
@@ -597,6 +614,13 @@ function openModeratorModal() {
                             <input type="text" id="new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
                             <input type="color" id="new-role-color" value="#ff0000" class="bg-slate-800/50 border border-slate-700 rounded-lg px-2 py-2 h-10 w-12">
                             <button onclick="addNewRole()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Role</button>
+                        </div>
+                        <!-- Live Preview -->
+                        <div class="mt-3 pt-3 border-t border-slate-700">
+                            <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
+                            <div id="add-role-preview" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700">
+                                <span class="text-sm text-slate-400">Start typing to see preview...</span>
+                            </div>
                         </div>
                     </div>
                     <div>
@@ -866,6 +890,181 @@ function openModeratorModal() {
             `).join('');
             container.classList.remove('hidden');
         };
+    }
+    
+    // ===== LIVE PREVIEW FUNCTIONALITY =====
+    
+    // Helper function to render game card preview
+    function renderGameCardPreview(game, previewElement) {
+        const hasCoverImage = game.logo && game.logo.trim() !== '';
+        const hasRules = game.rules && game.rules.trim() !== '';
+        const hasExtraInfo = game.extra_information && game.extra_information.trim() !== '';
+        const hasApworldVersion = game.apworld_version && game.apworld_version.trim() !== '';
+        const hasModVersion = game.mod_version && game.mod_version.trim() !== '';
+        
+        const links = [
+            { url: game.apworld_link, icon: 'fa-globe', label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === 'Core' ? 'Core' : 'v' + game.apworld_version})` : ''}` },
+            { url: game.mod_link, icon: 'fa-puzzle-piece', label: `Mod${hasModVersion ? ` (${game.mod_version === 'Core' ? '' : 'v'}${game.mod_version})` : ''}` },
+            { url: game.mod_setup_guide_link, icon: 'fa-book', label: 'Setup Guide' },
+            { url: game.tracker_link, icon: 'fa-map', label: 'Tracker' },
+            { url: game.game_info_link, icon: 'fa-circle-info', label: 'Game Info' },
+            { url: game.support_link, icon: 'fa-circle-question', label: 'Support' },
+            { url: game.save_file_link, icon: 'fa-download', label: 'Save File', primary: true }
+        ].filter(l => l.url && l.url.trim() !== '');
+        
+        previewElement.innerHTML = `
+            <div class="game-card-header flex gap-4">
+                ${hasCoverImage ? `
+                    <img src="${game.logo}" alt="${game.name}" class="w-12 h-12 object-contain bg-slate-800 rounded" onerror="this.style.display='none'">
+                ` : '<div class="w-12 h-12 bg-slate-800 rounded flex items-center justify-center text-slate-600"><i class="fa-solid fa-gamepad"></i></div>'}
+                <div class="flex-1">
+                    <h2 class="text-xl font-bold text-white">${game.name || 'Game Name'}</h2>
+                    <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold bg-green-500/20 text-green-400">Available</span>
+                </div>
+            </div>
+            ${hasRules ? `
+                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700">
+                    <span class="text-ap-accent font-semibold">Rules:</span> ${game.rules}
+                </div>
+            ` : ''}
+            ${hasExtraInfo ? `
+                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700">
+                    <span class="text-ap-accent font-semibold">Information:</span> ${game.extra_information}
+                </div>
+            ` : ''}
+            ${links.length > 0 ? `
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    ${links.map(link => `
+                        <a href="#" class="flex items-center gap-2 p-2 rounded border ${link.primary ? 'bg-ap-accent/20 text-ap-accent border-ap-accent/30' : 'bg-slate-800 text-slate-400 border-slate-700'}">
+                            <i class="fa-solid ${link.icon}"></i>
+                            <span class="truncate">${link.label}</span>
+                        </a>
+                    `).join('')}
+                </div>
+            ` : '<p class="text-sm text-slate-500 italic">No links added yet</p>'}
+        `;
+    }
+    
+    // Add Game Live Preview
+    const addGameInputs = ['game-name', 'game-id', 'game-logo', 'game-apworld-link', 'game-apworld-version', 
+                           'game-mod-link', 'game-mod-version', 'game-mod-setup-guide-link', 'game-tracker-link',
+                           'game-game-info-link', 'game-support-link', 'game-save-file-link', 'game-rules', 'game-extra-information'];
+    addGameInputs.forEach(id => {
+        const input = $(id);
+        if (input) {
+            input.addEventListener('input', () => {
+                const previewEl = $('add-game-preview');
+                if (!previewEl) return;
+                
+                const gameData = {
+                    name: $('game-name').value.trim() || 'Game Name',
+                    logo: $('game-logo').value.trim(),
+                    apworld_link: $('game-apworld-link').value.trim(),
+                    apworld_version: $('game-apworld-version').value.trim(),
+                    mod_link: $('game-mod-link').value.trim(),
+                    mod_version: $('game-mod-version').value.trim(),
+                    mod_setup_guide_link: $('game-mod-setup-guide-link').value.trim(),
+                    tracker_link: $('game-tracker-link').value.trim(),
+                    game_info_link: $('game-game-info-link').value.trim(),
+                    support_link: $('game-support-link').value.trim(),
+                    save_file_link: $('game-save-file-link').value.trim(),
+                    rules: $('game-rules').value.trim(),
+                    extra_information: $('game-extra-information').value.trim()
+                };
+                
+                renderGameCardPreview(gameData, previewEl);
+            });
+        }
+    });
+    
+    // Edit Game Live Preview
+    const editGameInputs = ['edit-game-name', 'edit-game-logo', 'edit-game-apworld-link', 'edit-game-apworld-version',
+                            'edit-game-mod-link', 'edit-game-mod-version', 'edit-game-mod-setup-guide-link', 'edit-game-tracker-link',
+                            'edit-game-game-info-link', 'edit-game-support-link', 'edit-game-save-file-link', 'edit-game-rules', 'edit-game-extra-information'];
+    editGameInputs.forEach(id => {
+        const input = $(id);
+        if (input) {
+            input.addEventListener('input', () => {
+                const previewContainer = $('edit-game-preview-container');
+                const previewEl = $('edit-game-preview');
+                if (!previewContainer || !previewEl) return;
+                
+                previewContainer.classList.remove('hidden');
+                
+                const gameData = {
+                    name: $('edit-game-name').value.trim() || 'Game Name',
+                    logo: $('edit-game-logo').value.trim(),
+                    apworld_link: $('edit-game-apworld-link').value.trim(),
+                    apworld_version: $('edit-game-apworld-version').value.trim(),
+                    mod_link: $('edit-game-mod-link').value.trim(),
+                    mod_version: $('edit-game-mod-version').value.trim(),
+                    mod_setup_guide_link: $('edit-game-mod-setup-guide-link').value.trim(),
+                    tracker_link: $('edit-game-tracker-link').value.trim(),
+                    game_info_link: $('edit-game-game-info-link').value.trim(),
+                    support_link: $('edit-game-support-link').value.trim(),
+                    save_file_link: $('edit-game-save-file-link').value.trim(),
+                    rules: $('edit-game-rules').value.trim(),
+                    extra_information: $('edit-game-extra-information').value.trim()
+                };
+                
+                renderGameCardPreview(gameData, previewEl);
+            });
+        }
+    });
+    
+    // Edit Player Live Preview
+    const editPlayerInputs = ['edit-player-new-name', 'edit-player-pfp', 'edit-player-bio', 'edit-player-pronouns', 'edit-player-discord'];
+    editPlayerInputs.forEach(id => {
+        const input = $(id);
+        if (input) {
+            input.addEventListener('input', () => {
+                const previewContainer = $('edit-player-preview-container');
+                const previewEl = $('edit-player-preview');
+                if (!previewContainer || !previewEl) return;
+                
+                previewContainer.classList.remove('hidden');
+                
+                const playerName = $('edit-player-select').value;
+                const player = players.find(p => p.name === playerName);
+                const displayName = $('edit-player-new-name').value.trim() || player?.name || 'Player Name';
+                const pfpLink = $('edit-player-pfp').value.trim();
+                const bio = $('edit-player-bio').value.trim();
+                const pronouns = $('edit-player-pronouns').value.trim();
+                const discord = $('edit-player-discord').value.trim();
+                
+                previewEl.innerHTML = `
+                    ${pfpLink ? `<img src="${pfpLink}" alt="${displayName}" class="w-16 h-16 rounded-full object-cover border-2 border-ap-accent">` : '<div class="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center text-slate-400"><i class="fa-solid fa-user text-2xl"></i></div>'}
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-lg font-bold text-white">${displayName}</h3>
+                            ${pronouns ? `<span class="text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">${pronouns}</span>` : ''}
+                        </div>
+                        ${bio ? `<p class="text-sm text-slate-400 mt-1">${bio}</p>` : ''}
+                        ${discord ? `<p class="text-xs text-slate-500 mt-1"><i class="fa-brands fa-discord mr-1"></i>${discord}</p>` : ''}
+                    </div>
+                `;
+            });
+        }
+    });
+    
+    // Add New Role Live Preview
+    const newRoleNameInput = $('new-role-name');
+    const newRoleColorInput = $('new-role-color');
+    if (newRoleNameInput && newRoleColorInput) {
+        newRoleNameInput.addEventListener('input', updateRolePreview);
+        newRoleColorInput.addEventListener('input', updateRolePreview);
+    }
+    
+    function updateRolePreview() {
+        const previewEl = $('add-role-preview');
+        if (!previewEl || !newRoleNameInput || !newRoleColorInput) return;
+        
+        const roleName = newRoleNameInput.value.trim() || 'Role Name';
+        const roleColor = newRoleColorInput.value || '#ff0000';
+        
+        previewEl.style.color = roleColor;
+        previewEl.style.borderColor = roleColor + '40';
+        previewEl.innerHTML = `<span class="text-sm">${roleName}</span>`;
     }
 }
 
