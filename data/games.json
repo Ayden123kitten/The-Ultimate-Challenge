@@ -856,5 +856,27 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "earthbound",
+    "name": "Earthbound",
+    "logo": "https://cdn2.steamgriddb.com/logo/6ffcc0d3641930e3d8980ec43343ccc5.png",
+    "yaml_slot_name": "Earthbound",
+    "apworld_link": "",
+    "apworld_version": "Core",
+    "mod_link": "",
+    "mod_version": "Core",
+    "mod_setup_guide_link": "https://archipelago.gg/tutorial/EarthBound/setup_en",
+    "tracker_link": "https://github.com/PinkSwitch/earthbound_poptracker/releases/tag/ebpoptracker1.0",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1488562318869663774",
+    "save_file_link": "https://drive.google.com/drive/folders/14pRIjDNKV7Fru81pN1JsyhRXvbhxqTrC",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
