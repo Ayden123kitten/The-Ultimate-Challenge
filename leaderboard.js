@@ -252,14 +252,14 @@ function renderTopCards(top3) {
         card.className = `glass rounded-xl p-6 ${borderColors[index]} border-t-4`;
 
         const avatar = stat.pfpLink
-            ? `<img src="${stat.pfpLink}" alt="${stat.name}" class="w-20 h-20 rounded-full object-cover border-4 border-slate-600" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+            ? `<img src="${stat.pfpLink}" alt="${stat.name}" class="w-20 h-20 rounded-full object-cover border-4 border-slate-600 mx-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
             : '';
         const fallbackAvatar = `<div class="w-20 h-20 rounded-full bg-ap-accent/20 flex items-center justify-center mx-auto" style="${stat.pfpLink ? 'display:none;' : ''}"><i class="fa-solid fa-user text-3xl text-ap-accent"></i></div>`;
 
         card.innerHTML = `
             <div class="text-center">
                 <div class="text-lg font-bold text-white mb-4">${cardTitles[index]}</div>
-                <div class="mb-4">
+                <div class="mb-4 flex justify-center">
                     ${avatar}${fallbackAvatar}
                 </div>
                 <h3 class="text-xl font-bold text-white mb-2">${stat.name}</h3>
