@@ -182,9 +182,9 @@ function renderLeaderboard() {
 
         // Rank badge
         let rankBadge = '';
-        if (rank === 1) rankBadge = '<span class="text-2xl">🥇</span>';
-        else if (rank === 2) rankBadge = '<span class="text-2xl">🥈</span>';
-        else if (rank === 3) rankBadge = '<span class="text-2xl">🥉</span>';
+        if (rank === 1) rankBadge = '<i class="fa-solid fa-trophy text-yellow-400 text-2xl"></i>';
+        else if (rank === 2) rankBadge = '<i class="fa-solid fa-medal text-gray-400 text-2xl"></i>';
+        else if (rank === 3) rankBadge = '<i class="fa-solid fa-medal text-orange-600 text-2xl"></i>';
         else rankBadge = `<span class="text-slate-400 font-bold">#${rank}</span>`;
 
         // Player avatar and name
@@ -242,7 +242,11 @@ function renderTopCards(top3) {
 
     if (top3.length === 0) return;
 
-    const cardTitles = ['🥇 1st Place', '🥈 2nd Place', '🥉 3rd Place'];
+    const cardTitles = [
+        '<i class="fa-solid fa-trophy text-yellow-400 mr-2"></i>1st Place', 
+        '<i class="fa-solid fa-medal text-gray-400 mr-2"></i>2nd Place', 
+        '<i class="fa-solid fa-medal text-orange-600 mr-2"></i>3rd Place'
+    ];
     const borderColors = ['border-yellow-500', 'border-gray-400', 'border-orange-600'];
 
     top3.forEach((stat, index) => {
