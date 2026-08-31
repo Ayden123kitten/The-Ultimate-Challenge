@@ -620,7 +620,10 @@ function openModeratorModal() {
                     <div>
                         <h4 class="text-sm font-semibold text-slate-300 mb-2">Add/Remove Moderator</h4>
                         <div class="flex gap-2 mb-2">
-                            <input type="text" id="moderator-name-input" placeholder="Player name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
+                            <select id="moderator-name-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
+                                <option value="">Select a player...</option>
+                                ${players.slice().sort((a, b) => a.name.localeCompare(b.name)).map(p => `<option value="${p.name}">${p.name}</option>`).join('')}
+                            </select>
                             <button onclick="manageModerator('add')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Moderator</button>
                             <button onclick="manageModerator('remove')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Remove Moderator</button>
                         </div>
@@ -1039,6 +1042,7 @@ openModeratorModal = async function() {
     // Populate moderator select if admin
     if (isAdmin) {
         const modSelect = $('moderator-select');
+        const adminSelect = $('admin-select');
         if (modSelect) {
             await populateModeratorSelect();
             
@@ -1054,6 +1058,9 @@ openModeratorModal = async function() {
                     permsContainer.classList.add('hidden');
                 }
             });
+        }
+        if (adminSelect) {
+            await populateAdminSelect();
         }
     }
 };
@@ -1092,6 +1099,29 @@ async function populateModeratorSelect() {
                 modSelect.innerHTML = '<option value="">Select a moderator...</option>' + 
                     data.moderators.slice().sort((a, b) => a.name.localeCompare(b.name)).map(m => `<option value="${m.name}">${m.name}</option>`).join('');
             }
+            const adminSelect = $('admin-select');
+            if (adminSelect) {
+                adminSelect.innerHTML = '<option value="">Select a moderator...</option>' + 
+                    data.moderators.slice().sort((a, b) => a.name.localeCompare(b.name)).map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+            }
+        }
+    } catch (err) {
+        console.error('Failed to load moderators:', err);
+    }
+}
+
+async function populateAdminSelect() {
+    try {
+        const res = await fetch('/api/get-moderators', {
+            headers: AUTH.authHeader()
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const adminSelect = $('admin-select');
+            if (adminSelect) {
+                adminSelect.innerHTML = '<option value="">Select a moderator...</option>' + 
+                    data.moderators.slice().sort((a, b) => a.name.localeCompare(b.name)).map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+            }
         }
     } catch (err) {
         console.error('Failed to load moderators:', err);
@@ -1099,9 +1129,9 @@ async function populateModeratorSelect() {
 }
 
 async function manageModerator(action) {
-    const name = $('moderator-name-input').value.trim();
+    const name = $('moderator-name-select').value;
     
-    if (!name) return alert('Please enter a player name');
+    if (!name) return alert('Please select a player');
     
     try {
         const res = await fetch('/api/moderator-actions', {
@@ -1115,7 +1145,7 @@ async function manageModerator(action) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         alert(`Moderator ${action === 'add' ? 'added' : 'removed'} successfully!`);
-        $('moderator-name-input').value = '';
+        $('moderator-name-select').value = '';
         openModeratorModal(); // Refresh the modal
     } catch (err) {
         alert('Error: ' + err.message);
