@@ -31,8 +31,8 @@ function formatTime(ms) {
 async function loadData() {
     try {
         const [gamesRes, playersRes] = await Promise.all([
-            fetch(`/api/get-games?t=${Date.now()}`),
-            fetch(`/api/get-players?t=${Date.now()}`)
+            fetch(`/api/get-data?type=games&t=${Date.now()}`),
+            fetch(`/api/get-data?type=players&t=${Date.now()}`)
         ]);
 
         if (!gamesRes.ok) throw new Error(`Games API: ${gamesRes.status}`);
