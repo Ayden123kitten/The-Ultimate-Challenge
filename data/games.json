@@ -922,5 +922,27 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "tlozalltp",
+    "name": "The Legend of Zelda: A Link to the Past",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/d94c59b53ea6a9eec0a47ae789867098.png",
+    "yaml_slot_name": "",
+    "apworld_link": "https://archipelago.gg/games",
+    "apworld_version": "Core",
+    "mod_link": "",
+    "mod_version": "Core",
+    "mod_setup_guide_link": "https://github.com/Alchav/Archipelago/blob/main/worlds/alttp/docs/multiworld_en.md",
+    "tracker_link": "https://github.com/Br00ty/tloz_brooty/releases/tag/1.5.5.1",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/827141303330406408",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
