@@ -31,7 +31,7 @@ function formatTime(ms) {
 
 async function loadRoles() {
     try {
-        const res = await fetch(`/api/get-roles?t=${Date.now()}`);
+        const res = await fetch(`/api/get-data?type=roles&t=${Date.now()}`);
         if (res.ok) {
             availableRoles = await res.json();
         }
@@ -73,8 +73,8 @@ function getModeratorIcon(playerName) {
 async function loadData() {
     try {
         const [gamesRes, playersRes] = await Promise.all([
-            fetch(`/api/get-games?t=${Date.now()}`),
-            fetch(`/api/get-players?t=${Date.now()}`)
+            fetch(`/api/get-data?type=games&t=${Date.now()}`),
+            fetch(`/api/get-data?type=players&t=${Date.now()}`)
         ]);
 
         if (!gamesRes.ok) throw new Error(`Games API: ${gamesRes.status}`);

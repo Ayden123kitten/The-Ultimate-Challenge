@@ -1,1 +1,1 @@
-(api/get-data.js)
+Nothing needs to be added to .gitignore since the changes only include JavaScript source files (.js) which are not build artifacts, dependencies, or temporary files.
