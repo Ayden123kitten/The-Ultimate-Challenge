@@ -970,10 +970,61 @@ function openModeratorModal() {
                     <button onclick="updateEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Event Time Settings</button>
                 </div>
             </div>
+            
+            <!-- Live Preview -->
+            <div class="glass rounded-lg p-4">
+                <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                <div id="event-timer-preview" class="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                    <div class="text-center">
+                        <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent">${formatTime(Date.now() - (settings.start_time ? new Date(settings.start_time).getTime() : 0))}</div>
+                        <div id="preview-status" class="text-xs text-slate-400 uppercase">${settings.start_time ? 'Event Live' : 'Not Set'}</div>
+                    </div>
+                </div>
+            </div>
         </div>
     `;
     
     modal.classList.remove('hidden');
+    
+    // Update preview on input change
+    const startInput = $('event-start-time-input');
+    const endInput = $('event-end-time-input');
+    
+    function updatePreview() {
+        const previewTimer = $('preview-timer');
+        const previewStatus = $('preview-status');
+        
+        const startTime = startInput.value;
+        const endTime = endInput.value;
+        
+        if (!startTime) {
+            previewTimer.textContent = '00:00:00';
+            previewStatus.textContent = 'Not Set';
+            return;
+        }
+        
+        const now = Date.now();
+        const start = new Date(startTime).getTime();
+        const end = endTime ? new Date(endTime).getTime() : null;
+        
+        if (now < start) {
+            previewTimer.textContent = formatTime(start - now);
+            previewStatus.textContent = 'Starts In';
+            previewStatus.className = 'text-xs text-yellow-400 uppercase';
+        } else if (end === null || (now >= start && now <= end)) {
+            previewTimer.textContent = formatTime(now - start);
+            previewStatus.textContent = 'Event Live';
+            previewStatus.className = 'text-xs text-green-400 uppercase';
+        } else {
+            previewTimer.textContent = formatTime(now - end);
+            previewStatus.textContent = 'Event Ended';
+            previewStatus.className = 'text-xs text-red-400 uppercase';
+        }
+    }
+    
+    startInput.addEventListener('change', updatePreview);
+    endInput.addEventListener('change', updatePreview);
+    updatePreview();
     
     // Setup form handlers
     const addGameForm = $('add-game-form');
