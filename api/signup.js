@@ -9,7 +9,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { name, password, pfpLink } = req.body;
+    const { name, password, pfpLink, bio, pronouns, discord } = req.body;
     if (!name || !password) {
         return res.status(400).json({ error: 'Name and password are required.' });
     }
@@ -69,11 +69,21 @@ export default async function handler(req, res) {
                 const password_hash = await bcrypt.hash(password, 10);
                 existingPlayer.password_hash = password_hash;
                 existingPlayer.pfp_link = pfpLink || '';
+                existingPlayer.bio = bio || '';
+                existingPlayer.pronouns = pronouns || '';
+                existingPlayer.discord = discord || '';
             }
         } else {
             // New player - create account
             const password_hash = await bcrypt.hash(password, 10);
-            players.push({ name: name.trim(), password_hash, pfp_link: pfpLink || '' });
+            players.push({ 
+                name: name.trim(), 
+                password_hash, 
+                pfp_link: pfpLink || '',
+                bio: bio || '',
+                pronouns: pronouns || '',
+                discord: discord || ''
+            });
         }
 
         // Update the file on GitHub
