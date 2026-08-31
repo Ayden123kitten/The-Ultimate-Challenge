@@ -750,7 +750,7 @@
   {
     "id": "apquest",
     "name": "APQuest",
-    "logo": "",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/679c4da61fce989a001ac76fccffcb92.png",
     "yaml_slot_name": "APQuest",
     "apworld_link": "https://archipelago.gg/games",
     "apworld_version": "Core",
