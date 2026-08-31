@@ -3,7 +3,7 @@
 // ==========================================
 const CONFIG = {
     GITHUB_OWNER: 'Ayden123kitten',
-    GITHUB_REPO: '',
+    GITHUB_REPO: 'The-Ultimate-Challenge',
     BRANCH: 'main'
 };
 
