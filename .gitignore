@@ -1,1 +1,0 @@
-Nothing should be ignored in this case, as the changes only include JavaScript source files (.js) which are legitimate code files to track in version control.
