@@ -147,6 +147,76 @@
             </div>
         </div>
         
+        <!-- Account Settings -->
+        <div class="glass rounded-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold text-white mb-6">Account Settings</h2>
+            <form id="account-form" class="space-y-6">
+                <div>
+                    <label for="current-name" class="block text-sm font-medium text-slate-300 mb-2">Current Name</label>
+                    <input 
+                        type="text" 
+                        id="current-name" 
+                        name="current_name" 
+                        readonly
+                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-slate-400 cursor-not-allowed"
+                    >
+                </div>
+
+                <div>
+                    <label for="new-name" class="block text-sm font-medium text-slate-300 mb-2">New Name</label>
+                    <input 
+                        type="text" 
+                        id="new-name" 
+                        name="new_name" 
+                        placeholder="Enter new username"
+                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                    >
+                </div>
+
+                <div class="pt-4 border-t border-slate-700">
+                    <h3 class="text-lg font-semibold text-white mb-4">Change Password</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="current-password" class="block text-sm font-medium text-slate-300 mb-2">Current Password</label>
+                            <input 
+                                type="password" 
+                                id="current-password" 
+                                name="current_password" 
+                                placeholder="Enter current password"
+                                class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="new-password" class="block text-sm font-medium text-slate-300 mb-2">New Password</label>
+                            <input 
+                                type="password" 
+                                id="new-password" 
+                                name="new_password" 
+                                placeholder="Enter new password"
+                                class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="confirm-password" class="block text-sm font-medium text-slate-300 mb-2">Confirm New Password</label>
+                            <input 
+                                type="password" 
+                                id="confirm-password" 
+                                name="confirm_password" 
+                                placeholder="Confirm new password"
+                                class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-ap-accent hover:bg-sky-600 text-slate-900 font-medium py-3 px-6 rounded-lg transition-colors">
+                    <i class="fa-solid fa-user-pen mr-2"></i>Update Account
+                </button>
+            </form>
+        </div>
+
         <!-- Profile Settings -->
         <div class="glass rounded-xl p-8">
             <h2 class="text-2xl font-bold text-white mb-6">Profile Settings</h2>
@@ -225,6 +295,12 @@
             const currentPlayerNameEl = document.getElementById('current-player-name');
             if (currentPlayerNameEl) {
                 currentPlayerNameEl.textContent = user;
+            }
+
+            // Set current name in account form
+            const currentNameInput = document.getElementById('current-name');
+            if (currentNameInput) {
+                currentNameInput.value = user;
             }
 
             let isModerator = false;
@@ -325,6 +401,65 @@
                     }
                 } catch (err) {
                     alert('Failed to save settings.');
+                }
+            });
+
+            // Account form handler (change name and password)
+            const accountForm = document.getElementById('account-form');
+            accountForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(accountForm);
+                const data = Object.fromEntries(formData.entries());
+
+                // Validate password fields if any are filled
+                if (data.current_password || data.new_password || data.confirm_password) {
+                    if (!data.current_password) {
+                        alert('Current password is required to change password.');
+                        return;
+                    }
+                    if (!data.new_password) {
+                        alert('New password is required.');
+                        return;
+                    }
+                    if (data.new_password !== data.confirm_password) {
+                        alert('New passwords do not match.');
+                        return;
+                    }
+                }
+
+                try {
+                    const res = await fetch('/api/update-profile', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            ...AUTH.authHeader()
+                        },
+                        body: JSON.stringify({
+                            data: {
+                                new_name: data.new_name || undefined,
+                                current_password: data.current_password || undefined,
+                                new_password: data.new_password || undefined
+                            }
+                        })
+                    });
+
+                    if (res.ok) {
+                        // If name was changed, update localStorage and reload
+                        if (data.new_name && data.new_name !== user) {
+                            AUTH.setSession(data.new_name, AUTH.getToken());
+                            alert('Account updated successfully! Please log in again with your new credentials.');
+                            AUTH.logout();
+                        } else {
+                            alert('Account updated successfully!');
+                            accountForm.reset();
+                            document.getElementById('current-name').value = data.new_name || user;
+                        }
+                    } else {
+                        const err = await res.json();
+                        alert('Error updating account: ' + err.error);
+                    }
+                } catch (err) {
+                    alert('Failed to update account.');
                 }
             });
             
