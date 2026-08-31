@@ -48,7 +48,12 @@ export default async function handler(req, res) {
             data = data.map(p => ({
                 name: p.name,
                 pfp_link: p.pfp_link || '',
-                has_password: !!p.password_hash
+                has_password: !!p.password_hash,
+                bio: p.bio || '',
+                pronouns: p.pronouns || '',
+                discord: p.discord || '',
+                website: p.website || '',
+                roles: p.roles || []
             }));
         }
 
