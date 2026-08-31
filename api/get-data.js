@@ -2,7 +2,7 @@ export default async function handler(req, res) {
     const token = process.env.GITHUB_TOKEN;
     const owner = process.env.GITHUB_OWNER;
     const repo = process.env.GITHUB_REPO;
-    const branch = process.env.GITHUB_BRANCH || 'main';
+    const branch = process.env.BRANCH || 'main';
 
     if (!token || !owner || !repo) {
         return res.status(500).json({ error: 'Server configuration missing. Contact admin.' });
