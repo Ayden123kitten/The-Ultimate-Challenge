@@ -834,5 +834,27 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "tloztaol",
+    "name": "Zelda 2: The Adventure of Link",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/a714b6bada5e4ad469abf003c9d2c3d8.png",
+    "yaml_slot_name": "",
+    "apworld_link": "https://github.com/PinkSwitch/Archipelago/releases?q=zelda&expanded=true#release-Zelda2ap1.1",
+    "apworld_version": "1.1",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "",
+    "tracker_link": "https://github.com/palex00/zelda-2-ap-tracker/releases/tag/0.0.4",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1239454398367924325",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
