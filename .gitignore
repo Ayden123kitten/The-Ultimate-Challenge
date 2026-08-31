@@ -1,3 +1,1 @@
-```javascript
-
-```
+Nothing needs to be added to .gitignore since only a source/config file (settings.html) was modified and there are no build artifacts, dependencies, or temporary files in the changes.
