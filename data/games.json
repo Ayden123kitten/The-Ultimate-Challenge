@@ -746,5 +746,27 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "apquest",
+    "name": "APQuest",
+    "logo": "",
+    "yaml_slot_name": "APQuest",
+    "apworld_link": "https://archipelago.gg/games",
+    "apworld_version": "",
+    "mod_link": "",
+    "mod_version": "Core",
+    "mod_setup_guide_link": "",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
