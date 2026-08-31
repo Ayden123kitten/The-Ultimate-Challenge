@@ -48,8 +48,8 @@ async function loadData() {
         const baseRawUrl = `https://raw.githubusercontent.com/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/${CONFIG.BRANCH}/data`;
 
         const [gamesRes, playersRes, settingsRes] = await Promise.all([
-            fetch(`/api/get-data?type=games`),          // via API to bypass raw CDN cache
-            fetch(`/api/get-data?type=players`),        // via API so password_hash never reaches the browser
+            fetch(`/api/get-data?type=games&t=${Date.now()}`),      // ✅ Fixed
+            fetch(`/api/get-data?type=players&t=${Date.now()}`),    // ✅ Fixed
             fetch(`${baseRawUrl}/settings.json?t=${Date.now()}`)
         ]);
 
