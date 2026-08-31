@@ -517,10 +517,10 @@ function showPlayerModal(stat) {
     const settingsSection = document.createElement('div');
     settingsSection.style.cssText = `margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
     
-    const hasSettings = playerObj && (playerObj.bio || playerObj.pronouns || playerObj.discord || playerObj.website);
+    const hasSettings = playerObj && ((playerObj.bio && playerObj.bio.trim() !== '') || (playerObj.pronouns && playerObj.pronouns.trim() !== '') || (playerObj.discord && playerObj.discord.trim() !== '') || (playerObj.website && playerObj.website.trim() !== ''));
     
     if (hasSettings) {
-        if (playerObj.bio) {
+        if (playerObj.bio && playerObj.bio.trim() !== '') {
             const bioDiv = document.createElement('div');
             bioDiv.style.cssText = `margin-bottom: 10px; overflow-wrap: anywhere; word-break: break-word;`;
             const bioLabel = document.createElement('span');
@@ -534,7 +534,7 @@ function showPlayerModal(stat) {
             settingsSection.appendChild(bioDiv);
         }
         
-        if (playerObj.pronouns) {
+        if (playerObj.pronouns && playerObj.pronouns.trim() !== '') {
             const pronounsDiv = document.createElement('div');
             pronounsDiv.style.cssText = `margin-bottom: 10px;`;
             const pronounsLabel = document.createElement('span');
@@ -548,7 +548,7 @@ function showPlayerModal(stat) {
             settingsSection.appendChild(pronounsDiv);
         }
         
-        if (playerObj.discord) {
+        if (playerObj.discord && playerObj.discord.trim() !== '') {
             const discordDiv = document.createElement('div');
             discordDiv.style.cssText = `margin-bottom: 10px;`;
             const discordLabel = document.createElement('span');
@@ -562,7 +562,7 @@ function showPlayerModal(stat) {
             settingsSection.appendChild(discordDiv);
         }
         
-        if (playerObj.website) {
+        if (playerObj.website && playerObj.website.trim() !== '') {
             const websiteDiv = document.createElement('div');
             websiteDiv.style.cssText = `margin-bottom: 10px;`;
             const websiteLabel = document.createElement('span');
@@ -579,8 +579,6 @@ function showPlayerModal(stat) {
             websiteDiv.appendChild(websiteText);
             settingsSection.appendChild(websiteDiv);
         }
-        
-        content.appendChild(settingsSection);
     }
 
     // Awards Section
@@ -694,6 +692,9 @@ function showPlayerModal(stat) {
 
     content.appendChild(closeBtn);
     content.appendChild(header);
+    if (hasSettings) {
+        content.appendChild(settingsSection);
+    }
     content.appendChild(statsGrid);
     content.appendChild(historySection);
     modal.appendChild(content);
