@@ -42,7 +42,7 @@ async function loadRoles() {
 
 async function loadModeratorRoles() {
     try {
-        const res = await fetch(`/api/get-moderator-roles?t=${Date.now()}`);
+        const res = await fetch(`/api/get-data?type=moderators`);
         if (res.ok) {
             moderatorRoles = await res.json();
         }
