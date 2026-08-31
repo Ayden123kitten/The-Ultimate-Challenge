@@ -944,5 +944,27 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "tlozalbw",
+    "name": "The Legend of Zelda: A Link Between Worlds",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/1ce5e897cda6aeb211dffe8d514f4365.png",
+    "yaml_slot_name": "",
+    "apworld_link": "https://github.com/randomsalience/albw-archipelago/releases/tag/v0.3.4-hotfix",
+    "apworld_version": "0.3.4",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://github.com/randomsalience/albw-archipelago/blob/main/docs/setup_en.md",
+    "tracker_link": "https://github.com/guigui0246/albw-ap-poptracker/releases",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1434699603843874846",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
