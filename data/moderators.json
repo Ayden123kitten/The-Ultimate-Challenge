@@ -16,7 +16,7 @@
       "name": "TeraKord",
       "permissions": {
         "manageModerators": false,
-        "manageGames": false,
+        "manageGames": true,
         "managePlayers": false,
         "manageRoles": false,
         "manageAwards": false,
