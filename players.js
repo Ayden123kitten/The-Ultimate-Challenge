@@ -13,6 +13,7 @@ const CONFIG = {
 let games = [];
 let players = []; // [{ name, pfp_link, has_password }]
 let availableRoles = []; // [{ name, color }]
+let moderatorRoles = {}; // { playerName: 'admin' | 'moderator' }
 let currentPlayer = AUTH.getName();
 let currentAuthTab = 'login'; // Track which auth tab is active: 'login' or 'signup'
 let authPanelRendered = false; // Track if auth panel has been rendered
@@ -39,10 +40,31 @@ async function loadRoles() {
     }
 }
 
+async function loadModeratorRoles() {
+    try {
+        const res = await fetch(`/api/get-moderator-roles?t=${Date.now()}`);
+        if (res.ok) {
+            moderatorRoles = await res.json();
+        }
+    } catch (err) {
+        console.error('Failed to load moderator roles:', err);
+    }
+}
+
 function renderRoleBadge(roleName) {
     const role = availableRoles.find(r => r.name === roleName);
     if (!role) return '';
     return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold" style="background-color: ${role.color}20; color: ${role.color}; border: 1px solid ${role.color}"><span style="width: 6px; height: 6px; background-color: ${role.color}; border-radius: 50%;"></span>${role.name}</span>`;
+}
+
+function getModeratorIcon(playerName) {
+    const role = moderatorRoles[playerName];
+    if (role === 'admin') {
+        return '<i class="fa-solid fa-crown text-yellow-400" title="Admin"></i>';
+    } else if (role === 'moderator') {
+        return '<i class="fa-solid fa-shield-halved text-blue-400" title="Moderator"></i>';
+    }
+    return '';
 }
 
 // ==========================================
@@ -61,7 +83,7 @@ async function loadData() {
         games = await gamesRes.json();
         players = await playersRes.json();
         
-        await loadRoles();
+        await Promise.all([loadRoles(), loadModeratorRoles()]);
 
         renderAuthPanel();
         renderPlayers();
@@ -350,6 +372,9 @@ function renderPlayers() {
             ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
             : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
         
+
+        // Get moderator icon (admin or moderator)
+        const modIcon = getModeratorIcon(stat.name);
         // Get player roles from players array
         const playerObj = players.find(p => p.name === stat.name);
         const playerRoles = (playerObj && playerObj.roles) ? playerObj.roles : [];
@@ -371,7 +396,13 @@ function renderPlayers() {
 
 
         card.innerHTML = `
-            ${avatar}
+            <div style="position: relative;">
+                ${avatar}
+                <div style="position: absolute; bottom: -5px; right: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
+                    ${rankBadge}
+                </div>
+            </div>
+                ${modIcon ? `<div style="position: absolute; top: -5px; left: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">${modIcon}</div>` : ''}
             <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
                 <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ''}</h2>
                 ${rolesHtml}
