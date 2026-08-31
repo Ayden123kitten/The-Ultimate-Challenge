@@ -569,7 +569,11 @@ function openModeratorModal() {
                 <div id="edit-player-form-container" class="hidden space-y-4">
                     <input type="text" id="edit-player-new-name" placeholder="New Name (optional)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
                     <input type="url" id="edit-player-pfp" placeholder="Profile Picture URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                    <textarea id="edit-player-bio" placeholder="Bio" rows="3" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full"></textarea>
+                    <input type="text" id="edit-player-pronouns" placeholder="Pronouns" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                    <input type="text" id="edit-player-discord" placeholder="Discord Username" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
                     <button onclick="saveEditedPlayer()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Changes</button>
+                    <button onclick="deletePlayer()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg w-full">Delete Player</button>
                 </div>
             </div>
             
@@ -829,6 +833,9 @@ function openModeratorModal() {
             
             $('edit-player-new-name').value = '';
             $('edit-player-pfp').value = player.pfp_link || '';
+            $('edit-player-bio').value = player.bio || '';
+            $('edit-player-pronouns').value = player.pronouns || '';
+            $('edit-player-discord').value = player.discord || '';
             container.classList.remove('hidden');
         };
     }
@@ -911,7 +918,10 @@ async function saveEditedPlayer() {
     const playerData = {
         name: playerName,
         newName: $('edit-player-new-name').value.trim() || undefined,
-        pfp_link: $('edit-player-pfp').value.trim()
+        pfp_link: $('edit-player-pfp').value.trim(),
+        bio: $('edit-player-bio').value.trim(),
+        pronouns: $('edit-player-pronouns').value.trim(),
+        discord: $('edit-player-discord').value.trim()
     };
     
     try {
@@ -923,6 +933,30 @@ async function saveEditedPlayer() {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         alert('Player updated successfully!');
+        loadData();
+        closeModeratorModal();
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+async function deletePlayer() {
+    const playerName = $('edit-player-select').value;
+    if (!playerName) return;
+    
+    if (!confirm(`Are you sure you want to delete player "${playerName}"? This action cannot be undone.`)) {
+        return;
+    }
+    
+    try {
+        const res = await fetch('/api/moderator-actions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+            body: JSON.stringify({ action: 'deletePlayer', playerName })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        alert('Player deleted successfully!');
         loadData();
         closeModeratorModal();
     } catch (err) {
