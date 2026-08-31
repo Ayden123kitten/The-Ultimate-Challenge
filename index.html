@@ -199,8 +199,8 @@
     </footer>
 
     <!-- Moderation Panel Modal -->
-    <div id="moderator-modal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
-        <div class="glass rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div id="moderator-modal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4" onclick="closeModeratorModalOnClick(event)">
+        <div class="glass rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
             <div class="p-6">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-white">Moderation Panel</h2>
@@ -249,6 +249,13 @@
                 observer.observe(gamesCountDesktop, { childList: true, subtree: true, characterData: true });
             }
         });
+        
+        // Close moderator modal when clicking on the backdrop
+        function closeModeratorModalOnClick(event) {
+            if (event.target.id === 'moderator-modal') {
+                closeModeratorModal();
+            }
+        }
     </script>
 </body>
 </html>

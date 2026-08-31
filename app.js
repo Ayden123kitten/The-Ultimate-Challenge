@@ -491,7 +491,7 @@ let isAdmin = false;
             if (navSection) {
                 const modBtn = document.createElement('button');
                 modBtn.id = 'moderator-toggle-btn';
-                modBtn.className = 'group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-ap-accent transition-all';
+                modBtn.className = 'group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all';
                 modBtn.innerHTML = '<i class="fa-solid fa-shield-halved group-hover:text-ap-accent transition-colors"></i><span class="text-sm font-medium hidden xl:inline">Moderation</span>';
                 modBtn.onclick = openModeratorModal;
                 navSection.appendChild(modBtn);
