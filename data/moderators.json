@@ -33,6 +33,17 @@
         "manageAwards": false,
         "manageSettings": false
       }
+    },
+    {
+      "name": "Grilled",
+      "permissions": {
+        "manageModerators": false,
+        "manageGames": false,
+        "managePlayers": false,
+        "manageRoles": false,
+        "manageAwards": false,
+        "manageSettings": false
+      }
     }
   ]
 }
