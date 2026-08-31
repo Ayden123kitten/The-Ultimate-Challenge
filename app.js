@@ -4,7 +4,7 @@
 const CONFIG = {
     GITHUB_OWNER: 'Ayden123kitten',
     GITHUB_REPO: 'The-Ultimate-Challenge',
-    BRANCH: 'main'
+    BRANCH: 'main',
 };
 
 // ==========================================
