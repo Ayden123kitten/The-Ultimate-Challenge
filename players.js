@@ -369,8 +369,8 @@ function renderPlayers() {
         else rankBadge = `<span class="text-slate-400 font-bold text-sm">#${overallRank}</span>`;
 
         const avatar = stat.pfpLink
-            ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--ap-accent); background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
-            : `<div style="width: 60px; height: 60px; border-radius: 50%; background: var(--ap-accent)/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: var(--ap-accent);"></i></div>`;
+            ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
+            : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
         
         // Get player roles from players array
         const playerObj = players.find(p => p.name === stat.name);
@@ -400,7 +400,7 @@ function renderPlayers() {
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
-                <h2 style="margin: 0; font-size: 0.95rem; color: var(--text-color); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: var(--ap-accent);">(You)</span>' : ''}</h2>
+                <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ''}</h2>
                 ${rolesHtml}
             </div>
         `;
@@ -429,7 +429,7 @@ function showPlayerModal(stat) {
     modal.style.cssText = `
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.85);
+        background: rgba(15, 23, 42, 0.4);
         z-index: 1000;
         display: flex;
         justify-content: center;
@@ -439,7 +439,8 @@ function showPlayerModal(stat) {
 
     const content = document.createElement('div');
     content.style.cssText = `
-        background: var(--bg-color);
+        background: rgba(30, 41, 59, 0.98);
+        backdrop-filter: blur(10px);
         padding: 30px;
         border-radius: 16px;
         max-width: 600px;
@@ -447,7 +448,7 @@ function showPlayerModal(stat) {
         max-height: 80vh;
         overflow-y: auto;
         position: relative;
-        border: 1px solid var(--border-color);
+        border: 1px solid rgba(255,255,255,0.1);
         box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     `;
 
@@ -459,7 +460,7 @@ function showPlayerModal(stat) {
         top: 15px; right: 20px;
         background: none;
         border: none;
-        color: var(--text-muted);
+        color: #94a3b8;
         font-size: 1.5rem;
         cursor: pointer;
         line-height: 1;
@@ -468,11 +469,11 @@ function showPlayerModal(stat) {
 
     // Header
     const header = document.createElement('div');
-    header.style.cssText = `display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;`;
+    header.style.cssText = `display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;`;
     
     const avatar = stat.pfpLink
-        ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid var(--ap-accent);">`
-        : `<div style="width: 60px; height: 60px; border-radius: 50%; background: var(--ap-accent)/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: var(--ap-accent);"></i></div>`;
+        ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8;">`
+        : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
 
     const info = document.createElement('div');
     const h2 = document.createElement('h2');
@@ -518,10 +519,10 @@ function showPlayerModal(stat) {
             bioDiv.style.cssText = `margin-bottom: 10px;`;
             const bioLabel = document.createElement('span');
             bioLabel.textContent = 'Bio: ';
-            bioLabel.style.cssText = `font-weight: bold; color: var(--text-muted);`;
+            bioLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
             const bioText = document.createElement('span');
             bioText.textContent = playerObj.bio;
-            bioText.style.cssText = `color: var(--text-color);`;
+            bioText.style.cssText = `color: #e2e8f0;`;
             bioDiv.appendChild(bioLabel);
             bioDiv.appendChild(bioText);
             settingsSection.appendChild(bioDiv);
@@ -532,10 +533,10 @@ function showPlayerModal(stat) {
             pronounsDiv.style.cssText = `margin-bottom: 10px;`;
             const pronounsLabel = document.createElement('span');
             pronounsLabel.textContent = 'Pronouns: ';
-            pronounsLabel.style.cssText = `font-weight: bold; color: var(--text-muted);`;
+            pronounsLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
             const pronounsText = document.createElement('span');
             pronounsText.textContent = playerObj.pronouns;
-            pronounsText.style.cssText = `color: var(--ap-accent);`;
+            pronounsText.style.cssText = `color: #38bdf8;`;
             pronounsDiv.appendChild(pronounsLabel);
             pronounsDiv.appendChild(pronounsText);
             settingsSection.appendChild(pronounsDiv);
@@ -546,7 +547,7 @@ function showPlayerModal(stat) {
             discordDiv.style.cssText = `margin-bottom: 10px;`;
             const discordLabel = document.createElement('span');
             discordLabel.textContent = 'Discord: ';
-            discordLabel.style.cssText = `font-weight: bold; color: var(--text-muted);`;
+            discordLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
             const discordText = document.createElement('span');
             discordText.textContent = playerObj.discord;
             discordText.style.cssText = `color: #5865F2;`;
@@ -560,12 +561,12 @@ function showPlayerModal(stat) {
             websiteDiv.style.cssText = `margin-bottom: 10px;`;
             const websiteLabel = document.createElement('span');
             websiteLabel.textContent = 'Website: ';
-            websiteLabel.style.cssText = `font-weight: bold; color: var(--text-muted);`;
+            websiteLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
             const websiteText = document.createElement('a');
             websiteText.textContent = playerObj.website;
             websiteText.href = playerObj.website.startsWith('http') ? playerObj.website : '#';
             websiteText.target = '_blank';
-            websiteText.style.cssText = `color: var(--ap-accent); text-decoration: none;`;
+            websiteText.style.cssText = `color: #38bdf8; text-decoration: none;`;
             websiteText.onmouseover = function() { this.style.textDecoration = 'underline'; };
             websiteText.onmouseout = function() { this.style.textDecoration = 'none'; };
             websiteDiv.appendChild(websiteLabel);
@@ -584,7 +585,7 @@ function showPlayerModal(stat) {
         awardsSection.style.cssText = `margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
         const awardsTitle = document.createElement('h3');
         awardsTitle.textContent = 'Awards';
-        awardsTitle.style.cssText = `border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; font-size: 1.2rem; color: var(--text-color);`;
+        awardsTitle.style.cssText = `border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px; font-size: 1.2rem; color: #e2e8f0;`;
         awardsSection.appendChild(awardsTitle);
         
         const awardsList = document.createElement('div');
@@ -600,7 +601,7 @@ function showPlayerModal(stat) {
             // Render icon - check if it's a FontAwesome class or emoji
             let iconHtml = '';
             if (award.icon && award.icon.startsWith('fa-')) {
-                iconHtml = `<i class="${award.icon}" style="font-size: 1.5rem; color: var(--ap-accent); min-width: 24px;"></i>`;
+                iconHtml = `<i class="${award.icon}" style="font-size: 1.5rem; color: #38bdf8; min-width: 24px;"></i>`;
             } else {
                 iconHtml = `<span style="font-size: 1.5rem; min-width: 24px;">${award.icon || '🏆'}</span>`;
             }
@@ -609,12 +610,12 @@ function showPlayerModal(stat) {
             awardInfo.style.cssText = `flex: 1;`;
             
             const awardName = document.createElement('div');
-            awardName.innerHTML = `${iconHtml} <strong style="color: var(--ap-accent);">${award.name}</strong>`;
+            awardName.innerHTML = `${iconHtml} <strong style="color: #38bdf8;">${award.name}</strong>`;
             awardName.style.cssText = `display: flex; align-items: center; gap: 8px; margin-bottom: 4px;`;
             
             const awardDesc = document.createElement('div');
             awardDesc.textContent = award.description || '';
-            awardDesc.style.cssText = `font-size: 0.85rem; color: var(--text-muted);`;
+            awardDesc.style.cssText = `font-size: 0.85rem; color: #94a3b8;`;
             
             awardInfo.appendChild(awardName);
             awardInfo.appendChild(awardDesc);
@@ -644,10 +645,10 @@ function showPlayerModal(stat) {
             background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center;
         `;
         const val = document.createElement('div');
-        val.style.cssText = `font-size: 1.5rem; font-weight: bold; color: var(--ap-accent);`;
+        val.style.cssText = `font-size: 1.5rem; font-weight: bold; color: #38bdf8;`;
         val.textContent = s.value;
         const lbl = document.createElement('div');
-        lbl.style.cssText = `font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-top: 5px;`;
+        lbl.style.cssText = `font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 5px;`;
         lbl.textContent = s.label;
         box.appendChild(val);
         box.appendChild(lbl);
@@ -659,7 +660,7 @@ function showPlayerModal(stat) {
     historySection.style.cssText = `margin-top: 20px;`;
     const historyTitle = document.createElement('h3');
     historyTitle.textContent = 'Games Played';
-    historyTitle.style.cssText = `border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;`;
+    historyTitle.style.cssText = `border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px;`;
     
     const historyList = document.createElement('div');
     historyList.style.cssText = `display: flex; flex-direction: column; gap: 10px;`;
@@ -669,17 +670,17 @@ function showPlayerModal(stat) {
             const item = document.createElement('div');
             item.style.cssText = `
                 background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; 
-                border-left: 3px solid var(--ap-accent); font-size: 0.9rem;
+                border-left: 3px solid #38bdf8; font-size: 0.9rem;
                 display: flex; justify-content: space-between; align-items: center;
             `;
             item.innerHTML = `
-                <strong style="color: var(--text-color);">${game.gameName}</strong>
-                <span style="color: var(--ap-accent); font-weight: bold; font-family: monospace;">${formatTime(game.timeMs)}</span>
+                <strong style="color: #e2e8f0;">${game.gameName}</strong>
+                <span style="color: #38bdf8; font-weight: bold; font-family: monospace;">${formatTime(game.timeMs)}</span>
             `;
             historyList.appendChild(item);
         });
     } else {
-        historyList.innerHTML = '<p style="color:var(--text-muted); text-align:center;">No games played yet.</p>';
+        historyList.innerHTML = '<p style="color:#94a3b8; text-align:center;">No games played yet.</p>';
     }
 
     historySection.appendChild(historyTitle);
