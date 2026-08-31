@@ -768,5 +768,27 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "btd6",
+    "name": "Bloons TD 6",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/877638212861256c9cc89c428b96a29e.png",
+    "yaml_slot_name": "BloonsTD6",
+    "apworld_link": "https://github.com/Matt41321/Archipelago/releases#release-v0.7.1",
+    "apworld_version": "0.7.1",
+    "mod_link": "https://github.com/Matt41321/BloonsArchipelago/releases/tag/0.9.1",
+    "mod_version": "0.9.1",
+    "mod_setup_guide_link": "https://github.com/Matt41321/BloonsArchipelago/blob/main/README.md",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
