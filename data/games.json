@@ -784,7 +784,7 @@
   {
     "id": "apquest",
     "name": "APQuest",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/679c4da61fce989a001ac76fccffcb92.png",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
     "yaml_slot_name": "APQuest",
     "apworld_link": "https://archipelago.gg/games/APQuest/info/en",
     "apworld_version": "Core",
@@ -794,7 +794,7 @@
     "tracker_link": "https://github.com/palex00/ap-quest-tracker/archive/refs/tags/1.0.2.zip",
     "game_info_link": "",
     "support_link": "https://discord.com/channels/731205301247803413/1450659987331481610",
-    "save_file_link": "",
+    "save_file_link": "https://drive.google.com/drive/folders/16p5aHc6hDyY3xDXaNAAt8xSRcHX-_8Vv?usp=drive_link",
     "rules": "",
     "extra_information": "",
     "current_player": null,
