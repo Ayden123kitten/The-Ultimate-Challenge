@@ -768,3 +768,158 @@ try {
 // Initialize
 loadData();
 setInterval(loadData, 10000);
+
+// Open inline editor for a specific player
+function openPlayerInlineEditor(playerName, event) {
+    if (event) event.stopPropagation();
+    
+    const player = players.find(p => p.name === playerName);
+    if (!player) return;
+    
+    // Create modal dynamically since it doesn't exist in players.html
+    let modal = document.getElementById('moderator-modal');
+    let content = document.getElementById('moderator-panel-content');
+    
+    // If modal doesn't exist, create it
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'moderator-modal';
+        modal.className = 'fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4';
+        modal.onclick = function(e) {
+            if (e.target.id === 'moderator-modal') {
+                closeModeratorModal();
+            }
+        };
+        document.body.appendChild(modal);
+        
+        const panel = document.createElement('div');
+        panel.className = 'bg-slate-800 rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto';
+        panel.onclick = function(e) { e.stopPropagation(); };
+        
+        const header = document.createElement('div');
+        header.className = 'flex justify-between items-center mb-4';
+        header.innerHTML = `
+            <h2 class="text-xl font-bold text-white">Moderation Panel</h2>
+            <button onclick="closeModeratorModal()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+        `;
+        panel.appendChild(header);
+        
+        content = document.createElement('div');
+        content.id = 'moderator-panel-content';
+        panel.appendChild(content);
+        
+        modal.appendChild(panel);
+    }
+    
+    content = document.getElementById('moderator-panel-content');
+    
+    content.innerHTML = `
+        <div class="space-y-6">
+            <!-- Edit Player Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-user text-ap-accent mr-2"></i>Edit Player: ${player.name}</h3>
+                <div id="inline-edit-player-form-container" class="space-y-4">
+                    <input type="text" id="inline-edit-player-name" placeholder="Player Name" value="${player.name}" disabled class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full opacity-50">
+                    <input type="url" id="inline-edit-player-pfp" placeholder="Profile Picture URL" value="${player.pfp_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                    <textarea id="inline-edit-player-bio" placeholder="Bio" rows="3" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">${player.bio || ''}</textarea>
+                    <input type="text" id="inline-edit-player-pronouns" placeholder="Pronouns" value="${player.pronouns || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                    <input type="text" id="inline-edit-player-discord" placeholder="Discord Username" value="${player.discord || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                </div>
+                <div class="flex gap-2 mt-4">
+                    <button onclick="saveInlineEditedPlayer('${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
+                    <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
+                </div>
+            </div>
+            
+            <!-- Live Preview -->
+            <div class="glass rounded-lg p-4">
+                <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                <div id="inline-edit-player-preview" class="glass rounded-xl p-6 flex items-center gap-4"></div>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+    
+    // Setup live preview
+    setupInlinePlayerPreview(player);
+}
+
+// Setup live preview for player editing
+function setupInlinePlayerPreview(originalPlayer) {
+    const inputs = [
+        'inline-edit-player-pfp', 'inline-edit-player-bio', 
+        'inline-edit-player-pronouns', 'inline-edit-player-discord'
+    ];
+    
+    function updatePreview() {
+        const previewPlayer = {
+            ...originalPlayer,
+            pfp_link: $('inline-edit-player-pfp').value || originalPlayer.pfp_link,
+            bio: $('inline-edit-player-bio').value,
+            pronouns: $('inline-edit-player-pronouns').value,
+            discord: $('inline-edit-player-discord').value
+        };
+        
+        renderPlayerPreview(previewPlayer, 'inline-edit-player-preview');
+    }
+    
+    inputs.forEach(id => {
+        const el = $(id);
+        if (el) el.addEventListener('input', updatePreview);
+    });
+    
+    updatePreview();
+}
+
+// Render player preview
+function renderPlayerPreview(player, containerId) {
+    const container = $(containerId);
+    if (!container) return;
+    
+    const avatar = player.pfp_link && player.pfp_link.trim() !== ''
+        ? `<img src="${player.pfp_link}" alt="${player.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8;">`
+        : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
+    
+    container.innerHTML = `
+        ${avatar}
+        <div class="flex-1">
+            <h3 class="text-lg font-bold text-white">${player.name}</h3>
+            ${player.pronouns ? `<p class="text-sm text-ap-accent">${player.pronouns}</p>` : ''}
+            ${player.bio ? `<p class="text-sm text-slate-300 mt-2">${player.bio}</p>` : ''}
+            ${player.discord ? `<p class="text-xs text-slate-400 mt-1"><i class="fa-brands fa-discord mr-1"></i>${player.discord}</p>` : ''}
+        </div>
+    `;
+}
+
+// Save inline edited player
+async function saveInlineEditedPlayer(playerName) {
+    const playerData = {
+        name: playerName,
+        pfp_link: $('inline-edit-player-pfp').value.trim(),
+        bio: $('inline-edit-player-bio').value.trim(),
+        pronouns: $('inline-edit-player-pronouns').value.trim(),
+        discord: $('inline-edit-player-discord').value.trim()
+    };
+    
+    try {
+        const res = await fetch('/api/moderator-actions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+            body: JSON.stringify({ action: 'updatePlayer', playerData })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        alert('Player updated successfully!');
+        closeModeratorModal();
+        loadData();
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+// Close moderator modal
+function closeModeratorModal() {
+    const modal = document.getElementById('moderator-modal');
+    if (modal) modal.classList.add('hidden');
+}
