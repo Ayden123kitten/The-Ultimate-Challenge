@@ -8,7 +8,9 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Server configuration missing. Contact admin.' });
     }
 
-    const { type } = req.query;
+    // Parse query params from URL for Vercel Edge compatibility
+    const url = new URL(req.url, 'http://localhost');
+    const type = url.searchParams.get('type');
 
     // Map data types to file paths
     const fileMap = {
