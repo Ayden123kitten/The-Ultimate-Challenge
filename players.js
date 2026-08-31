@@ -401,6 +401,11 @@ function renderPlayers() {
                 <div style="position: absolute; bottom: -5px; right: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
                     ${rankBadge}
                 </div>
+                ${inlineEditMode && isModerator ? `
+                    <button onclick="openPlayerInlineEditor('${stat.name}', event)" style="position: absolute; top: -5px; right: -5px; background: #1e293b; border: 2px solid #38bdf8; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Edit Player">
+                        <i class="fa-solid fa-gear" style="color: #38bdf8;"></i>
+                    </button>
+                ` : ''}
             </div>
                 ${modIcon ? `<div style="position: absolute; top: -5px; left: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">${modIcon}</div>` : ''}
             <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
@@ -722,11 +727,44 @@ if (sortSelect) {
     });
 }
 
-// Moderator status check
+// Moderator status check and inline edit mode
+let isModerator = false; // Track moderator status
+let inlineEditMode = false; // Track inline edit mode state
+
+// Load inline edit mode preference from localStorage
+try {
+    const savedMode = localStorage.getItem('inlineEditMode');
+    inlineEditMode = savedMode === 'true';
+} catch (e) {
+    console.warn('Could not load inline edit mode preference:', e);
+}
+
 (async () => {
     if (AUTH.isLoggedIn()) {
         isModerator = await AUTH.checkModerator();
         console.log('Moderator status:', isModerator);
+        
+        // Add inline edit mode toggle button to nav if moderator
+        if (isModerator) {
+            const nav = document.querySelector('header nav');
+            if (nav) {
+                const inlineEditBtn = document.createElement('button');
+                inlineEditBtn.id = 'inline-edit-toggle-btn-players';
+                inlineEditBtn.className = 'text-slate-400 hover:text-white transition-colors flex items-center gap-2 ' + 
+                    (inlineEditMode ? 'text-ap-accent' : '');
+                inlineEditBtn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i><span>Inline Edit</span>';
+                inlineEditBtn.onclick = () => {
+                    inlineEditMode = !inlineEditMode;
+                    try {
+                        localStorage.setItem('inlineEditMode', inlineEditMode.toString());
+                    } catch (e) {}
+                    inlineEditBtn.className = 'text-slate-400 hover:text-white transition-colors flex items-center gap-2 ' + 
+                        (inlineEditMode ? 'text-ap-accent' : '');
+                    renderPlayers();
+                };
+                nav.appendChild(inlineEditBtn);
+            }
+        }
     }
 })();
 

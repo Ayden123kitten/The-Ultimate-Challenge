@@ -208,8 +208,16 @@ function renderGames() {
 
         const card = document.createElement('div');
         card.className = 'glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50';
+        
+        // Add inline edit button for moderator
+        const inlineEditButtonHtml = (inlineEditMode && isModerator) ? `
+            <button onclick="openGameInlineEditor('${game.id}', event)" class="absolute top-3 right-3 p-2 rounded-lg bg-slate-700/80 hover:bg-ap-accent/80 text-slate-300 hover:text-white transition-all z-10" title="Edit Game">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+        ` : '';
 
         card.innerHTML = `
+            ${inlineEditButtonHtml}
             <div class="game-card-header">
                 ${hasCoverImage ? `
                     <div class="cover-art-container">
@@ -403,6 +411,8 @@ function updateGlobalTimer() {
     if (!settings.start_time || settings.start_time.trim() === '') {
         timerEl.textContent = '00:00:00';
         statusEl.textContent = '';
+        // Add inline edit button for moderator
+        addInlineEditButtonToTimer();
         return;
     }
 
@@ -422,6 +432,143 @@ function updateGlobalTimer() {
         timerEl.textContent = formatTime(now - end);
         statusEl.textContent = 'Event Ended';
         statusEl.className = 'text-xs text-red-400 uppercase tracking-widest';
+    }
+    
+    // Add inline edit button for moderator
+    addInlineEditButtonToTimer();
+}
+
+// Add inline edit button to the global timer
+function addInlineEditButtonToTimer() {
+    const timerContainer = document.querySelector('#global-timer').parentElement;
+    if (!timerContainer) return;
+    
+    // Remove existing edit button
+    const existingBtn = timerContainer.querySelector('.inline-edit-btn');
+    if (existingBtn) existingBtn.remove();
+    
+    // Only add button if in inline edit mode and user is moderator
+    if (!inlineEditMode || !isModerator) return;
+    
+    const editBtn = document.createElement('button');
+    editBtn.className = 'inline-edit-btn absolute top-2 right-2 p-1.5 rounded-lg bg-slate-700/80 hover:bg-ap-accent/80 text-slate-300 hover:text-white transition-all z-10';
+    editBtn.innerHTML = '<i class="fa-solid fa-gear"></i>';
+    editBtn.title = 'Edit Event Timer Settings';
+    editBtn.onclick = () => openEventTimerSettingsModal();
+    timerContainer.style.position = 'relative';
+    timerContainer.appendChild(editBtn);
+}
+
+// Open event timer settings modal
+function openEventTimerSettingsModal() {
+    const modal = $('moderator-modal');
+    const content = $('moderator-panel-content');
+    
+    if (!modal || !content) return;
+    
+    content.innerHTML = `
+        <div class="space-y-6">
+            <!-- Event Time Settings Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-ap-accent mr-2"></i>Event Timer Settings</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
+                        <input type="datetime-local" id="event-start-time-input" value="${settings.start_time || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                        <p class="text-xs text-slate-400 mt-2">Set when the event starts. Before this time, a countdown will be shown.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Event End Time (optional)</label>
+                        <input type="datetime-local" id="event-end-time-input" value="${settings.end_time || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                        <p class="text-xs text-slate-400 mt-2">Set when the event ends. Leave empty for an ongoing event.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="saveEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Settings</button>
+                        <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Live Preview -->
+            <div class="glass rounded-lg p-4">
+                <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                <div id="event-timer-preview" class="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                    <div class="text-center">
+                        <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent">${formatTime(Date.now() - (settings.start_time ? new Date(settings.start_time).getTime() : 0))}</div>
+                        <div id="preview-status" class="text-xs text-slate-400 uppercase">${settings.start_time ? 'Event Live' : 'Not Set'}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+    
+    // Update preview on input change
+    const startInput = $('event-start-time-input');
+    const endInput = $('event-end-time-input');
+    
+    function updatePreview() {
+        const previewTimer = $('preview-timer');
+        const previewStatus = $('preview-status');
+        
+        const startTime = startInput.value;
+        const endTime = endInput.value;
+        
+        if (!startTime) {
+            previewTimer.textContent = '00:00:00';
+            previewStatus.textContent = 'Not Set';
+            return;
+        }
+        
+        const now = Date.now();
+        const start = new Date(startTime).getTime();
+        const end = endTime ? new Date(endTime).getTime() : null;
+        
+        if (now < start) {
+            previewTimer.textContent = formatTime(start - now);
+            previewStatus.textContent = 'Starts In';
+            previewStatus.className = 'text-xs text-yellow-400 uppercase';
+        } else if (end === null || (now >= start && now <= end)) {
+            previewTimer.textContent = formatTime(now - start);
+            previewStatus.textContent = 'Event Live';
+            previewStatus.className = 'text-xs text-green-400 uppercase';
+        } else {
+            previewTimer.textContent = formatTime(now - end);
+            previewStatus.textContent = 'Event Ended';
+            previewStatus.className = 'text-xs text-red-400 uppercase';
+        }
+    }
+    
+    startInput.addEventListener('change', updatePreview);
+    endInput.addEventListener('change', updatePreview);
+    updatePreview();
+}
+
+// Save event time settings
+async function saveEventTimeSettings() {
+    const startTime = $('event-start-time-input').value;
+    const endTime = $('event-end-time-input').value;
+    
+    try {
+        const res = await fetch('/api/moderator-actions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+            body: JSON.stringify({ 
+                action: 'updateSettings', 
+                settingsData: { 
+                    start_time: startTime, 
+                    end_time: endTime 
+                } 
+            })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        alert('Event timer settings updated successfully!');
+        closeModeratorModal();
+        loadData();
+    } catch (err) {
+        alert('Error: ' + err.message);
     }
 }
 
@@ -472,6 +619,16 @@ if (logoutBtn) {
 // Moderator status check and panel setup
 let isModerator = false;
 let isAdmin = false;
+let inlineEditMode = false; // Track inline edit mode state
+
+// Load inline edit mode preference from localStorage
+try {
+    const savedMode = localStorage.getItem('inlineEditMode');
+    inlineEditMode = savedMode === 'true';
+} catch (e) {
+    console.warn('Could not load inline edit mode preference:', e);
+}
+
 (async () => {
     if (AUTH.isLoggedIn()) {
         isModerator = await AUTH.checkModerator();
@@ -495,10 +652,51 @@ let isAdmin = false;
                 modBtn.innerHTML = '<i class="fa-solid fa-shield-halved group-hover:text-ap-accent transition-colors"></i><span class="text-sm font-medium hidden xl:inline">Moderation</span>';
                 modBtn.onclick = openModeratorModal;
                 navSection.appendChild(modBtn);
+                
+                // Add inline edit mode toggle button
+                const inlineEditBtn = document.createElement('button');
+                inlineEditBtn.id = 'inline-edit-toggle-btn';
+                inlineEditBtn.className = 'group flex items-center gap-2 px-3 py-2 rounded-lg transition-all ' + 
+                    (inlineEditMode ? 'text-ap-accent bg-ap-accent/20' : 'text-slate-400 hover:text-white hover:bg-slate-700/50');
+                inlineEditBtn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm font-medium hidden xl:inline">Inline Edit</span>';
+                inlineEditBtn.onclick = toggleInlineEditMode;
+                inlineEditBtn.title = 'Toggle inline editing mode';
+                navSection.appendChild(inlineEditBtn);
             }
         }
     }
 })();
+
+// Toggle inline edit mode
+function toggleInlineEditMode() {
+    inlineEditMode = !inlineEditMode;
+    try {
+        localStorage.setItem('inlineEditMode', inlineEditMode.toString());
+    } catch (e) {
+        console.warn('Could not save inline edit mode preference:', e);
+    }
+    
+    // Update button appearance
+    const btn = $('inline-edit-toggle-btn');
+    if (btn) {
+        btn.className = 'group flex items-center gap-2 px-3 py-2 rounded-lg transition-all ' + 
+            (inlineEditMode ? 'text-ap-accent bg-ap-accent/20' : 'text-slate-400 hover:text-white hover:bg-slate-700/50');
+    }
+    
+    // Re-render components with inline edit buttons
+    renderGames();
+    updateGlobalTimer(); // This will add edit button to timer
+    
+    // If on players page, re-render players
+    if (typeof renderPlayers === 'function') {
+        renderPlayers();
+    }
+    
+    // If on leaderboard page, re-render leaderboard
+    if (typeof renderLeaderboard === 'function') {
+        renderLeaderboard(currentTab || 'games');
+    }
+}
 
 // Moderator modal functions
 function openModeratorModal() {
@@ -1105,6 +1303,192 @@ async function saveEditedGame() {
         alert('Game updated successfully!');
         loadData();
         closeModeratorModal();
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+// Open inline editor for a specific game
+function openGameInlineEditor(gameId, event) {
+    if (event) event.stopPropagation();
+    
+    const game = games.find(g => g.id === gameId);
+    if (!game) return;
+    
+    const modal = $('moderator-modal');
+    const content = $('moderator-panel-content');
+    
+    if (!modal || !content) return;
+    
+    content.innerHTML = `
+        <div class="space-y-6">
+            <!-- Edit Game Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-gamepad text-ap-accent mr-2"></i>Edit Game: ${game.name}</h3>
+                <div id="inline-edit-game-form-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="inline-edit-game-name" placeholder="Game Name" value="${game.name}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="inline-edit-game-id" placeholder="Game ID" value="${game.id}" disabled class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white opacity-50">
+                    <input type="text" id="inline-edit-game-yaml-slot-name" placeholder="YAML Slot Name" value="${game.yaml_slot_name || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="inline-edit-game-logo" placeholder="Logo URL" value="${game.logo || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="inline-edit-game-apworld-link" placeholder="Apworld Link" value="${game.apworld_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="inline-edit-game-apworld-version" placeholder="Apworld Version" value="${game.apworld_version || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="inline-edit-game-mod-link" placeholder="Mod Link" value="${game.mod_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="inline-edit-game-mod-version" placeholder="Mod Version" value="${game.mod_version || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="inline-edit-game-mod-setup-guide-link" placeholder="Setup Guide Link" value="${game.mod_setup_guide_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="inline-edit-game-tracker-link" placeholder="Tracker Link" value="${game.tracker_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="inline-edit-game-game-info-link" placeholder="Game Info Link" value="${game.game_info_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="inline-edit-game-support-link" placeholder="Support Link" value="${game.support_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="inline-edit-game-save-file-link" placeholder="Save File Link" value="${game.save_file_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <textarea id="inline-edit-game-rules" placeholder="Rules" rows="2" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2">${game.rules || ''}</textarea>
+                    <textarea id="inline-edit-game-extra-information" placeholder="Extra Information" rows="2" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2">${game.extra_information || ''}</textarea>
+                </div>
+                <div class="flex gap-2 mt-4">
+                    <button onclick="saveInlineEditedGame('${game.id}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
+                    <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
+                </div>
+            </div>
+            
+            <!-- Live Preview -->
+            <div class="glass rounded-lg p-4">
+                <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                <div id="inline-edit-game-preview" class="glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50"></div>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+    
+    // Setup live preview
+    setupInlineGamePreview(game);
+}
+
+// Setup live preview for game editing
+function setupInlineGamePreview(originalGame) {
+    const inputs = [
+        'inline-edit-game-name', 'inline-edit-game-yaml-slot-name', 'inline-edit-game-logo',
+        'inline-edit-game-apworld-link', 'inline-edit-game-apworld-version', 'inline-edit-game-mod-link',
+        'inline-edit-game-mod-version', 'inline-edit-game-mod-setup-guide-link', 'inline-edit-game-tracker-link',
+        'inline-edit-game-game-info-link', 'inline-edit-game-support-link', 'inline-edit-game-save-file-link',
+        'inline-edit-game-rules', 'inline-edit-game-extra-information'
+    ];
+    
+    function updatePreview() {
+        const previewGame = {
+            ...originalGame,
+            name: $('inline-edit-game-name').value || originalGame.name,
+            yaml_slot_name: $('inline-edit-game-yaml-slot-name').value,
+            logo: $('inline-edit-game-logo').value,
+            apworld_link: $('inline-edit-game-apworld-link').value,
+            apworld_version: $('inline-edit-game-apworld-version').value,
+            mod_link: $('inline-edit-game-mod-link').value,
+            mod_version: $('inline-edit-game-mod-version').value,
+            mod_setup_guide_link: $('inline-edit-game-mod-setup-guide-link').value,
+            tracker_link: $('inline-edit-game-tracker-link').value,
+            game_info_link: $('inline-edit-game-game-info-link').value,
+            support_link: $('inline-edit-game-support-link').value,
+            save_file_link: $('inline-edit-game-save-file-link').value,
+            rules: $('inline-edit-game-rules').value,
+            extra_information: $('inline-edit-game-extra-information').value
+        };
+        
+        renderGamePreview(previewGame, 'inline-edit-game-preview');
+    }
+    
+    inputs.forEach(id => {
+        const el = $(id);
+        if (el) el.addEventListener('input', updatePreview);
+    });
+    
+    updatePreview();
+}
+
+// Render game preview
+function renderGamePreview(game, containerId) {
+    const container = $(containerId);
+    if (!container) return;
+    
+    const hasCoverImage = game.logo && game.logo.trim() !== '';
+    const hasRules = game.rules && game.rules.trim() !== '';
+    const hasExtraInfo = game.extra_information && game.extra_information.trim() !== '';
+    const hasApworldVersion = game.apworld_version && game.apworld_version.trim() !== '';
+    const hasModVersion = game.mod_version && game.mod_version.trim() !== '';
+    
+    const links = [
+        { url: game.apworld_link, icon: 'fa-globe', label: `Apworld${hasApworldVersion ? ` (${game.apworld_version})` : ''}` },
+        { url: game.mod_link, icon: 'fa-puzzle-piece', label: `Mod${hasModVersion ? ` (${game.mod_version})` : ''}` },
+        { url: game.mod_setup_guide_link, icon: 'fa-book', label: 'Setup Guide' },
+        { url: game.tracker_link, icon: 'fa-map', label: 'Tracker' },
+        { url: game.game_info_link, icon: 'fa-circle-info', label: 'Game Info' },
+        { url: game.support_link, icon: 'fa-circle-question', label: 'Support' },
+        { url: game.save_file_link, icon: 'fa-download', label: 'Save File', primary: true }
+    ].filter(l => l.url && l.url.trim() !== '');
+    
+    container.innerHTML = `
+        <div class="game-card-header">
+            ${hasCoverImage ? `
+                <div class="cover-art-container">
+                    <img src="${game.logo}" alt="${game.name}" class="cover-art-logo" onerror="this.style.display='none'">
+                </div>
+            ` : '<div class="cover-art-container"></div>'}
+            
+            <div class="game-card-title-time-row">
+                <div class="game-card-title">
+                    <h2 class="text-xl font-bold text-white">${game.name}</h2>
+                    <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold bg-green-500/20 text-green-400">Available</span>
+                </div>
+            </div>
+        </div>
+        
+        ${hasRules ? `
+            <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden">
+                <span class="text-ap-accent font-semibold">Rules:</span> <span class="break-words overflow-wrap-anywhere">${game.rules}</span>
+            </div>
+        ` : ''}
+        
+        ${hasExtraInfo ? `
+            <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden">
+                <span class="text-ap-accent font-semibold">Information:</span> <span class="break-words overflow-wrap-anywhere">${game.extra_information}</span>
+            </div>
+        ` : ''}
+        
+        ${links.length > 0 ? `
+            <div class="grid grid-cols-2 gap-2 text-sm min-w-0">
+                ${links.map(link => renderLink(link.url, link.icon, link.label, link.primary)).join('')}
+            </div>
+        ` : ''}
+    `;
+}
+
+// Save inline edited game
+async function saveInlineEditedGame(gameId) {
+    const gameData = {
+        name: $('inline-edit-game-name').value.trim(),
+        yaml_slot_name: $('inline-edit-game-yaml-slot-name').value.trim(),
+        logo: $('inline-edit-game-logo').value.trim(),
+        apworld_link: $('inline-edit-game-apworld-link').value.trim(),
+        apworld_version: $('inline-edit-game-apworld-version').value.trim(),
+        mod_link: $('inline-edit-game-mod-link').value.trim(),
+        mod_version: $('inline-edit-game-mod-version').value.trim(),
+        mod_setup_guide_link: $('inline-edit-game-mod-setup-guide-link').value.trim(),
+        tracker_link: $('inline-edit-game-tracker-link').value.trim(),
+        game_info_link: $('inline-edit-game-game-info-link').value.trim(),
+        support_link: $('inline-edit-game-support-link').value.trim(),
+        save_file_link: $('inline-edit-game-save-file-link').value.trim(),
+        rules: $('inline-edit-game-rules').value.trim(),
+        extra_information: $('inline-edit-game-extra-information').value.trim()
+    };
+    
+    try {
+        const res = await fetch('/api/moderator-actions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+            body: JSON.stringify({ action: 'updateGame', gameId, gameData })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        alert('Game updated successfully!');
+        closeModeratorModal();
+        loadData();
     } catch (err) {
         alert('Error: ' + err.message);
     }
