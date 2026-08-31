@@ -352,7 +352,7 @@ function renderPlayers() {
         filteredStats = playerStats.filter(stat => stat.name.toLowerCase().includes(query));
     }
 
-    filteredStats.forEach(stat => {
+    filteredStats.forEach((stat, index) => {
         const card = document.createElement('div');
         const isSelected = stat.name === currentPlayer;
         card.className = `glass rounded-xl p-4 transition-all cursor-pointer hover:shadow-lg ${isSelected ? 'border-2 border-ap-accent' : ''}`;
@@ -368,6 +368,9 @@ function renderPlayers() {
         };
         card.onclick = () => showPlayerModal(stat);
 
+
+        // Calculate rank badge based on position in sorted list
+        const rankBadge = `<span style="font-size: 0.75rem; font-weight: bold; color: #38bdf8;">#${index + 1}</span>`;
         const avatar = stat.pfpLink
             ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
             : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
@@ -417,7 +420,7 @@ function renderPlayers() {
         container.appendChild(card);
     });
 
-    if (players.length === 0) {
+    if (filteredStats.length === 0) {
         container.innerHTML = `
             <div class="col-span-full text-center text-slate-500 py-20">
                 <i class="fa-solid fa-users-slash text-4xl mb-4"></i>
@@ -728,7 +731,6 @@ if (sortSelect) {
 }
 
 // Moderator status check and inline edit mode
-let isModerator = false; // Track moderator status
 let inlineEditMode = false; // Track inline edit mode state
 
 // Load inline edit mode preference from localStorage
