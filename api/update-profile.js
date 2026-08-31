@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export default async function handler(req, res) {
@@ -66,7 +67,57 @@ export default async function handler(req, res) {
             return res.status(404).json({ error: 'Player not found' });
         }
 
-        // Update allowed fields
+        // Handle name change
+        if (data.new_name) {
+            const newName = data.new_name.trim();
+            
+            // Validate name - only allow alphanumeric characters, spaces, underscores, and hyphens
+            const nameRegex = /^[a-zA-Z0-9 _-]+$/;
+            if (!nameRegex.test(newName)) {
+                return res.status(400).json({ error: 'Name can only contain letters, numbers, spaces, underscores, and hyphens.' });
+            }
+            
+            // Check if name already exists
+            const existingPlayer = players.find(p => p.name.toLowerCase() === newName.toLowerCase());
+            if (existingPlayer && existingPlayer.name !== username) {
+                return res.status(409).json({ error: 'This name is already taken. Please choose a different name.' });
+            }
+            
+            // Update the player's name
+            players[playerIndex].name = newName;
+        }
+
+        // Handle password change
+        if (data.current_password && data.new_password) {
+            const player = players[playerIndex];
+            
+            // Verify current password
+            if (!player.password_hash) {
+                return res.status(400).json({ error: 'Account does not have a password set.' });
+            }
+            
+            const validPassword = await bcrypt.compare(data.current_password, player.password_hash);
+            if (!validPassword) {
+                return res.status(401).json({ error: 'Current password is incorrect.' });
+            }
+            
+            // Validate new password
+            if (data.new_password.length < 6) {
+                return res.status(400).json({ error: 'New password must be at least 6 characters long.' });
+            }
+            
+            // Validate password - only allow printable ASCII characters
+            const passwordRegex = /^[\x20-\x7E]+$/;
+            if (!passwordRegex.test(data.new_password)) {
+                return res.status(400).json({ error: 'Password contains invalid characters. Please use only standard keyboard characters.' });
+            }
+            
+            // Hash and update password
+            const newPasswordHash = await bcrypt.hash(data.new_password, 10);
+            players[playerIndex].password_hash = newPasswordHash;
+        }
+
+        // Update allowed profile fields
         const allowedFields = ['pfp_link', 'bio', 'pronouns', 'discord'];
         allowedFields.forEach(field => {
             if (data[field] !== undefined) {
