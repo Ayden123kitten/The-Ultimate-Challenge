@@ -54,5 +54,10 @@
     "name": "JustGovart",
     "password_hash": "$2b$10$W/.CLASyZBjYzkkTTnXN2.3YbGaIgtvcVg0j.gFJFM58R4lacDrWy",
     "pfp_link": ""
+  },
+  {
+    "name": "Casual Mario",
+    "password_hash": "$2b$10$ov363dyRiKhq1jz/51wPyu8SvInQyECTGYsNk6M5TlxYMz6mtzR2W",
+    "pfp_link": "https://imgur.com/a/xA6OyH1"
   }
 ]
