@@ -651,10 +651,10 @@
     "mod_version": "3.5.6",
     "rules": "You must play on brutal difficulty.",
     "extra_information": "",
-    "apworld_link": "https://github.com/TRPG0/ArchipelagoULTRAKILL/releases/tag/3.5.5",
+    "apworld_link": "https://github.com/TRPG0/ArchipelagoULTRAKILL/releases/download/3.5.5/ultrakill.apworld",
     "mod_link": "https://thunderstore.io/c/ultrakill/p/TRPG/Archipelago/",
     "mod_setup_guide_link": "https://github.com/TRPG0/ArchipelagoULTRAKILL",
-    "tracker_link": "https://github.com/BowserCrusher/UltrakillPoptracker",
+    "tracker_link": "https://github.com/BowserCrusher/UltrakillPoptracker/releases/download/0.7.8/UltrakillPoptracker.zip",
     "game_info_link": "",
     "support_link": "https://discord.com/channels/731205301247803413/1497340963012481104",
     "save_file_link": "https://drive.google.com/drive/folders/1OFSKMwyXLXRMNcJ24rGVngtN36BZO1RR",
@@ -663,7 +663,7 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false,
-    "yaml_slot_name": "",
+    "yaml_slot_name": "ULTRAKILL",
     "slot_count": 1
   },
   {
