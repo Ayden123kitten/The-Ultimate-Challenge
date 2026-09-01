@@ -237,7 +237,7 @@
     "mod_version": "",
     "rules": "",
     "extra_information": "",
-    "apworld_link": "https://github.com/spineraks-org/ArchipelagoTwistyCube/releases/tag/v1.0.0",
+    "apworld_link": "https://github.com/spineraks-org/ArchipelagoTwistyCube/releases/download/v1.0.0/twistycube.apworld",
     "mod_link": "https://cube-ap.netlify.app/",
     "mod_setup_guide_link": "https://github.com/spineraks-org/ArchipelagoTwistyCube/blob/main/worlds/twistycube/docs/setup_en.md",
     "tracker_link": "",
@@ -249,7 +249,7 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false,
-    "yaml_slot_name": "",
+    "yaml_slot_name": "TwistyCube",
     "slot_count": 1
   },
   {
