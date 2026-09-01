@@ -41,7 +41,15 @@
   {
     "name": "Amasingearth",
     "password_hash": "$2b$10$.mOhQCMBnJPQjZIdZZ29hO8Rk.cjQcfY8cMiVG9ZmUI6yMFlSDSMm",
-    "pfp_link": "https://i.pinimg.com/1200x/78/2e/3f/782e3f8f8d493a0a05e11ab7c7a833d8.jpg"
+    "pfp_link": "https://i.pinimg.com/1200x/78/2e/3f/782e3f8f8d493a0a05e11ab7c7a833d8.jpg",
+    "awards": [
+      {
+        "name": "Veteran",
+        "icon": "fa-medal",
+        "description": "Have an account before the Async starts.",
+        "awardedAt": "2026-09-01T22:54:42.244Z"
+      }
+    ]
   },
   {
     "name": "mastercrashers",
