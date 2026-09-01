@@ -1217,5 +1217,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "ageofmythology",
+    "name": "Age of Mythology: Retold",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/92256b22c64d7619b1bc9138a1dfbbbf.png",
+    "yaml_slot_name": "AgeOfMythology",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/1-800-thewolf/AoM-Archipelago/releases/download/v1.3.6/aom.apworld",
+    "apworld_version": "1.3.6",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://github.com/1-800-thewolf/AoM-Archipelago#installation",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1302047515482390588",
+    "save_file_link": "https://drive.google.com/drive/folders/1Psnq6BQor4HTJWwCXRwgJ8pwCpejyFIu?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
