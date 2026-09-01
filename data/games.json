@@ -398,8 +398,8 @@
     "mod_version": "1.1.0",
     "rules": "",
     "extra_information": "",
-    "apworld_link": "https://discord.com/channels/731205301247803413/929585237695029268/1471932962537738425",
-    "mod_link": "https://github.com/ThePhar/RogueLegacyRandomizer/releases/tag/1.1.0",
+    "apworld_link": "https://cdn.discordapp.com/attachments/929585237695029268/1471932962554773524/rogue_legacy.apworld?ex=6a97bf25&is=6a966da5&hm=255db24b28f83ab782bb3f40b47c78c773a01238338c6c6ce733af70454a7adf&",
+    "mod_link": "https://github.com/ThePhar/RogueLegacyRandomizer/releases/download/1.1.0/Rogue.Legacy.Randomizer.1.1.0.exe",
     "mod_setup_guide_link": "https://github.com/ThePhar/RogueLegacyRandomizer#install-instructions-for-most-users",
     "tracker_link": "",
     "game_info_link": "",
@@ -410,7 +410,7 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false,
-    "yaml_slot_name": "",
+    "yaml_slot_name": "RogueLegacy",
     "slot_count": 1
   },
   {
