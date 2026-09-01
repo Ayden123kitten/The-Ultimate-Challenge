@@ -29,33 +29,65 @@
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', system-ui, sans-serif; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
         .game-logo { width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; }
+        /* Mobile menu transition */
+        #mobile-menu { transition: all 0.3s ease-in-out; }
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            header .flex-col { gap: 0.75rem; }
+            .form-section { padding: 1rem; }
+        }
+        @media (max-width: 640px) {
+            .grid { grid-template-columns: 1fr !important; }
+            .flex-wrap { flex-direction: column; align-items: stretch; }
+            input[type="text"], input[type="url"], input[type="password"], textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
     <!-- Header -->
     <header class="sticky top-0 z-50 glass border-b border-slate-700">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <img src="/favicon.png" alt="Game Logo" class="game-logo" style="width: 48px; height: 48px;">
-                    <div>
-                        <h1 class="text-2xl font-bold text-white tracking-tight">The Ultimate Challenge</h1>
-                        <p class="text-xs text-slate-400">Settings</p>
-                    </div>
-                </a>
-            </div>
-
-            <nav class="flex items-center gap-4">
-                <div id="current-player-display" class="flex items-center gap-2 text-sm">
-                    <span class="text-slate-400">Playing as:</span>
-                    <span id="current-player-name" class="font-semibold text-ap-accent">Not logged in</span>
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                    <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                        <img src="/favicon.png" alt="Game Logo" class="game-logo" style="width: 48px; height: 48px;">
+                        <div>
+                            <h1 class="text-xl font-bold text-white tracking-tight">The Ultimate Challenge</h1>
+                            <p class="text-xs text-slate-400">Settings</p>
+                        </div>
+                    </a>
+                    
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-btn" class="sm:hidden text-slate-400 hover:text-white transition-colors p-2">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
                 </div>
-                <div class="w-px h-5 bg-slate-600"></div>
-                <a href="/" class="text-slate-400 hover:text-white transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Back to Games</span>
-                </a>
-            </nav>
+
+                <nav id="nav-container" class="flex items-center gap-4 flex-wrap justify-center w-full sm:w-auto">
+                    <div id="current-player-display" class="flex items-center gap-2 text-sm">
+                        <span class="text-slate-400 hidden sm:inline">Playing as:</span>
+                        <span id="current-player-name" class="font-semibold text-ap-accent">Not logged in</span>
+                    </div>
+                    <div class="w-px h-5 bg-slate-600 hidden sm:block"></div>
+                    <a href="/" class="text-slate-400 hover:text-white transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span class="hidden sm:inline">Back to Games</span>
+                        <span class="sm:hidden">Back</span>
+                    </a>
+                </nav>
+            </div>
+            
+            <!-- Mobile Menu (hidden by default) -->
+            <div id="mobile-menu" class="hidden sm:hidden mt-4 pt-4 border-t border-slate-700">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="text-sm text-slate-400">Playing as:</span>
+                        <span id="current-player-name-mobile" class="font-semibold text-ap-accent">Not logged in</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -465,6 +497,29 @@
                         alert('Failed to assign award.');
                     }
                 });
+            }
+        });
+        
+        // Mobile menu toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            // Sync player name between desktop and mobile displays
+            const playerNameDesktop = document.getElementById('current-player-name');
+            const playerNameMobile = document.getElementById('current-player-name-mobile');
+            
+            if (playerNameDesktop && playerNameMobile) {
+                const observer = new MutationObserver(function(mutations) {
+                    playerNameMobile.textContent = playerNameDesktop.textContent;
+                });
+                observer.observe(playerNameDesktop, { childList: true, subtree: true, characterData: true });
             }
         });
     </script>
