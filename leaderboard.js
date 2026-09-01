@@ -206,22 +206,22 @@ function renderLeaderboard() {
         }
 
         row.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-6 py-4 whitespace-nowrap col-rank">
                 ${rankBadge}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap">
+            <td class="px-6 py-4 whitespace-nowrap col-player">
                 <div class="flex items-center gap-3">
                     ${avatar}${fallbackAvatar}
                     <span class="font-semibold text-white">${stat.name}</span>
                 </div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center">
+            <td class="px-6 py-4 whitespace-nowrap text-center col-metric">
                 ${metricValue}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center hidden md:table-cell">
+            <td class="px-6 py-4 whitespace-nowrap text-center hidden md:table-cell col-avg-time">
                 <span class="text-slate-300">${formatTime(stat.avgTimePerGame)}</span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center hidden lg:table-cell">
+            <td class="px-6 py-4 whitespace-nowrap text-center hidden lg:table-cell col-total-time">
                 <span class="text-slate-300">${formatTime(stat.totalTimeMs)}</span>
             </td>
         `;
