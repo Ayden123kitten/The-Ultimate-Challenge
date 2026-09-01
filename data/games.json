@@ -605,8 +605,8 @@
     "mod_version": "0.2.2",
     "rules": "You must use the Eclipse mod for harder difficulty (https://thunderstore.io/c/risk-of-rain-returns/p/0n_x/Eclipse/).",
     "extra_information": "Do not update your mod to 0.2.3, as it's currently unstable and may fail to send checks.",
-    "apworld_link": "https://github.com/studkid/RoR_Archipelago/releases/tag/v0.6.2",
-    "mod_link": "https://thunderstore.io/c/risk-of-rain-returns/p/studkid/Archipelago/",
+    "apworld_link": "https://github.com/studkid/RoR_Archipelago/releases/download/v0.6.2/ror1.apworld",
+    "mod_link": "https://github.com/studkid/RoR_Archipelago/releases/download/v0.6.2/RoR_AP_0.6.2.zip",
     "mod_setup_guide_link": "https://github.com/studkid/Archipelago/blob/main/worlds/ror1/docs/setup_RoRR_en.md",
     "tracker_link": "",
     "game_info_link": "",
@@ -617,7 +617,7 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false,
-    "yaml_slot_name": "",
+    "yaml_slot_name": "RiskOfRainReturns",
     "slot_count": 1
   },
   {
