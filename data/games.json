@@ -1194,5 +1194,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "againstthestorm",
+    "name": "Against The Storm",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/e595b4a6f9d0cefe4fce92e5d561be45.png",
+    "yaml_slot_name": "AgainstTheStorm",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/Ryguy-9999/ArchipelagoATS/releases/download/v1.2.1/against_the_storm.apworld",
+    "apworld_version": "1.2.1",
+    "mod_link": "https://thunderstore.io/c/against-the-storm/p/ATS_for_AP_Team/Against_The_Storm_for_Archipelago/",
+    "mod_version": "1.2.1",
+    "mod_setup_guide_link": "https://github.com/Ryguy-9999/ArchipelagoATS/blob/main/worlds/against_the_storm/docs/setup_en.md",
+    "tracker_link": "https://github.com/Chfou/ATS-poptracker/releases/download/v0.4/ATS-poptracker-v0.4.1.zip",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1250491355290140672",
+    "save_file_link": "https://drive.google.com/drive/folders/1gHpiF3KQGETYHyfMbVa1y1aea2ILWHPo?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
