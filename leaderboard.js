@@ -12,6 +12,7 @@ const CONFIG = {
 // ==========================================
 let games = [];
 let players = [];
+let availableRoles = []; // [{ name, color }]
 let currentPlayer = AUTH.getName();
 let currentSortType = 'games'; // 'games', 'time', 'claims', 'completion'
 
@@ -23,6 +24,17 @@ function formatTime(ms) {
     const minutes = Math.floor((ms / (1000 * 60)) % 60);
     const hours = Math.floor((ms / (1000 * 60 * 60)));
     return `${hours.toString().padStart(6, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+async function loadRoles() {
+    try {
+        const res = await fetch(`/api/get-data?type=roles&t=${Date.now()}`);
+        if (res.ok) {
+            availableRoles = await res.json();
+        }
+    } catch (err) {
+        console.error('Failed to load roles:', err);
+    }
 }
 
 // ==========================================
@@ -173,7 +185,7 @@ function renderLeaderboard() {
     playerStats.forEach((stat, index) => {
         const rank = index + 1;
         const row = document.createElement('tr');
-        row.className = 'hover:bg-slate-800/30 transition-colors';
+        row.className = 'hover:bg-slate-800/30 transition-colors cursor-pointer';
         
         // Add special styling for top 3
         if (rank <= 3) {
@@ -225,6 +237,8 @@ function renderLeaderboard() {
                 <span class="text-slate-300">${formatTime(stat.totalTimeMs)}</span>
             </td>
         `;
+
+        row.addEventListener('click', () => showPlayerModal(stat));
 
         container.appendChild(row);
     });
@@ -318,9 +332,275 @@ function setupTabListeners() {
 }
 
 // ==========================================
+// PLAYER MODAL
+// ==========================================
+function showPlayerModal(stat) {
+    // Remove existing modal if any
+    const existing = document.getElementById('player-detail-modal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'player-detail-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(15, 23, 42, 0.4);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(4px);
+    `;
+
+    const content = document.createElement('div');
+    content.style.cssText = `
+        background: rgba(30, 41, 59, 0.98);
+        backdrop-filter: blur(10px);
+        padding: 30px;
+        border-radius: 16px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    `;
+
+    // Close Button
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.style.cssText = `
+        position: absolute;
+        top: 15px; right: 20px;
+        background: none;
+        border: none;
+        color: #94a3b8;
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+    `;
+    closeBtn.onclick = () => modal.remove();
+
+    // Header
+    const header = document.createElement('div');
+    header.style.cssText = `display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;`;
+    
+    const avatar = stat.pfpLink
+        ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8;">`
+        : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
+
+    const info = document.createElement('div');
+    info.style.cssText = `display: flex; flex-direction: column; gap: 4px;`;
+    
+    // Name row with pronouns badge
+    const nameRow = document.createElement('div');
+    nameRow.style.cssText = `display: flex; align-items: center; gap: 8px; flex-wrap: wrap;`;
+    
+    const h2 = document.createElement('h2');
+    h2.textContent = stat.name;
+    h2.style.margin = '0';
+    h2.style.fontSize = '1.25rem';
+    h2.style.color = '#e2e8f0';
+    
+    // Pronouns badge
+    const playerObj = players.find(p => p.name === stat.name);
+    const playerPronouns = (playerObj && playerObj.pronouns) ? playerObj.pronouns.trim() : '';
+    if (playerPronouns) {
+        const pronounsBadge = document.createElement('span');
+        pronounsBadge.textContent = playerPronouns;
+        pronounsBadge.style.cssText = `display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #38bdf822; color: #38bdf8; border: 1px solid #38bdf8; white-space: nowrap;`;
+        nameRow.appendChild(h2);
+        nameRow.appendChild(pronounsBadge);
+    } else {
+        nameRow.appendChild(h2);
+    }
+    
+    // Roles in modal
+    const playerRoles = (playerObj && playerObj.roles) ? playerObj.roles : [];
+    const modalRoles = document.createElement('div');
+    modalRoles.style.cssText = `display: flex; flex-wrap: wrap; gap: 6px;`;
+    playerRoles.forEach(roleName => {
+        const role = availableRoles.find(r => r.name === roleName);
+        if (role) {
+            const badge = document.createElement('span');
+            badge.textContent = role.name;
+            badge.style.cssText = `
+                display: inline-flex; align-items: center; gap: 4px;
+                padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;
+                background-color: ${role.color}33; color: ${role.color}; border: 1px solid ${role.color};
+            `;
+            const dot = document.createElement('span');
+            dot.style.cssText = `display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${role.color};`;
+            badge.prepend(dot);
+            modalRoles.appendChild(badge);
+        }
+    });
+
+    info.appendChild(nameRow);
+    if (modalRoles.children.length > 0) {
+        info.appendChild(modalRoles);
+    }
+    
+    // Bio under name
+    const playerBio = (playerObj && playerObj.bio) ? playerObj.bio.trim() : '';
+    if (playerBio) {
+        const bioDiv = document.createElement('div');
+        bioDiv.style.cssText = `margin-top: 4px; overflow-wrap: anywhere; word-break: break-word;`;
+        const bioText = document.createElement('span');
+        bioText.textContent = playerBio;
+        bioText.style.cssText = `color: #94a3b8; overflow-wrap: anywhere; word-break: break-word; font-size: 0.9rem;`;
+        bioDiv.appendChild(bioText);
+        info.appendChild(bioDiv);
+    }
+    
+    // Discord username under bio
+    const playerDiscord = (playerObj && playerObj.discord) ? playerObj.discord.trim() : '';
+    if (playerDiscord) {
+        const discordDiv = document.createElement('div');
+        discordDiv.style.cssText = `display: flex; align-items: center; gap: 6px; margin-top: 4px;`;
+        const discordIcon = document.createElement('i');
+        discordIcon.className = 'fa-brands fa-discord';
+        discordIcon.style.cssText = `color: #5865F2;`;
+        const discordText = document.createElement('span');
+        discordText.textContent = playerDiscord;
+        discordText.style.cssText = `color: #5865F2; overflow-wrap: anywhere; word-break: break-word; font-size: 0.9rem;`;
+        discordDiv.appendChild(discordIcon);
+        discordDiv.appendChild(discordText);
+        info.appendChild(discordDiv);
+    }
+    
+    header.innerHTML = avatar;
+    header.appendChild(info);
+
+    // Awards Section
+    const playerAwards = (playerObj && playerObj.awards) ? playerObj.awards : [];
+    
+    if (playerAwards.length > 0) {
+        const awardsSection = document.createElement('div');
+        awardsSection.style.cssText = `margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
+        const awardsTitle = document.createElement('h3');
+        awardsTitle.textContent = 'Awards';
+        awardsTitle.style.cssText = `border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px; font-size: 1.2rem; color: #e2e8f0;`;
+        awardsSection.appendChild(awardsTitle);
+        
+        const awardsList = document.createElement('div');
+        awardsList.style.cssText = `display: flex; flex-direction: column; gap: 10px;`;
+        
+        playerAwards.forEach(award => {
+            const awardItem = document.createElement('div');
+            awardItem.style.cssText = `
+                display: flex; align-items: center; gap: 12px;
+                background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px;
+            `;
+            
+            // Render icon - check if it's a FontAwesome class or emoji
+            let iconHtml = '';
+            if (award.icon && award.icon.startsWith('fa-')) {
+                iconHtml = `<i class="${award.icon}" style="font-size: 1.5rem; color: #38bdf8; min-width: 24px;"></i>`;
+            } else {
+                iconHtml = `<span style="font-size: 1.5rem; min-width: 24px;">${award.icon || '🏆'}</span>`;
+            }
+            
+            const awardInfo = document.createElement('div');
+            awardInfo.style.cssText = `flex: 1; min-width: 0;`;
+            
+            const awardName = document.createElement('div');
+            awardName.innerHTML = `${iconHtml} <strong style="color: #38bdf8;">${award.name}</strong>`;
+            awardName.style.cssText = `display: flex; align-items: center; gap: 8px; margin-bottom: 4px;`;
+            
+            const awardDesc = document.createElement('div');
+            awardDesc.textContent = award.description || '';
+            awardDesc.style.cssText = `font-size: 0.85rem; color: #94a3b8; overflow-wrap: anywhere; word-break: break-word;`;
+            
+            awardInfo.appendChild(awardName);
+            awardInfo.appendChild(awardDesc);
+            awardItem.appendChild(awardInfo);
+            awardsList.appendChild(awardItem);
+        });
+        
+        awardsSection.appendChild(awardsList);
+        content.appendChild(awardsSection);
+    }
+
+    // Stats Grid
+    const statsGrid = document.createElement('div');
+    statsGrid.style.cssText = `
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 25px;
+    `;
+    
+    const statBoxes = [
+        { label: 'Games Played', value: stat.gamesPlayed },
+        { label: 'Total Time', value: formatTime(stat.totalTimeMs) },
+        { label: 'Total Claims', value: stat.totalClaims }
+    ];
+
+    statBoxes.forEach(s => {
+        const box = document.createElement('div');
+        box.style.cssText = `
+            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center;
+        `;
+        const val = document.createElement('div');
+        val.style.cssText = `font-size: 1.5rem; font-weight: bold; color: #38bdf8;`;
+        val.textContent = s.value;
+        const lbl = document.createElement('div');
+        lbl.style.cssText = `font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 5px;`;
+        lbl.textContent = s.label;
+        box.appendChild(val);
+        box.appendChild(lbl);
+        statsGrid.appendChild(box);
+    });
+
+    // Game History Section
+    const historySection = document.createElement('div');
+    historySection.style.cssText = `margin-top: 20px;`;
+    const historyTitle = document.createElement('h3');
+    historyTitle.textContent = 'Games Played';
+    historyTitle.style.cssText = `border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px;`;
+    
+    const historyList = document.createElement('div');
+    historyList.style.cssText = `display: flex; flex-direction: column; gap: 10px;`;
+
+    if (stat.gameHistory.length > 0) {
+        stat.gameHistory.forEach(game => {
+            const item = document.createElement('div');
+            item.style.cssText = `
+                background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; 
+                border-left: 3px solid #38bdf8; font-size: 0.9rem;
+                display: flex; justify-content: space-between; align-items: center;
+            `;
+            item.innerHTML = `
+                <strong style="color: #e2e8f0;">${game.gameName}</strong>
+                <span style="color: #38bdf8; font-weight: bold; font-family: monospace;">${formatTime(game.timeMs)}</span>
+            `;
+            historyList.appendChild(item);
+        });
+    } else {
+        historyList.innerHTML = '<p style="color:#94a3b8; text-align:center;">No games played yet.</p>';
+    }
+
+    historySection.appendChild(historyTitle);
+    historySection.appendChild(historyList);
+
+    content.appendChild(closeBtn);
+    content.appendChild(header);
+    content.appendChild(statsGrid);
+    content.appendChild(historySection);
+    modal.appendChild(content);
+    
+    // Close on outside click
+    modal.onclick = (e) => {
+        if (e.target === modal) modal.remove();
+    };
+
+    document.body.appendChild(modal);
+}
+
+// ==========================================
 // INITIALIZE
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
+    loadRoles();
     setupTabListeners();
     loadData();
     
