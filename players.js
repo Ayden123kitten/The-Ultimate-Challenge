@@ -378,9 +378,6 @@ function renderPlayers() {
         // Get player roles from players array
         const playerObj = players.find(p => p.name === stat.name);
         const playerRoles = (playerObj && playerObj.roles) ? playerObj.roles : [];
-        const playerBio = (playerObj && playerObj.bio) ? playerObj.bio.trim() : '';
-        const playerDiscord = (playerObj && playerObj.discord) ? playerObj.discord.trim() : '';
-        const playerPronouns = (playerObj && playerObj.pronouns) ? playerObj.pronouns.trim() : '';
 
         // Roles HTML
         let rolesHtml = '';
@@ -397,22 +394,6 @@ function renderPlayers() {
             rolesHtml += '</div>';
         }
 
-        // Pronouns oval badge HTML
-        const pronounsBadge = playerPronouns 
-            ? `<span style="display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; background-color: #38bdf822; color: #38bdf8; border: 1px solid #38bdf8; white-space: nowrap; margin-left: 6px;">${playerPronouns}</span>`
-            : '';
-
-        // Bio text (truncated for card view)
-        const bioDisplay = playerBio 
-            ? `<p style="margin: 4px 0 0 0; font-size: 0.75rem; color: #94a3b8; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; max-width: 100%;">${playerBio}</p>`
-            : '';
-
-        // Discord username (truncated for card view)
-        const discordDisplay = playerDiscord
-            ? `<p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #5865F2; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;"><i class="fa-brands fa-discord mr-1"></i>${playerDiscord}</p>`
-            : '';
-
-
         card.innerHTML = `
             <div style="position: relative;">
                 ${avatar}
@@ -424,13 +405,8 @@ function renderPlayers() {
             </div>
                 ${modIcon ? `<div style="position: absolute; top: -5px; left: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">${modIcon}</div>` : ''}
             <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
-                <div style="display: flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap;">
-                    <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ''}</h2>
-                    ${pronounsBadge}
-                </div>
+                <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ''}</h2>
                 ${rolesHtml}
-                ${bioDisplay}
-                ${discordDisplay}
             </div>
         `;
 
@@ -505,12 +481,32 @@ function showPlayerModal(stat) {
         : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
 
     const info = document.createElement('div');
+    info.style.cssText = `display: flex; flex-direction: column; gap: 4px;`;
+    
+    // Name row with pronouns badge
+    const nameRow = document.createElement('div');
+    nameRow.style.cssText = `display: flex; align-items: center; gap: 8px; flex-wrap: wrap;`;
+    
     const h2 = document.createElement('h2');
     h2.textContent = stat.name;
-    h2.style.margin = '0 0 10px 0';
+    h2.style.margin = '0';
+    h2.style.fontSize = '1.25rem';
+    h2.style.color = '#e2e8f0';
+    
+    // Pronouns badge
+    const playerObj = players.find(p => p.name === stat.name);
+    const playerPronouns = (playerObj && playerObj.pronouns) ? playerObj.pronouns.trim() : '';
+    if (playerPronouns) {
+        const pronounsBadge = document.createElement('span');
+        pronounsBadge.textContent = playerPronouns;
+        pronounsBadge.style.cssText = `display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #38bdf822; color: #38bdf8; border: 1px solid #38bdf8; white-space: nowrap;`;
+        nameRow.appendChild(h2);
+        nameRow.appendChild(pronounsBadge);
+    } else {
+        nameRow.appendChild(h2);
+    }
     
     // Roles in modal
-    const playerObj = players.find(p => p.name === stat.name);
     const playerRoles = (playerObj && playerObj.roles) ? playerObj.roles : [];
     const modalRoles = document.createElement('div');
     modalRoles.style.cssText = `display: flex; flex-wrap: wrap; gap: 6px;`;
@@ -531,8 +527,39 @@ function showPlayerModal(stat) {
         }
     });
 
-    info.appendChild(h2);
-    info.appendChild(modalRoles);
+    info.appendChild(nameRow);
+    if (modalRoles.children.length > 0) {
+        info.appendChild(modalRoles);
+    }
+    
+    // Bio under name
+    const playerBio = (playerObj && playerObj.bio) ? playerObj.bio.trim() : '';
+    if (playerBio) {
+        const bioDiv = document.createElement('div');
+        bioDiv.style.cssText = `margin-top: 4px; overflow-wrap: anywhere; word-break: break-word;`;
+        const bioText = document.createElement('span');
+        bioText.textContent = playerBio;
+        bioText.style.cssText = `color: #94a3b8; overflow-wrap: anywhere; word-break: break-word; font-size: 0.9rem;`;
+        bioDiv.appendChild(bioText);
+        info.appendChild(bioDiv);
+    }
+    
+    // Discord username under bio
+    const playerDiscord = (playerObj && playerObj.discord) ? playerObj.discord.trim() : '';
+    if (playerDiscord) {
+        const discordDiv = document.createElement('div');
+        discordDiv.style.cssText = `display: flex; align-items: center; gap: 6px; margin-top: 4px;`;
+        const discordIcon = document.createElement('i');
+        discordIcon.className = 'fa-brands fa-discord';
+        discordIcon.style.cssText = `color: #5865F2;`;
+        const discordText = document.createElement('span');
+        discordText.textContent = playerDiscord;
+        discordText.style.cssText = `color: #5865F2; overflow-wrap: anywhere; word-break: break-word; font-size: 0.9rem;`;
+        discordDiv.appendChild(discordIcon);
+        discordDiv.appendChild(discordText);
+        info.appendChild(discordDiv);
+    }
+    
     header.innerHTML = avatar;
     header.appendChild(info);
 
@@ -715,8 +742,24 @@ function showPlayerModal(stat) {
 
     content.appendChild(closeBtn);
     content.appendChild(header);
-    if (hasSettings) {
-        content.appendChild(settingsSection);
+    // Settings section is now redundant since bio, pronouns, and discord are shown in header
+    // Only show website if it exists
+    if (playerObj && playerObj.website && playerObj.website.trim() !== '') {
+        const websiteDiv = document.createElement('div');
+        websiteDiv.style.cssText = `margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
+        const websiteLabel = document.createElement('span');
+        websiteLabel.textContent = 'Website: ';
+        websiteLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
+        const websiteText = document.createElement('a');
+        websiteText.textContent = playerObj.website;
+        websiteText.href = playerObj.website.startsWith('http') ? playerObj.website : '#';
+        websiteText.target = '_blank';
+        websiteText.style.cssText = `color: #38bdf8; text-decoration: none; overflow-wrap: anywhere; word-break: break-word;`;
+        websiteText.onmouseover = function() { this.style.textDecoration = 'underline'; };
+        websiteText.onmouseout = function() { this.style.textDecoration = 'none'; };
+        websiteDiv.appendChild(websiteLabel);
+        websiteDiv.appendChild(websiteText);
+        content.appendChild(websiteDiv);
     }
     content.appendChild(statsGrid);
     content.appendChild(historySection);
