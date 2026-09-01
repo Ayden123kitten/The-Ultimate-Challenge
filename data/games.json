@@ -1148,5 +1148,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "librarian",
+    "name": "Librarian: Tidy Up the Arcane Library!",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/60d462e6006ca3a50e85a6490aca1cfe.png",
+    "yaml_slot_name": "Librarian",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/Str8UpWHITE64/Librarian-AP/releases/download/2.0.3/librarian.apworld",
+    "apworld_version": "2.0.3",
+    "mod_link": "https://github.com/Str8UpWHITE64/Librarian-AP/releases/download/2.0.3/Librarian-AP_v2.0.3.zip",
+    "mod_version": "2.0.3",
+    "mod_setup_guide_link": "https://github.com/Str8UpWHITE64/Librarian-AP#installation",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1501512989923086386",
+    "save_file_link": "https://drive.google.com/drive/folders/1DRb8UpuBPhV5lyIhHRI0DXKamBAAataL?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
