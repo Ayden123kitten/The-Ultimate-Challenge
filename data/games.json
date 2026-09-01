@@ -30,8 +30,8 @@
     "mod_version": "0.5.14",
     "rules": "",
     "extra_information": "",
-    "apworld_link": "https://github.com/SWCreeperKing/PowerwashSimAP/releases/tag/v0.5.14",
-    "mod_link": "https://github.com/SWCreeperKing/PowerwashSimAP/releases/tag/v0.5.14",
+    "apworld_link": "https://github.com/SWCreeperKing/PowerwashSimAP/releases/download/v0.5.14/powerwashsimulator.apworld",
+    "mod_link": "https://github.com/SWCreeperKing/PowerwashSimAP/releases/download/v0.5.14/SW_CreeperKing.ArchipelagoMod.zip",
     "mod_setup_guide_link": "https://github.com/SWCreeperKing/PowerwashSimAP#how-to-install",
     "tracker_link": "",
     "game_info_link": "",
@@ -42,7 +42,7 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false,
-    "yaml_slot_name": "",
+    "yaml_slot_name": "PowerWashSim",
     "slot_count": 1
   },
   {
