@@ -162,14 +162,14 @@
   },
   {
     "id": "riftofthenecrodancer",
-    "name": "Rift Of The NecroDancer",
+    "name": "Rift of the NecroDancer",
     "logo": "https://cdn2.steamgriddb.com/logo_thumb/a22e4383849b4bb63896c5655ac51f4a.png",
     "apworld_version": "0.16.0",
     "mod_version": "0.16.0",
     "rules": "",
     "extra_information": "",
-    "apworld_link": "https://github.com/studkid/RiftArchipelago/releases/tag/v0.16.0",
-    "mod_link": "https://github.com/studkid/RiftArchipelago/releases/tag/v0.16.0",
+    "apworld_link": "https://github.com/studkid/RiftArchipelago/releases/download/v0.16.0/rotn.apworld",
+    "mod_link": "https://github.com/studkid/RiftArchipelago/releases/download/v0.16.0/RiftArchipelago-0.13.0.zip",
     "mod_setup_guide_link": "https://github.com/studkid/Archipelago/blob/RotN/worlds/rotn/docs/setup_en.md",
     "tracker_link": "",
     "game_info_link": "",
@@ -180,7 +180,7 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false,
-    "yaml_slot_name": "",
+    "yaml_slot_name": "RotNecroDancer",
     "slot_count": 1
   },
   {
