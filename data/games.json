@@ -1125,5 +1125,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "jigsaw",
+    "name": "Jigsaw",
+    "logo": "https://i.postimg.cc/ZqgT4tNh/image2-min.png",
+    "yaml_slot_name": "Jigsaw",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/spineraks-org/ArchipelagoJigsaw/releases/tag/v0.10.0",
+    "apworld_version": "0.10.0",
+    "mod_link": "https://jigsaw-ap.netlify.app/",
+    "mod_version": "0.10.3) (Website",
+    "mod_setup_guide_link": "https://discord.com/channels/731205301247803413/1409148531637489775/1409149784937332786",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1409148531637489775",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
