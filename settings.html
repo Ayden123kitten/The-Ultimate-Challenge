@@ -259,7 +259,7 @@
                 
                 const res = await fetch('/api/get-data?type=players');
                 players = await res.json();
-                const currentPlayer = players.find(p => p.name === user);
+                const currentPlayer = players.find(p => p.name.toLowerCase() === user.toLowerCase());
 
                 if (currentPlayer) {
                     document.getElementById('profile-pic').value = currentPlayer.pfp_link || '';
