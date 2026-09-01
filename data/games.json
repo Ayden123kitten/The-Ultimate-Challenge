@@ -922,7 +922,7 @@
   {
     "id": "fnafucn",
     "name": "Ultimate Custom Night",
-    "logo": "https://cdn2.steamgriddb.com/logo/956bf3fde2321e4c8176ef0781d05479.png",
+    "logo": "https://shared.steamstatic.com/store_item_assets/steam/apps/871720/logo.png?t=1528433550",
     "yaml_slot_name": "UCN",
     "apworld_link": "https://github.com/fewffwa/UCN-AP/releases/download/0.1.1/ucn.apworld",
     "apworld_version": "0.1.1",
