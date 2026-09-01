@@ -1447,5 +1447,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "archipelaballs",
+    "name": "Archipelaballs",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "yaml_slot_name": "Archipelaballs",
+    "slot_count": 1,
+    "apworld_link": "https://archipelago.shinten.moe/games/Archipelaballs/archipelaballs.apworld",
+    "apworld_version": "",
+    "mod_link": "https://archipelaballs.shinten.moe/",
+    "mod_version": "",
+    "mod_setup_guide_link": "",
+    "tracker_link": "",
+    "game_info_link": "https://archipelago.shinten.moe/games/Archipelaballs/info_en.html",
+    "support_link": "https://discord.com/channels/731205301247803413/1520698911944216606",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
