@@ -1102,5 +1102,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "inscryption",
+    "name": "Inscryption",
+    "logo": "https://cdn2.steamgriddb.com/logo/5ef8cf77201dc48f2a2f22cd14ec648c.png",
+    "yaml_slot_name": "inscryption",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/empathy-mp3/Archipelago_Inscryption/releases/tag/v1.5.4",
+    "apworld_version": "1.5.4 Beta",
+    "mod_link": "https://github.com/empathy-mp3/Archipelago_Inscryption/releases/tag/v1.5.4",
+    "mod_version": "1.5.4 Beta",
+    "mod_setup_guide_link": "https://github.com/empathy-mp3/Archipelago_Inscryption/releases/tag/v1.5.4",
+    "tracker_link": "https://github.com/empathy-mp3/Archipelago_Inscryption/releases/tag/v1.5.4",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1356651394320437469",
+    "save_file_link": "https://drive.google.com/drive/folders/1cHJCstrcnJpciOBlupa-xX7-ys59AKZG",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
