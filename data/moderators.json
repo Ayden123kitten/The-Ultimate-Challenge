@@ -26,12 +26,12 @@
     {
       "name": "LORD X",
       "permissions": {
-        "manageModerators": false,
+        "manageModerators": true,
         "manageGames": true,
-        "managePlayers": false,
-        "manageRoles": false,
-        "manageAwards": false,
-        "manageSettings": false
+        "managePlayers": true,
+        "manageRoles": true,
+        "manageAwards": true,
+        "manageSettings": true
       }
     },
     {
