@@ -144,7 +144,7 @@
     "apworld_version": "Core",
     "mod_version": "2.2",
     "rules": "You must play with Infernum installed, as it makes the game harder without breaking logic.",
-    "extra_information": "The only mods allowed are Calamity, Calamity Infernum, and Magic Storage.",
+    "extra_information": "The only mods that are allowed are Calamity, Calamity Infernum, and Magic Storage.",
     "apworld_link": "https://archipelago.gg/games/Terraria/info/en",
     "mod_link": "https://steamcommunity.com/sharedfiles/filedetails/?id=2922217554",
     "mod_setup_guide_link": "https://archipelago.gg/tutorial/Terraria/setup_en",
@@ -157,7 +157,7 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false,
-    "yaml_slot_name": "",
+    "yaml_slot_name": "Terraria",
     "slot_count": 1
   },
   {
