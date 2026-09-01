@@ -20,11 +20,11 @@ let currentPlayer = AUTH.getName();
 const $ = (id) => document.getElementById(id);
 
 function formatTime(ms) {
-    if (!ms || ms < 0) return '00:00:00';
+    if (!ms || ms < 0) return '000000:00:00';
     const seconds = Math.floor((ms / 1000) % 60);
     const minutes = Math.floor((ms / (1000 * 60)) % 60);
     const hours = Math.floor((ms / (1000 * 60 * 60)));
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    return `${hours.toString().padStart(6, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
 async function loadCheesetrackerData() {
@@ -409,7 +409,7 @@ function updateGlobalTimer() {
     const statusEl = $('timer-status');
 
     if (!settings.start_time || settings.start_time.trim() === '') {
-        timerEl.textContent = '00:00:00';
+        timerEl.textContent = '000000:00:00';
         statusEl.textContent = '';
         // Add inline edit button for moderator
         addInlineEditButtonToTimer();
@@ -516,7 +516,7 @@ function openEventTimerSettingsModal() {
         const endTime = endInput.value;
         
         if (!startTime) {
-            previewTimer.textContent = '00:00:00';
+            previewTimer.textContent = '000000:00:00';
             previewStatus.textContent = 'Not Set';
             return;
         }
@@ -1000,7 +1000,7 @@ function openModeratorModal() {
         const endTime = endInput.value;
         
         if (!startTime) {
-            previewTimer.textContent = '00:00:00';
+            previewTimer.textContent = '000000:00:00';
             previewStatus.textContent = 'Not Set';
             return;
         }

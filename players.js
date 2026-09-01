@@ -22,11 +22,11 @@ let isModerator = false; // Track moderator status
 const $ = (id) => document.getElementById(id);
 
 function formatTime(ms) {
-    if (!ms || ms < 0) return '00:00:00';
+    if (!ms || ms < 0) return '000000:00:00';
     const seconds = Math.floor((ms / 1000) % 60);
     const minutes = Math.floor((ms / (1000 * 60)) % 60);
     const hours = Math.floor((ms / (1000 * 60 * 60)));
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    return `${hours.toString().padStart(6, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
 async function loadRoles() {
