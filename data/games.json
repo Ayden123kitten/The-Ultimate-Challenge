@@ -1309,5 +1309,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "apeescape",
+    "name": "Ape Escape",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/0868dbe2d591f3c1beb2f6dd50bdb72e.png",
+    "yaml_slot_name": "ApeEscape",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/Thedragon005/Archipelago-Ape-Escape/releases/download/v0.9.10/apeescape.apworld",
+    "apworld_version": "0.9.10",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://github.com/Thedragon005/Archipelago-Ape-Escape/blob/apeescape/worlds/apeescape/docs/setup_en.md",
+    "tracker_link": "https://github.com/lurch9229/Ape-Escape-Tracker/releases/download/0.7.0/Ape-Escape-Tracker-0.7.0.zip",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1168645708103028856",
+    "save_file_link": "https://drive.google.com/drive/folders/1eY9VS-5CNhyvulpweOCHS7ESBYlgjXZn?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
