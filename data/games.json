@@ -1171,5 +1171,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "adventure",
+    "name": "Adventure",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/ace26ac24b643986e59f67ae2e323d0a.png",
+    "yaml_slot_name": "Adventure",
+    "slot_count": 1,
+    "apworld_link": "https://archipelago.gg/games/Adventure/info/en",
+    "apworld_version": "Core",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "",
+    "tracker_link": "https://github.com/ZobeePlays/Adventure-AP-Tracker/archive/refs/tags/Releases.zip",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1090814076378153111",
+    "save_file_link": "https://drive.google.com/drive/folders/1Ca4H9yc3SaoIrYa384Mwq07KADRn9gnp?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
