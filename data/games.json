@@ -1401,5 +1401,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "aquaria",
+    "name": "Aquaria",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/883e881bb4d22a7add958f2d6b052c9f.png",
+    "yaml_slot_name": "Aquaria",
+    "slot_count": 1,
+    "apworld_link": "https://archipelago.gg/games/Aquaria/info/en",
+    "apworld_version": "Core",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://archipelago.gg/tutorial/Aquaria/setup_en",
+    "tracker_link": "https://github.com/palex00/aquaria-ap-tracker/archive/refs/tags/1.0.3.zip",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1257452465272389687",
+    "save_file_link": "https://drive.google.com/drive/folders/1YOCJWmCKHRAexJ33h5IhAvBV88CqimWQ?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
