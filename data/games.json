@@ -1332,5 +1332,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "ae3",
+    "name": "Ape Escape 3",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/acbb8431ab8b5071fb0d96952101f951.png",
+    "yaml_slot_name": "ApeEscape3",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/aidanii24/ae3-archipelago/releases/download/v2.0.6/ape_escape_3.apworld",
+    "apworld_version": "2.0.6",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://github.com/aidanii24/ae3-archipelago/blob/main/docs/setup.md",
+    "tracker_link": "https://git.ddd.rip/SophiaNya/ae3-poptracker-pack/releases/download/0.1.5/AE3Tracker.zip",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1336332485788831825",
+    "save_file_link": "https://drive.google.com/drive/folders/1EY_XBZFV4p5_-mdu6-fZMIHGAs3FHjPN?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
