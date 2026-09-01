@@ -1394,6 +1394,7 @@ function openGameInlineEditor(gameId, event) {
                     <input type="text" id="inline-edit-game-name" placeholder="Game Name" value="${game.name}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="text" id="inline-edit-game-id" placeholder="Game ID" value="${game.id}" disabled class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white opacity-50">
                     <input type="text" id="inline-edit-game-yaml-slot-name" placeholder="YAML Slot Name" value="${game.yaml_slot_name || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="number" id="inline-edit-game-slot-count" placeholder="Slot Count" min="1" value="${game.slot_count || 1}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-logo" placeholder="Logo URL" value="${game.logo || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-apworld-link" placeholder="Apworld Link" value="${game.apworld_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="text" id="inline-edit-game-apworld-version" placeholder="Apworld Version" value="${game.apworld_version || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
@@ -1430,7 +1431,7 @@ function openGameInlineEditor(gameId, event) {
 // Setup live preview for game editing
 function setupInlineGamePreview(originalGame) {
     const inputs = [
-        'inline-edit-game-name', 'inline-edit-game-yaml-slot-name', 'inline-edit-game-logo',
+        'inline-edit-game-name', 'inline-edit-game-yaml-slot-name', 'inline-edit-game-slot-count', 'inline-edit-game-logo',
         'inline-edit-game-apworld-link', 'inline-edit-game-apworld-version', 'inline-edit-game-mod-link',
         'inline-edit-game-mod-version', 'inline-edit-game-mod-setup-guide-link', 'inline-edit-game-tracker-link',
         'inline-edit-game-game-info-link', 'inline-edit-game-support-link', 'inline-edit-game-save-file-link',
@@ -1442,6 +1443,7 @@ function setupInlineGamePreview(originalGame) {
             ...originalGame,
             name: $('inline-edit-game-name').value || originalGame.name,
             yaml_slot_name: $('inline-edit-game-yaml-slot-name').value,
+            slot_count: parseInt($('inline-edit-game-slot-count').value) || 1,
             logo: $('inline-edit-game-logo').value,
             apworld_link: $('inline-edit-game-apworld-link').value,
             apworld_version: $('inline-edit-game-apworld-version').value,
@@ -1529,6 +1531,7 @@ async function saveInlineEditedGame(gameId) {
     const gameData = {
         name: $('inline-edit-game-name').value.trim(),
         yaml_slot_name: $('inline-edit-game-yaml-slot-name').value.trim(),
+        slot_count: parseInt($('inline-edit-game-slot-count').value) || 1,
         logo: $('inline-edit-game-logo').value.trim(),
         apworld_link: $('inline-edit-game-apworld-link').value.trim(),
         apworld_version: $('inline-edit-game-apworld-version').value.trim(),
