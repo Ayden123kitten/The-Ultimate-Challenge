@@ -1079,5 +1079,28 @@
     "completed": false,
     "logs": [],
     "slot_count": 1
+  },
+  {
+    "id": "FNAFWORLD",
+    "name": "FNAF World",
+    "logo": "https://cdn2.steamgriddb.com/logo/64f07f012a35c83d7c556ba0b69ef64e.png",
+    "yaml_slot_name": "FNAFWORLD",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/EviVirus/Archipelago-FNaFW/releases/tag/FNaFW-v1.2.1",
+    "apworld_version": "1.2.1",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://discord.com/channels/731205301247803413/1519051628169134340/1519211893326090342",
+    "tracker_link": "https://discord.com/channels/731205301247803413/1519051628169134340/1519211893326090342",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1519051628169134340",
+    "save_file_link": "https://drive.google.com/drive/folders/1SkIFqSmrwTsBdCQ7qMS1-AfsAgWfYYGr",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
