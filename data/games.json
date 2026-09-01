@@ -720,8 +720,8 @@
     "mod_version": "0.7.0",
     "rules": "",
     "extra_information": "",
-    "apworld_link": "https://github.com/GlassToadstool/Archipelago/releases/tag/0.7.2",
-    "mod_link": "hhttps://github.com/GlassToadstool/Portal2ArchipelagoMod/releases/tag/0.7.0",
+    "apworld_link": "https://github.com/GlassToadstool/Archipelago/releases/download/0.7.2/portal2.apworld",
+    "mod_link": "https://github.com/GlassToadstool/Portal2ArchipelagoMod/releases/download/0.7.0/Portal2ArchipelagoMod.zip",
     "mod_setup_guide_link": "https://github.com/GlassToadstool/Portal2ArchipelagoMod",
     "tracker_link": "",
     "game_info_link": "",
@@ -732,7 +732,7 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false,
-    "yaml_slot_name": "",
+    "yaml_slot_name": "Portal2",
     "slot_count": 1
   },
   {
