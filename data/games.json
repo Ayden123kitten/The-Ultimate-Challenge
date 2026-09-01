@@ -375,8 +375,8 @@
     "mod_version": "1.4.7",
     "rules": "",
     "extra_information": "",
-    "apworld_link": "https://github.com/xMcacutt-Archipelago/Archipelago-UnfairFlips/releases/tag/1.2.1",
-    "mod_link": "https://github.com/robotzurg/UnfairFlipsAPMod/releases/tag/1.4.7",
+    "apworld_link": "https://github.com/xMcacutt-Archipelago/Archipelago-UnfairFlips/releases/download/1.2.1/unfair_flips.apworld",
+    "mod_link": "https://github.com/robotzurg/UnfairFlipsAPMod/releases/download/1.4.7/UnfairFlipsAPMod.zip",
     "mod_setup_guide_link": "https://github.com/robotzurg/UnfairFlipsAPMod#thunderstore-install-guide-recommended",
     "tracker_link": "",
     "game_info_link": "",
@@ -387,7 +387,7 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false,
-    "yaml_slot_name": "",
+    "yaml_slot_name": "UnfairFlips",
     "slot_count": 1
   },
   {
