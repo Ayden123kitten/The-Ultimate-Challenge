@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The only modified file is 'settings.html', which is a source/config file and should not be added to .gitignore.
+Nothing should be ignored based on the provided file changes. The modified files (`leaderboard.html` and `leaderboard.js`) are source code files that should be tracked in version control. No build artifacts, dependencies, or temporary files are present in the change list.
