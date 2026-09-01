@@ -378,7 +378,10 @@ function renderPlayers() {
         // Get player roles from players array
         const playerObj = players.find(p => p.name === stat.name);
         const playerRoles = (playerObj && playerObj.roles) ? playerObj.roles : [];
-        
+        const playerBio = (playerObj && playerObj.bio) ? playerObj.bio.trim() : '';
+        const playerDiscord = (playerObj && playerObj.discord) ? playerObj.discord.trim() : '';
+        const playerPronouns = (playerObj && playerObj.pronouns) ? playerObj.pronouns.trim() : '';
+
         // Roles HTML
         let rolesHtml = '';
         if (playerRoles.length > 0) {
@@ -394,6 +397,21 @@ function renderPlayers() {
             rolesHtml += '</div>';
         }
 
+        // Pronouns oval badge HTML
+        const pronounsBadge = playerPronouns 
+            ? `<span style="display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; background-color: #38bdf822; color: #38bdf8; border: 1px solid #38bdf8; white-space: nowrap; margin-left: 6px;">${playerPronouns}</span>`
+            : '';
+
+        // Bio text (truncated for card view)
+        const bioDisplay = playerBio 
+            ? `<p style="margin: 4px 0 0 0; font-size: 0.75rem; color: #94a3b8; text-align: center; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; max-width: 100%;">${playerBio}</p>`
+            : '';
+
+        // Discord username (truncated for card view)
+        const discordDisplay = playerDiscord
+            ? `<p style="margin: 2px 0 0 0; font-size: 0.65rem; color: #5865F2; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;"><i class="fa-brands fa-discord mr-1"></i>${playerDiscord}</p>`
+            : '';
+
 
         card.innerHTML = `
             <div style="position: relative;">
@@ -406,8 +424,13 @@ function renderPlayers() {
             </div>
                 ${modIcon ? `<div style="position: absolute; top: -5px; left: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">${modIcon}</div>` : ''}
             <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
-                <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ''}</h2>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap;">
+                    <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ''}</h2>
+                    ${pronounsBadge}
+                </div>
                 ${rolesHtml}
+                ${bioDisplay}
+                ${discordDisplay}
             </div>
         `;
 
