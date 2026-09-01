@@ -1290,7 +1290,7 @@
   {
     "id": "anodyne",
     "name": "Anodyne",
-    "logo": "",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/b801759e5fe60c6715cdbb0a8a4574c1.png",
     "yaml_slot_name": "Anodyne",
     "slot_count": 1,
     "apworld_link": "https://github.com/PixieCatSupreme/ArchipelagoAno/releases/tag/v0.6.3",
