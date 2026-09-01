@@ -1,3 +1,8 @@
 {
-  "roles": []
+  "roles": [
+    {
+      "name": "Choo-Choo Charles Fan Club",
+      "color": "#ff0000"
+    }
+  ]
 }
