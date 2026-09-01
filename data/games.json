@@ -260,8 +260,8 @@
     "mod_version": "0.3.5.1",
     "rules": "",
     "extra_information": "",
-    "apworld_link": "https://github.com/SWCreeperKing/ArchipelagoSurvivors/releases/tag/v0.3.5.1",
-    "mod_link": "https://github.com/SWCreeperKing/ArchipelagoSurvivors/releases/tag/v0.3.5.1",
+    "apworld_link": "https://github.com/SWCreeperKing/ArchipelagoSurvivors/releases/download/v0.3.5.1/vampire_survivors.apworld",
+    "mod_link": "https://github.com/SWCreeperKing/ArchipelagoSurvivors/releases/download/v0.3.5.1/ArchipelagoSurvivors.zip",
     "mod_setup_guide_link": "https://github.com/SWCreeperKing/ArchipelagoSurvivors#how-to-install",
     "tracker_link": "",
     "game_info_link": "",
@@ -272,7 +272,7 @@
     "total_time_ms": 0,
     "logs": [],
     "completed": false,
-    "yaml_slot_name": "",
+    "yaml_slot_name": "VampireSurvivors",
     "slot_count": 1
   },
   {
