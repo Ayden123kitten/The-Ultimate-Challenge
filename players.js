@@ -60,9 +60,21 @@ async function loadAwards() {
       availableAwards = await res.json();
     }
   } catch (err) {
-    console.error("Failed to load awards:", err);
+    console.error("Failed to load data:", err);
+    $("players-container").innerHTML = `
+            <div class="col-span-full text-center text-red-400 p-8">
+                <i class="fa-solid fa-circle-exclamation text-4xl mb-4"></i>
+                <p class="text-lg font-bold">Error loading player stats</p>
+                <p class="text-sm mt-2">${err.message}</p>
+            </div>
+        `;
   }
 }
+
+// ==========================================
+// RENDER AUTH PANEL
+// ==========================================
+function renderAuthPanel() {
 
 function getModeratorIcon(playerName) {
   const role = moderatorRoles[playerName];
