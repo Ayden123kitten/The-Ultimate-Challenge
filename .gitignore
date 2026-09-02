@@ -1,48 +1,79 @@
+# Examples
+
+## Example 1:
+Input:
+### Added files:
+['src/main.py', 'README.md', 'config.json']
+
+### Deleted files:
+['old/unused.py']
+
+### Modified files:
+['utils.py']
+
+### Current .gitignore Content
+(empty)
+
+Expected Output:
+(empty — output nothing)
+
+## Example 2:
+Input:
+### Added files:
+['__pycache__/main.cpython-310.pyc', 'dist/app.js', '.env.local', '.vscode/settings.json']
+
+### Deleted files:
+[]
+
+### Modified files:
+[]
+
+### Current .gitignore Content
+'*.log'
+
+Expected Output:
+```
 # Compiled and build artifacts
 *.pyc
 __pycache__/
+dist/
+build/
 *.o
 *.obj
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
 
 # Dependencies
-node_modules/
-venv/
 .venv/
-.env
-.env.local
-.env.*
+venv/
+node_modules/
 
 # Logs and temp files
 *.log
 *.tmp
 *.swp
-*.swo
+
+# Environment
+.env
+.env.local
+.env.*
 
 # Editors
 .vscode/
 .idea/
+```
 
-# System files
-.DS_Store
-Thumbs.db
+## Example 3:
+Input:
+### Added files:
+['src/App.tsx', 'public/index.html', 'package.json']
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
+### Deleted files:
+[]
 
-# Build directories
-dist/
-build/
-target/
-.gradle/
+### Modified files:
+['src/utils/helper.ts']
 
-# Python caches
-.mypy_cache/
-.pytest_cache/
+### Current .gitignore Content
+(empty)
+
+Expected Output:
+(empty — output nothing)
