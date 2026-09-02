@@ -165,7 +165,7 @@
               id="global-timer"
               class="text-4xl font-mono font-bold text-ap-accent tracking-wider"
             >
-              000000:00:00
+              0:00:00
             </div>
             <div
               id="timer-status"
@@ -227,7 +227,7 @@
               <i class="fa-solid fa-gamepad text-ap-accent"></i>
               <span class="text-sm text-slate-400">Completed:</span>
               <span id="total-games-count" class="font-bold text-ap-accent"
-                >0/20</span
+                >0/?</span
               >
             </div>
 
@@ -251,26 +251,30 @@
           class="hidden lg:hidden mt-4 pt-4 border-t border-slate-700"
         >
           <div class="flex flex-col gap-3">
-            <div class="flex items-center justify-center gap-2">
+            <div
+              class="flex items-center justify-center gap-2 bg-slate-800/50 rounded-lg px-3 py-2 border border-slate-700"
+            >
               <i class="fa-solid fa-gamepad text-ap-accent"></i>
               <span class="text-sm text-slate-400">Completed:</span>
               <span
                 id="total-games-count-mobile"
                 class="font-bold text-ap-accent"
-                >0/20</span
+                >0/?</span
               >
             </div>
             <div class="flex items-center justify-center gap-4">
               <a
                 href="/players.html"
-                class="flex items-center gap-2 text-slate-400 hover:text-ap-accent transition-colors"
+                class="mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+                data-page="players"
               >
                 <i class="fa-solid fa-users"></i>
                 <span class="text-sm">Players</span>
               </a>
               <a
                 href="/leaderboard.html"
-                class="flex items-center gap-2 text-slate-400 hover:text-ap-accent transition-colors"
+                class="mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+                data-page="leaderboard"
               >
                 <i class="fa-solid fa-trophy"></i>
                 <span class="text-sm">Leaderboard</span>
@@ -278,14 +282,19 @@
               <a
                 href="/settings.html"
                 id="settings-nav-link-index-mobile"
-                class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+                class="mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+                data-page="settings"
               >
                 <i class="fa-solid fa-gear"></i>
                 <span class="text-sm">Settings</span>
               </a>
             </div>
             <div
-              class="flex items-center justify-center gap-2 pt-2 border-t border-slate-700"
+              id="mobile-moderation-container"
+              class="flex items-center justify-center gap-2"
+            ></div>
+            <div
+              class="flex items-center justify-center gap-2 bg-gradient-to-r from-slate-800/50 to-slate-800/30 rounded-lg px-3 py-2 border border-slate-700"
             >
               <i class="fa-solid fa-user-circle text-ap-accent"></i>
               <span class="text-sm text-slate-400">Playing as:</span>
@@ -432,6 +441,15 @@
             mobileMenu.classList.toggle("hidden");
           });
         }
+
+        // Set active state for mobile nav links based on current page
+        const currentPath = window.location.pathname;
+        const mobileNavLinks = document.querySelectorAll(".mobile-nav-link");
+        mobileNavLinks.forEach((link) => {
+          if (currentPath.includes(link.getAttribute("data-page"))) {
+            link.classList.add("bg-ap-accent/20", "text-ap-accent");
+          }
+        });
 
         // Sync player name between desktop and mobile displays
         const playerNameDesktop = document.getElementById(

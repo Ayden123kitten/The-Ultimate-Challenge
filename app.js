@@ -20,11 +20,11 @@ let currentPlayer = AUTH.getName();
 const $ = (id) => document.getElementById(id);
 
 function formatTime(ms) {
-  if (!ms || ms < 0) return "000000:00:00";
+  if (!ms || ms < 0) return "0:00:00";
   const seconds = Math.floor((ms / 1000) % 60);
   const minutes = Math.floor((ms / (1000 * 60)) % 60);
   const hours = Math.floor(ms / (1000 * 60 * 60));
-  return `${hours.toString().padStart(6, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
 async function loadCheesetrackerData() {
@@ -514,7 +514,7 @@ function updateGlobalTimer() {
   const statusEl = $("timer-status");
 
   if (!settings.start_time || settings.start_time.trim() === "") {
-    timerEl.textContent = "000000:00:00";
+    timerEl.textContent = "0:00:00";
     statusEl.textContent = "";
     // Add inline edit button for moderator
     addInlineEditButtonToTimer();
@@ -785,6 +785,30 @@ try {
         inlineEditBtn.title = "Toggle inline editing mode";
         navSection.appendChild(inlineEditBtn);
       }
+
+      // Add to mobile menu as well
+      const mobileModContainer = $("mobile-moderation-container");
+      if (mobileModContainer) {
+        const modBtnMobile = document.createElement("button");
+        modBtnMobile.className =
+          "flex items-center gap-2 text-slate-400 hover:text-ap-accent transition-colors";
+        modBtnMobile.innerHTML =
+          '<i class="fa-solid fa-shield-halved"></i><span class="text-sm">Moderation</span>';
+        modBtnMobile.onclick = openModeratorModal;
+        mobileModContainer.appendChild(modBtnMobile);
+
+        const inlineEditBtnMobile = document.createElement("button");
+        inlineEditBtnMobile.className =
+          "flex items-center gap-2 transition-colors " +
+          (inlineEditMode
+            ? "text-ap-accent"
+            : "text-slate-400 hover:text-white");
+        inlineEditBtnMobile.innerHTML =
+          '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm">Inline Edit</span>';
+        inlineEditBtnMobile.onclick = toggleInlineEditMode;
+        inlineEditBtnMobile.title = "Toggle inline editing mode";
+        mobileModContainer.appendChild(inlineEditBtnMobile);
+      }
     }
   }
 })();
@@ -824,14 +848,34 @@ function toggleInlineEditMode() {
 }
 
 // Moderator modal functions
-function openModeratorModal() {
+async function openModeratorModal() {
   const modal = $("moderator-modal");
   const content = $("moderator-panel-content");
 
   if (!modal || !content) return;
 
-  content.innerHTML = `
-        <div class="space-y-6">
+  // Fetch current user's permissions
+  let permissions = {
+    manageModerators: false,
+    manageGames: false,
+    managePlayers: false,
+    manageRoles: false,
+    manageAwards: false,
+    manageSettings: false
+  };
+
+  try {
+    permissions = await AUTH.getPermissions();
+  } catch (error) {
+    console.error("Failed to fetch permissions:", error);
+  }
+
+  // Build HTML based on permissions
+  let htmlContent = '<div class="space-y-6">';
+
+  // Add Game Section (requires manageGames permission)
+  if (permissions.manageGames) {
+    htmlContent += `
             <!-- Add Game Section -->
             <div class="glass rounded-lg p-4">
                 <h3 class="text-lg font-bold text-white mb-4">Add New Game</h3>
@@ -861,8 +905,12 @@ function openModeratorModal() {
                         <div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>
                     </div>
                 </div>
-            </div>
-            
+            </div>`;
+  }
+
+  // Edit Game Section (requires manageGames permission)
+  if (permissions.manageGames) {
+    htmlContent += `
             <!-- Edit Game Section -->
             <div class="glass rounded-lg p-4">
                 <h3 class="text-lg font-bold text-white mb-4">Edit Game</h3>
@@ -898,25 +946,33 @@ function openModeratorModal() {
                     <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
                     <div id="edit-game-preview" class="glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50"></div>
                 </div>
-            </div>
+            </div>`;
+  }
 
-                <!-- Remove Game Section -->
-                <div class="glass rounded-lg p-4">
-                  <h3 class="text-lg font-bold text-white mb-4">Remove Game</h3>
-                  <p class="text-sm text-slate-400 mb-3">Select a game to permanently remove it (this also deletes logs and Cheesetracker entries).</p>
-                  <select id="remove-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
-                    <option value="">Select a game...</option>
-                    ${games
-                      .slice()
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .map((g) => `<option value="${g.id}">${g.name}</option>`)
-                      .join("")}
-                  </select>
-                  <div class="flex gap-2">
-                    <button id="remove-game-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg w-full">Remove Game</button>
-                  </div>
-                </div>
-            
+  // Remove Game Section (requires manageGames permission)
+  if (permissions.manageGames) {
+    htmlContent += `
+            <!-- Remove Game Section -->
+            <div class="glass rounded-lg p-4">
+              <h3 class="text-lg font-bold text-white mb-4">Remove Game</h3>
+              <p class="text-sm text-slate-400 mb-3">Select a game to permanently remove it (this also deletes logs and Cheesetracker entries).</p>
+              <select id="remove-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
+                <option value="">Select a game...</option>
+                ${games
+                  .slice()
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((g) => `<option value="${g.id}">${g.name}</option>`)
+                  .join("")}
+              </select>
+              <div class="flex gap-2">
+                <button id="remove-game-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg w-full">Remove Game</button>
+              </div>
+            </div>`;
+  }
+
+  // Edit Player Section (requires managePlayers permission)
+  if (permissions.managePlayers) {
+    htmlContent += `
             <!-- Edit Player Section -->
             <div class="glass rounded-lg p-4">
                 <h3 class="text-lg font-bold text-white mb-4">Edit Player</h3>
@@ -944,8 +1000,12 @@ function openModeratorModal() {
                     <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
                     <div id="edit-player-preview" class="glass rounded-xl p-6 flex items-center gap-4"></div>
                 </div>
-            </div>
-            
+            </div>`;
+  }
+
+  // Edit Logs Section (requires managePlayers permission)
+  if (permissions.managePlayers) {
+    htmlContent += `
             <!-- Edit Logs Section -->
             <div class="glass rounded-lg p-4">
                 <h3 class="text-lg font-bold text-white mb-4">Edit Game Logs</h3>
@@ -961,8 +1021,12 @@ function openModeratorModal() {
                       .join("")}
                 </select>
                 <div id="edit-logs-container" class="hidden space-y-2 max-h-64 overflow-y-auto"></div>
-            </div>
-            
+            </div>`;
+  }
+
+  // Player Roles Section (requires manageRoles permission)
+  if (permissions.manageRoles) {
+    htmlContent += `
             <!-- Player Roles Section -->
             <div class="glass rounded-lg p-4">
                 <h3 class="text-lg font-bold text-white mb-4">Player Roles Management</h3>
@@ -1004,12 +1068,13 @@ function openModeratorModal() {
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Manage Moderators Section (Admin Only) -->
-            ${
-              isAdmin
-                ? `
+            </div>`;
+  }
+
+  // Manage Moderators Section (requires manageModerators permission - inherently admin)
+  if (permissions.manageModerators) {
+    htmlContent += `
+            <!-- Manage Moderators Section -->
             <div class="glass rounded-lg p-4">
                 <h3 class="text-lg font-bold text-white mb-4">Manage Moderators</h3>
                 <div class="space-y-4">
@@ -1075,11 +1140,12 @@ function openModeratorModal() {
                         </div>
                     </div>
                 </div>
-            </div>
-            `
-                : ""
-            }
-            
+            </div>`;
+  }
+
+  // Manage Awards Section (requires manageAwards permission)
+  if (permissions.manageAwards) {
+    htmlContent += `
             <!-- Manage Awards Section -->
             <div class="glass rounded-lg p-4">
                 <h3 class="text-lg font-bold text-white mb-4">Manage Awards</h3>
@@ -1117,8 +1183,12 @@ function openModeratorModal() {
                         </div>
                     </div>
                 </div>
-            </div>
-            
+            </div>`;
+  }
+
+  // Cheesetracker Settings Section (requires manageSettings permission)
+  if (permissions.manageSettings) {
+    htmlContent += `
             <!-- Cheesetracker Settings Section -->
             <div class="glass rounded-lg p-4">
                 <h3 class="text-lg font-bold text-white mb-4">Cheesetracker Integration</h3>
@@ -1130,8 +1200,12 @@ function openModeratorModal() {
                     </div>
                     <button onclick="updateCheesetrackerSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Cheesetracker Settings</button>
                 </div>
-            </div>
-            
+            </div>`;
+  }
+
+  // Event Time Settings Section (requires manageSettings permission)
+  if (permissions.manageSettings) {
+    htmlContent += `
             <!-- Event Time Settings Section -->
             <div class="glass rounded-lg p-4">
                 <h3 class="text-lg font-bold text-white mb-4">Event Time Settings</h3>
@@ -1148,8 +1222,11 @@ function openModeratorModal() {
                     </div>
                     <button onclick="updateEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Event Time Settings</button>
                 </div>
-            </div>
-            
+            </div>`;
+  }
+
+  // Event Timer Preview (always show)
+  htmlContent += `
             <!-- Live Preview -->
             <div class="glass rounded-lg p-4">
                 <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
@@ -1160,8 +1237,9 @@ function openModeratorModal() {
                     </div>
                 </div>
             </div>
-        </div>
-    `;
+        </div>`;
+
+  content.innerHTML = htmlContent;
 
   modal.classList.remove("hidden");
 
@@ -1177,7 +1255,7 @@ function openModeratorModal() {
     const endTime = endInput.value;
 
     if (!startTime) {
-      previewTimer.textContent = "000000:00:00";
+      previewTimer.textContent = "0:00:00";
       previewStatus.textContent = "Not Set";
       return;
     }
@@ -2150,7 +2228,7 @@ async function assignRole(action) {
 const originalOpenModeratorModal = openModeratorModal;
 openModeratorModal = async function () {
   await Promise.all([loadRoles(), loadAwards()]);
-  originalOpenModeratorModal();
+  await originalOpenModeratorModal();
 
   // Populate role select
   const roleSelect = $("role-select");
@@ -2470,7 +2548,18 @@ function updateAwardPreview() {
   const previewDescription = document.getElementById("preview-description");
 
   if (previewName) previewName.textContent = name || "Award Name";
-  if (previewIcon) previewIcon.textContent = icon || "";
+
+  // Render icon - check if it's a FontAwesome icon (starts with "fa-")
+  if (previewIcon) {
+    if (icon && icon.startsWith("fa-")) {
+      // FontAwesome icon
+      previewIcon.innerHTML = `<i class="fa-solid ${icon}"></i>`;
+    } else {
+      // Emoji or plain text
+      previewIcon.textContent = icon || "";
+    }
+  }
+
   if (previewDescription)
     previewDescription.textContent =
       description || "Description will appear here";

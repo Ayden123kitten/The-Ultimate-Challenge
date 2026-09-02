@@ -19,11 +19,11 @@ let currentSortType = "games"; // 'games', 'time', 'claims', 'completion'
 const $ = (id) => document.getElementById(id);
 
 function formatTime(ms) {
-  if (!ms || ms < 0) return "000000:00:00";
+  if (!ms || ms < 0) return "0:00:00";
   const seconds = Math.floor((ms / 1000) % 60);
   const minutes = Math.floor((ms / (1000 * 60)) % 60);
   const hours = Math.floor(ms / (1000 * 60 * 60));
-  return `${hours.toString().padStart(6, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
 async function loadRoles() {
@@ -394,7 +394,7 @@ function showPlayerModal(stat) {
   header.style.cssText = `display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;`;
 
   const avatar = stat.pfpLink
-    ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8;">`
+    ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>\'">`
     : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
 
   const info = document.createElement("div");
@@ -506,7 +506,7 @@ function showPlayerModal(stat) {
       // Render icon - check if it's a FontAwesome class or emoji
       let iconHtml = "";
       if (award.icon && award.icon.startsWith("fa-")) {
-        iconHtml = `<i class="${award.icon}" style="font-size: 1.5rem; color: #38bdf8; min-width: 24px;"></i>`;
+        iconHtml = `<i class="fa-solid ${award.icon}" style="font-size: 1.5rem; color: #38bdf8; min-width: 24px;"></i>`;
       } else {
         iconHtml = `<span style="font-size: 1.5rem; min-width: 24px;">${award.icon || "🏆"}</span>`;
       }

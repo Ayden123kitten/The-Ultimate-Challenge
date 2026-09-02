@@ -1,59 +1,91 @@
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 export default async function handler(req, res) {
-    res.setHeader('Content-Type', 'application/json');
-    
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+  res.setHeader("Content-Type", "application/json");
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const token = process.env.GITHUB_TOKEN;
+  const owner = process.env.GITHUB_OWNER;
+  const repo = process.env.GITHUB_REPO;
+  const branch = process.env.GITHUB_BRANCH || "main";
+  const jwtSecret = process.env.JWT_SECRET;
+
+  if (!token || !owner || !repo || !jwtSecret) {
+    return res
+      .status(500)
+      .json({ error: "Server configuration missing. Contact admin." });
+  }
+
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "No token provided" });
+  }
+
+  const authToken = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(authToken, jwtSecret);
+    const playerName = decoded.name;
+
+    const filePath = "data/moderators.json";
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=${branch}`;
+
+    const getRes = await fetch(apiUrl, {
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: "application/vnd.github.v3+json"
+      }
+    });
+
+    let moderators = [];
+    let admin = null;
+    if (getRes.ok) {
+      const fileData = await getRes.json();
+      const content = Buffer.from(fileData.content, "base64").toString("utf-8");
+      const data = JSON.parse(content);
+      admin = data.admin || null;
+      moderators = data.moderators || [];
     }
 
-    const token = process.env.GITHUB_TOKEN;
-    const owner = process.env.GITHUB_OWNER;
-    const repo = process.env.GITHUB_REPO;
-    const branch = process.env.GITHUB_BRANCH || 'main';
-    const jwtSecret = process.env.JWT_SECRET;
+    const isModerator =
+      admin === playerName || moderators.some((m) => m.name === playerName);
+    const isAdmin = admin === playerName;
 
-    if (!token || !owner || !repo || !jwtSecret) {
-        return res.status(500).json({ error: 'Server configuration missing. Contact admin.' });
+    // Get current user's permissions
+    let userPermissions = {
+      manageModerators: isAdmin,
+      manageGames: false,
+      managePlayers: false,
+      manageRoles: false,
+      manageAwards: false,
+      manageSettings: false
+    };
+
+    if (!isAdmin && isModerator) {
+      const moderator = moderators.find((m) => m.name === playerName);
+      if (moderator && moderator.permissions) {
+        userPermissions = moderator.permissions;
+      }
+    } else if (isAdmin) {
+      // Admin has all permissions
+      userPermissions = {
+        manageModerators: true,
+        manageGames: true,
+        managePlayers: true,
+        manageRoles: true,
+        manageAwards: true,
+        manageSettings: true
+      };
     }
 
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'No token provided' });
-    }
-
-    const authToken = authHeader.split(' ')[1];
-
-    try {
-        const decoded = jwt.verify(authToken, jwtSecret);
-        const playerName = decoded.name;
-
-        const filePath = 'data/moderators.json';
-        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=${branch}`;
-
-        const getRes = await fetch(apiUrl, {
-            headers: {
-                'Authorization': `token ${token}`,
-                'Accept': 'application/vnd.github.v3+json'
-            }
-        });
-
-        let moderators = [];
-        let admin = null;
-        if (getRes.ok) {
-            const fileData = await getRes.json();
-            const content = Buffer.from(fileData.content, 'base64').toString('utf-8');
-            const data = JSON.parse(content);
-            admin = data.admin || null;
-            moderators = data.moderators || [];
-        }
-
-        const isModerator = admin === playerName || moderators.some(m => m.name === playerName);
-        const isAdmin = admin === playerName;
-
-        return res.status(200).json({ isModerator, isAdmin });
-    } catch (error) {
-        console.error('Check moderator error:', error);
-        return res.status(401).json({ error: 'Invalid token' });
-    }
+    return res
+      .status(200)
+      .json({ isModerator, isAdmin, permissions: userPermissions });
+  } catch (error) {
+    console.error("Check moderator error:", error);
+    return res.status(401).json({ error: "Invalid token" });
+  }
 }

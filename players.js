@@ -13,6 +13,7 @@ const CONFIG = {
 let games = [];
 let players = []; // [{ name, pfp_link, has_password }]
 let availableRoles = []; // [{ name, color }]
+let availableAwards = []; // [{ name, icon, description }]
 let moderatorRoles = {}; // { playerName: 'admin' | 'moderator' }
 let currentPlayer = AUTH.getName();
 let currentAuthTab = "login"; // Track which auth tab is active: 'login' or 'signup'
@@ -22,11 +23,11 @@ let isModerator = false; // Track moderator status
 const $ = (id) => document.getElementById(id);
 
 function formatTime(ms) {
-  if (!ms || ms < 0) return "000000:00:00";
+  if (!ms || ms < 0) return "0:00:00";
   const seconds = Math.floor((ms / 1000) % 60);
   const minutes = Math.floor((ms / (1000 * 60)) % 60);
   const hours = Math.floor(ms / (1000 * 60 * 60));
-  return `${hours.toString().padStart(6, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
 async function loadRoles() {
@@ -51,10 +52,15 @@ async function loadModeratorRoles() {
   }
 }
 
-function renderRoleBadge(roleName) {
-  const role = availableRoles.find((r) => r.name === roleName);
-  if (!role) return "";
-  return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold" style="background-color: ${role.color}20; color: ${role.color}; border: 1px solid ${role.color}"><span style="width: 6px; height: 6px; background-color: ${role.color}; border-radius: 50%;"></span>${role.name}</span>`;
+async function loadAwards() {
+  try {
+    const res = await fetch(`/api/get-data?type=awards&t=${Date.now()}`);
+    if (res.ok) {
+      availableAwards = await res.json();
+    }
+  } catch (err) {
+    console.error("Failed to load awards:", err);
+  }
 }
 
 function getModeratorIcon(playerName) {
@@ -83,7 +89,7 @@ async function loadData() {
     games = await gamesRes.json();
     players = await playersRes.json();
 
-    await Promise.all([loadRoles(), loadModeratorRoles()]);
+    await Promise.all([loadRoles(), loadModeratorRoles(), loadAwards()]);
 
     renderAuthPanel();
     renderPlayers();
@@ -388,25 +394,7 @@ function renderPlayers() {
 
     // Get moderator icon (admin or moderator)
     const modIcon = getModeratorIcon(stat.name);
-    // Get player roles from players array
     const playerObj = players.find((p) => p.name === stat.name);
-    const playerRoles = playerObj && playerObj.roles ? playerObj.roles : [];
-
-    // Roles HTML
-    let rolesHtml = "";
-    if (playerRoles.length > 0) {
-      rolesHtml =
-        '<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 4px;">';
-      playerRoles.forEach((roleName) => {
-        const role = availableRoles.find((r) => r.name === roleName);
-        if (role) {
-          const roleColor = role.color;
-          const bgAlpha = (parseInt(roleColor.slice(1, 3), 16) / 255) * 0.2;
-          rolesHtml += `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; background-color: ${roleColor}33; color: ${roleColor}; border: 1px solid ${roleColor};"><span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${roleColor};"></span>${role.name}</span>`;
-        }
-      });
-      rolesHtml += "</div>";
-    }
 
     card.innerHTML = `
             <div style="position: relative;">
@@ -424,7 +412,6 @@ function renderPlayers() {
                 ${modIcon ? `<div style="position: absolute; top: -5px; left: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">${modIcon}</div>` : ""}
             <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
                 <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ""}</h2>
-                ${rolesHtml}
             </div>
         `;
 
@@ -495,7 +482,7 @@ function showPlayerModal(stat) {
   header.style.cssText = `display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;`;
 
   const avatar = stat.pfpLink
-    ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8;">`
+    ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>\'">`
     : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
 
   const info = document.createElement("div");
@@ -686,7 +673,7 @@ function showPlayerModal(stat) {
       // Render icon - check if it's a FontAwesome class or emoji
       let iconHtml = "";
       if (award.icon && award.icon.startsWith("fa-")) {
-        iconHtml = `<i class="${award.icon}" style="font-size: 1.5rem; color: #38bdf8; min-width: 24px;"></i>`;
+        iconHtml = `<i class="fa-solid ${award.icon}" style="font-size: 1.5rem; color: #38bdf8; min-width: 24px;"></i>`;
       } else {
         iconHtml = `<span style="font-size: 1.5rem; min-width: 24px;">${award.icon || "🏆"}</span>`;
       }
@@ -778,9 +765,9 @@ function showPlayerModal(stat) {
   // Only show website if it exists
   if (playerObj && playerObj.website && playerObj.website.trim() !== "") {
     const websiteDiv = document.createElement("div");
-    websiteDiv.style.cssText = `margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
+    websiteDiv.style.cssText = `margin-bottom: 25px;`;
     const websiteLabel = document.createElement("span");
-    websiteLabel.textContent = "Website: ";
+    websiteLabel.textContent = "Icon";
     websiteLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
     const websiteText = document.createElement("a");
     websiteText.textContent = playerObj.website;
@@ -924,6 +911,51 @@ function openPlayerInlineEditor(playerName, event) {
 
   content = document.getElementById("moderator-panel-content");
 
+  // Build roles HTML
+  let rolesHtml = "";
+  if (availableRoles.length > 0) {
+    rolesHtml =
+      '<div class="space-y-2"><label class="text-sm font-semibold text-slate-300">Assign Roles</label>';
+    availableRoles.forEach((role) => {
+      const isChecked =
+        player.roles && player.roles.includes(role.name) ? "checked" : "";
+      rolesHtml += `
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="inline-role-${role.name}" ${isChecked} class="inline-edit-role-checkbox w-4 h-4 rounded cursor-pointer">
+          <label for="inline-role-${role.name}" class="cursor-pointer flex items-center gap-2">
+            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: ${role.color};"></span>
+            <span style="color: #e2e8f0; font-size: 0.875rem;">${role.name}</span>
+          </label>
+        </div>
+      `;
+    });
+    rolesHtml += "</div>";
+  }
+
+  // Build awards HTML
+  let awardsHtml = "";
+  if (availableAwards.length > 0) {
+    awardsHtml =
+      '<div class="space-y-2"><label class="text-sm font-semibold text-slate-300">Assign Awards</label>';
+    availableAwards.forEach((award) => {
+      const isChecked =
+        player.awards && player.awards.includes(award.name) ? "checked" : "";
+      const icon = award.icon.startsWith("fa-")
+        ? `<i class="fa-solid ${award.icon}" style="color: ${award.color};"></i>`
+        : award.icon;
+      awardsHtml += `
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="inline-award-${award.name}" ${isChecked} class="inline-edit-award-checkbox w-4 h-4 rounded cursor-pointer">
+          <label for="inline-award-${award.name}" class="cursor-pointer flex items-center gap-2">
+            ${icon}
+            <span style="color: #e2e8f0; font-size: 0.875rem;">${award.name}</span>
+          </label>
+        </div>
+      `;
+    });
+    awardsHtml += "</div>";
+  }
+
   content.innerHTML = `
         <div class="space-y-6">
             <!-- Edit Player Section -->
@@ -936,6 +968,10 @@ function openPlayerInlineEditor(playerName, event) {
                     <input type="text" id="inline-edit-player-pronouns" placeholder="Pronouns" value="${player.pronouns || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
                     <input type="text" id="inline-edit-player-discord" placeholder="Discord Username" value="${player.discord || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
                 </div>
+                
+                ${rolesHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${rolesHtml}</div>` : ""}
+                ${awardsHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${awardsHtml}</div>` : ""}
+                
                 <div class="flex gap-2 mt-4">
                     <button onclick="saveInlineEditedPlayer('${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
                     <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
@@ -966,12 +1002,22 @@ function setupInlinePlayerPreview(originalPlayer) {
   ];
 
   function updatePreview() {
+    // Collect selected roles
+    const selectedRoles = [];
+    document
+      .querySelectorAll(".inline-edit-role-checkbox:checked")
+      .forEach((checkbox) => {
+        const roleId = checkbox.id.replace("inline-role-", "");
+        selectedRoles.push(roleId);
+      });
+
     const previewPlayer = {
       ...originalPlayer,
       pfp_link: $("inline-edit-player-pfp").value || originalPlayer.pfp_link,
       bio: $("inline-edit-player-bio").value,
       pronouns: $("inline-edit-player-pronouns").value,
-      discord: $("inline-edit-player-discord").value
+      discord: $("inline-edit-player-discord").value,
+      roles: selectedRoles
     };
 
     renderPlayerPreview(previewPlayer, "inline-edit-player-preview");
@@ -981,6 +1027,18 @@ function setupInlinePlayerPreview(originalPlayer) {
     const el = $(id);
     if (el) el.addEventListener("input", updatePreview);
   });
+
+  // Listen for role and award checkbox changes
+  document
+    .querySelectorAll(".inline-edit-role-checkbox")
+    .forEach((checkbox) => {
+      checkbox.addEventListener("change", updatePreview);
+    });
+  document
+    .querySelectorAll(".inline-edit-award-checkbox")
+    .forEach((checkbox) => {
+      checkbox.addEventListener("change", updatePreview);
+    });
 
   updatePreview();
 }
@@ -1043,12 +1101,32 @@ function renderPlayerPreview(player, containerId) {
 
 // Save inline edited player
 async function saveInlineEditedPlayer(playerName) {
+  // Collect selected roles
+  const selectedRoles = [];
+  document
+    .querySelectorAll(".inline-edit-role-checkbox:checked")
+    .forEach((checkbox) => {
+      const roleId = checkbox.id.replace("inline-role-", "");
+      selectedRoles.push(roleId);
+    });
+
+  // Collect selected awards
+  const selectedAwards = [];
+  document
+    .querySelectorAll(".inline-edit-award-checkbox:checked")
+    .forEach((checkbox) => {
+      const awardId = checkbox.id.replace("inline-award-", "");
+      selectedAwards.push(awardId);
+    });
+
   const playerData = {
     name: playerName,
     pfp_link: $("inline-edit-player-pfp").value.trim(),
     bio: $("inline-edit-player-bio").value.trim(),
     pronouns: $("inline-edit-player-pronouns").value.trim(),
-    discord: $("inline-edit-player-discord").value.trim()
+    discord: $("inline-edit-player-discord").value.trim(),
+    roles: selectedRoles,
+    awards: selectedAwards
   };
 
   try {
