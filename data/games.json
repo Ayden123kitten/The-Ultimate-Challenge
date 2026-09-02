@@ -1654,5 +1654,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "blasphemous",
+    "name": "Blasphemous",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/f53a13851422263fb59329edb66f1dbc.png",
+    "yaml_slot_name": "Blasphemous",
+    "slot_count": 1,
+    "apworld_link": "https://archipelago.gg/games/Blasphemous/info/en",
+    "apworld_version": "Core",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://archipelago.gg/tutorial/Blasphemous/setup_en",
+    "tracker_link": "",
+    "game_info_link": "https://brandenek.github.io/Blasphemous.Randomizer.Wiki/",
+    "support_link": "https://discord.com/channels/731205301247803413/1090815418731597884",
+    "save_file_link": "https://drive.google.com/drive/folders/1EfvJAAb-BRfThy0nJF01_xy0LaOiwRSe?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
