@@ -187,8 +187,10 @@ function renderGames() {
 
     // Event start settings: if a start time is set and it's in the future,
     // players should not be able to claim games yet.
-    const eventStartSet = settings.start_time && settings.start_time.trim() !== "";
-    const eventNotStarted = eventStartSet && Date.now() < new Date(settings.start_time).getTime();
+    const eventStartSet =
+      settings.start_time && settings.start_time.trim() !== "";
+    const eventNotStarted =
+      eventStartSet && Date.now() < new Date(settings.start_time).getTime();
 
     const canClaim = !isClaimed && currentPlayer !== "" && !eventNotStarted;
 
@@ -355,7 +357,7 @@ function renderGames() {
                 `
                       : `
                       <button disabled class="w-full bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-lock"></i> ${eventNotStarted ? "Event hasn't started" : (currentPlayer === "" ? "Log In on Players Page" : "Currently Unavailable")}
+                        <i class="fa-solid fa-lock"></i> ${eventNotStarted ? "Event hasn't started" : currentPlayer === "" ? "Log In on Players Page" : "Currently Unavailable"}
                       </button>
                     `
                 }
