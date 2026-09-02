@@ -636,12 +636,6 @@ try {
         console.log('Moderator status:', isModerator);
         console.log('Admin status:', isAdmin);
         
-        // Show settings link for logged-in users
-        const settingsLink = $('settings-nav-link-index');
-        if (settingsLink) settingsLink.style.display = 'flex';
-        const settingsLinkMobile = $('settings-nav-link-index-mobile');
-        if (settingsLinkMobile) settingsLinkMobile.style.display = 'flex';
-        
         // Add moderator button to header if user is a moderator
         if (isModerator) {
             const navSection = $('nav-container');

@@ -71,12 +71,6 @@ async function loadData() {
 function updateCurrentPlayerDisplay() {
     const currentNameEl = $('current-player-name');
     if (currentNameEl) currentNameEl.textContent = currentPlayer || 'Not logged in';
-
-    // Show settings link for logged-in users
-    const settingsLink = $('settings-nav-link');
-    if (settingsLink && AUTH.isLoggedIn()) {
-        settingsLink.style.display = 'flex';
-    }
 }
 
 // ==========================================

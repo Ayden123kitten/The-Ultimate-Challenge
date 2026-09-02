@@ -128,10 +128,6 @@ function renderAuthPanel() {
         `;
     $("auth-logout-btn").addEventListener("click", () => AUTH.logout());
 
-    // Show settings link for logged-in users
-    const settingsLink = $("settings-nav-link");
-    if (settingsLink) settingsLink.style.display = "flex";
-
     return;
   }
 
