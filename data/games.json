@@ -1516,5 +1516,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "autopelago",
+    "name": "Autopelago",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "yaml_slot_name": "Autopelago",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/airbreather/Archipelago/releases/download/v1.1.1/autopelago.apworld",
+    "apworld_version": "1.1.1",
+    "mod_link": "https://autopelago.app/",
+    "mod_version": "1.1.6",
+    "mod_setup_guide_link": "https://github.com/airbreather/Archipelago/blob/autopelago/worlds/autopelago/docs/setup_en.md",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1537072728975081502",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
