@@ -1792,5 +1792,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "candybox2",
+    "name": "Candy Box 2",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "yaml_slot_name": "CandyBox2",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/vicr123/Archipelago/releases/download/20260822-1/candybox2.apworld",
+    "apworld_version": "",
+    "mod_link": "https://candybox2-ap.vicr123.com/a328fd7171338a859ab445a007219155631ab59d",
+    "mod_version": "1.2.3",
+    "mod_setup_guide_link": "",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1351112920398037015",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
