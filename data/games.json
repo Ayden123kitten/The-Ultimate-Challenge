@@ -1746,5 +1746,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "brotato",
+    "name": "Brotato",
+    "logo": "",
+    "yaml_slot_name": "Brotato",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/SpenserHaddad/Brotato-ArchipelagoClient/releases/download/v0.15.2/brotato.apworld",
+    "apworld_version": "0.15.2",
+    "mod_link": "https://github.com/SpenserHaddad/Brotato-ArchipelagoClient/releases/download/v0.15.2/RampagingHippy-Archipelago.zip",
+    "mod_version": "0.15.2",
+    "mod_setup_guide_link": "https://github.com/SpenserHaddad/Brotato-ArchipelagoClient#installing",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1154944430097313803",
+    "save_file_link": "https://cdn2.steamgriddb.com/logo_thumb/c4e0ca9de71cce2b40af66bff49c4b24.png",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
