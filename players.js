@@ -900,7 +900,7 @@ function openPlayerInlineEditor(playerName, event) {
             <!-- Live Preview -->
             <div class="glass rounded-lg p-4">
                 <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
-                <div id="inline-edit-player-preview" class="glass rounded-xl p-6 flex items-center gap-4"></div>
+                <div id="inline-edit-player-preview" class="glass rounded-xl p-4 flex flex-col items-center justify-center gap-3" style="aspect-ratio: 1; min-height: 200px;"></div>
             </div>
         </div>
     `;
@@ -944,16 +944,38 @@ function renderPlayerPreview(player, containerId) {
     if (!container) return;
     
     const avatar = player.pfp_link && player.pfp_link.trim() !== ''
-        ? `<img src="${player.pfp_link}" alt="${player.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8;">`
+        ? `<img src="${player.pfp_link}" alt="${player.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>\'">`
         : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
     
+    // Get player roles
+    const playerRoles = (player && player.roles) ? player.roles : [];
+    
+    // Build roles HTML
+    let rolesHtml = '';
+    if (playerRoles.length > 0) {
+        rolesHtml = '<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 4px;">';
+        playerRoles.forEach(roleName => {
+            const role = availableRoles.find(r => r.name === roleName);
+            if (role) {
+                const roleColor = role.color;
+                rolesHtml += `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; background-color: ${roleColor}33; color: ${roleColor}; border: 1px solid ${roleColor};"><span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${roleColor};"></span>${role.name}</span>`;
+            }
+        });
+        rolesHtml += '</div>';
+    }
+    
     container.innerHTML = `
-        ${avatar}
-        <div class="flex-1">
-            <h3 class="text-lg font-bold text-white">${player.name}</h3>
-            ${player.pronouns ? `<p class="text-sm text-ap-accent">${player.pronouns}</p>` : ''}
-            ${player.bio ? `<p class="text-sm text-slate-300 mt-2">${player.bio}</p>` : ''}
-            ${player.discord ? `<p class="text-xs text-slate-400 mt-1"><i class="fa-brands fa-discord mr-1"></i>${player.discord}</p>` : ''}
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%;">
+            <div style="position: relative;">
+                ${avatar}
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
+                <h3 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${player.name}</h3>
+                ${rolesHtml}
+                ${player.pronouns ? `<p style="margin: 0; font-size: 0.8rem; padding: 2px 10px; border-radius: 9999px; color: #38bdf8; border: 1px solid #38bdf838; background-color: #38bdf822;">${player.pronouns}</p>` : ''}
+                ${player.bio ? `<p style="margin: 0; font-size: 0.75rem; color: #94a3b8; text-align: center; max-width: 100%; overflow-wrap: anywhere; word-break: break-word; max-height: 40px; overflow-y: auto;">${player.bio}</p>` : ''}
+                ${player.discord ? `<p style="margin: 0; font-size: 0.7rem; color: #5865F2;"><i class="fa-brands fa-discord" style="margin-right: 4px;"></i>${player.discord}</p>` : ''}
+            </div>
         </div>
     `;
 }
