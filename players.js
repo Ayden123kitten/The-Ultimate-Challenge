@@ -60,21 +60,11 @@ async function loadAwards() {
       availableAwards = await res.json();
     }
   } catch (err) {
-    console.error("Failed to load data:", err);
-    $("players-container").innerHTML = `
-            <div class="col-span-full text-center text-red-400 p-8">
-                <i class="fa-solid fa-circle-exclamation text-4xl mb-4"></i>
-                <p class="text-lg font-bold">Error loading player stats</p>
-                <p class="text-sm mt-2">${err.message}</p>
-            </div>
-        `;
+    console.error("Failed to load awards:", err);
   }
 }
 
-// ==========================================
-// RENDER AUTH PANEL
-// ==========================================
-function renderAuthPanel() {
+function getModeratorIcon(playerName) {
   const role = moderatorRoles[playerName];
   if (role === "admin") {
     return '<i class="fa-solid fa-crown text-yellow-400" title="Admin"></i>';
@@ -112,12 +102,12 @@ async function loadData() {
                 <p class="text-lg font-bold">Error loading player stats</p>
                 <p class="text-sm mt-2">${err.message}</p>
             </div>
-              ${modIcon ? `<div style="position: absolute; top: -5px; left: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">${modIcon}</div>` : ""}
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
-              <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ""}</h2>
-            </div>
-            <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(11,17,32,0.7); border: 1px solid #38bdf8; color: #38bdf8; padding: 4px 8px; border-radius: 8px; font-weight: 700; font-size: 0.85rem;">#${leaderboardPositions[stat.name] || "-"}</div>
-          `;
+        `;
+  }
+}
+
+// ==========================================
+// RENDER AUTH PANEL
 // ==========================================
 function renderAuthPanel() {
   const panel = $("auth-panel");
