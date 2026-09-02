@@ -1815,5 +1815,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "cartograp",
+    "name": "CartogrAP",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "yaml_slot_name": "CartogrAP",
+    "slot_count": 1,
+    "apworld_link": "",
+    "apworld_version": "",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1515573231506161674",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
