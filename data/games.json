@@ -1677,5 +1677,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "bombermanhero",
+    "name": "Bomberman Hero",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/34e420f6e47d96669897a45586997a57.png",
+    "yaml_slot_name": "BombermanHero",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/Happyhappyism/Archipelago/releases/download/bombhero_v0.2.1/bomberman_hero.apworld",
+    "apworld_version": "0.2.1",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://discord.com/channels/731205301247803413/1330612852867858505/1330736271525675042",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1330612852867858505",
+    "save_file_link": "https://drive.google.com/drive/folders/1Je64O6iNDE8PCWAVOC7hNa6GaQ6xL1Vg?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
