@@ -1,526 +1,702 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Settings - The Ultimate Challenge</title>
-    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        ap: {
-                            bg: '#0f172a',
-                            card: '#1e293b',
-                            accent: '#38bdf8',
-                            success: '#22c55e',
-                            danger: '#ef4444'
-                        }
-                    }
-                }
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              ap: {
+                bg: "#0f172a",
+                card: "#1e293b",
+                accent: "#38bdf8",
+                success: "#22c55e",
+                danger: "#ef4444"
+              }
             }
+          }
         }
+      };
     </script>
     <style>
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', system-ui, sans-serif; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .game-logo { width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; }
-        /* Mobile menu transition */
-        #mobile-menu { transition: all 0.3s ease-in-out; }
-        /* Mobile responsive styles */
-        @media (max-width: 768px) {
-            header .flex-col { gap: 0.75rem; }
-            .form-section { padding: 1rem; }
+      body {
+        background-color: #0f172a;
+        color: #e2e8f0;
+        font-family: "Segoe UI", system-ui, sans-serif;
+      }
+      .glass {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .game-logo {
+        width: 48px;
+        height: 48px;
+        object-fit: contain;
+        flex-shrink: 0;
+      }
+      /* Mobile menu transition */
+      #mobile-menu {
+        transition: all 0.3s ease-in-out;
+      }
+      /* Mobile responsive styles */
+      @media (max-width: 768px) {
+        header .flex-col {
+          gap: 0.75rem;
         }
-        @media (max-width: 640px) {
-            .grid { grid-template-columns: 1fr !important; }
-            .flex-wrap { flex-direction: column; align-items: stretch; }
-            input[type="text"], input[type="url"], input[type="password"], textarea {
-                font-size: 16px; /* Prevents zoom on iOS */
-            }
+        .form-section {
+          padding: 1rem;
         }
+      }
+      @media (max-width: 640px) {
+        .grid {
+          grid-template-columns: 1fr !important;
+        }
+        .flex-wrap {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        input[type="text"],
+        input[type="url"],
+        input[type="password"],
+        textarea {
+          font-size: 16px; /* Prevents zoom on iOS */
+        }
+      }
     </style>
-</head>
-<body class="min-h-screen flex flex-col">
+  </head>
+  <body class="min-h-screen flex flex-col">
     <!-- Header -->
     <header class="sticky top-0 z-50 glass border-b border-slate-700">
-        <div class="max-w-7xl mx-auto px-4 py-4">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
-                    <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                        <img src="/favicon.png" alt="Game Logo" class="game-logo" style="width: 48px; height: 48px;">
-                        <div>
-                            <h1 class="text-xl font-bold text-white tracking-tight">The Ultimate Challenge</h1>
-                        </div>
-                    </a>
-                    
-                    <!-- Mobile menu button -->
-                    <button id="mobile-menu-btn" class="sm:hidden text-slate-400 hover:text-white transition-colors p-2">
-                        <i class="fa-solid fa-bars text-xl"></i>
-                    </button>
-                </div>
+      <div class="max-w-7xl mx-auto px-4 py-4">
+        <div
+          class="flex flex-col sm:flex-row justify-between items-center gap-4"
+        >
+          <div
+            class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start"
+          >
+            <a
+              href="/"
+              class="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            >
+              <img
+                src="/favicon.png"
+                alt="Game Logo"
+                class="game-logo"
+                style="width: 48px; height: 48px"
+              />
+              <div>
+                <h1 class="text-xl font-bold text-white tracking-tight">
+                  The Ultimate Challenge
+                </h1>
+              </div>
+            </a>
 
-                <nav id="nav-container" class="flex items-center gap-4 flex-wrap justify-center w-full sm:w-auto">
-                    <div id="current-player-display" class="flex items-center gap-2 text-sm">
-                        <span class="text-slate-400 hidden sm:inline">Playing as:</span>
-                        <span id="current-player-name" class="font-semibold text-ap-accent">Not logged in</span>
-                    </div>
-                    <div class="w-px h-5 bg-slate-600 hidden sm:block"></div>
-                    <a href="/" class="text-slate-400 hover:text-white transition-colors flex items-center gap-2">
-                        <i class="fa-solid fa-arrow-left"></i>
-                        <span class="hidden sm:inline">Back to Games</span>
-                        <span class="sm:hidden">Back</span>
-                    </a>
-                </nav>
+            <!-- Mobile menu button -->
+            <button
+              id="mobile-menu-btn"
+              class="sm:hidden text-slate-400 hover:text-white transition-colors p-2"
+            >
+              <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+          </div>
+
+          <nav
+            id="nav-container"
+            class="flex items-center gap-4 flex-wrap justify-center w-full sm:w-auto"
+          >
+            <div
+              id="current-player-display"
+              class="flex items-center gap-2 text-sm"
+            >
+              <span class="text-slate-400 hidden sm:inline">Playing as:</span>
+              <span
+                id="current-player-name"
+                class="font-semibold text-ap-accent"
+                >Not logged in</span
+              >
             </div>
-            
-            <!-- Mobile Menu (hidden by default) -->
-            <div id="mobile-menu" class="hidden sm:hidden mt-4 pt-4 border-t border-slate-700">
-                <div class="flex flex-col gap-3">
-                    <div class="flex items-center justify-center gap-2">
-                        <span class="text-sm text-slate-400">Playing as:</span>
-                        <span id="current-player-name-mobile" class="font-semibold text-ap-accent">Not logged in</span>
-                    </div>
-                </div>
-            </div>
+            <div class="w-px h-5 bg-slate-600 hidden sm:block"></div>
+            <a
+              href="/"
+              class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+            >
+              <i
+                class="fa-solid fa-arrow-left group-hover:text-white transition-colors"
+              ></i>
+              <span class="hidden sm:inline">Back to Games</span>
+              <span class="sm:hidden">Back</span>
+            </a>
+          </nav>
         </div>
+
+        <!-- Mobile Menu (hidden by default) -->
+        <div
+          id="mobile-menu"
+          class="hidden sm:hidden mt-4 pt-4 border-t border-slate-700"
+        >
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center justify-center gap-2">
+              <span class="text-sm text-slate-400">Playing as:</span>
+              <span
+                id="current-player-name-mobile"
+                class="font-semibold text-ap-accent"
+                >Not logged in</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
 
     <!-- Main Content -->
     <main class="flex-grow max-w-5xl mx-auto px-4 py-8 w-full">
-        <!-- Account Settings -->
-        <div class="glass rounded-xl p-8 mb-8">
-            <h2 class="text-2xl font-bold text-white mb-6">Account Settings</h2>
-            <form id="account-form" class="space-y-6">
-                <div>
-                    <label for="current-name" class="block text-sm font-medium text-slate-300 mb-2">Current Name</label>
-                    <input 
-                        type="text" 
-                        id="current-name" 
-                        name="current_name" 
-                        readonly
-                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-slate-400 cursor-not-allowed"
-                    >
-                </div>
+      <!-- Account Settings -->
+      <div class="glass rounded-xl p-8 mb-8">
+        <h2 class="text-2xl font-bold text-white mb-6">Account Settings</h2>
+        <form id="account-form" class="space-y-6">
+          <div>
+            <label
+              for="current-name"
+              class="block text-sm font-medium text-slate-300 mb-2"
+              >Current Name</label
+            >
+            <input
+              type="text"
+              id="current-name"
+              name="current_name"
+              readonly
+              class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-slate-400 cursor-not-allowed"
+            />
+          </div>
 
-                <div>
-                    <label for="new-name" class="block text-sm font-medium text-slate-300 mb-2">New Name</label>
-                    <input 
-                        type="text" 
-                        id="new-name" 
-                        name="new_name" 
-                        placeholder="Enter new username"
-                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
-                    >
-                </div>
+          <div>
+            <label
+              for="new-name"
+              class="block text-sm font-medium text-slate-300 mb-2"
+              >New Name</label
+            >
+            <input
+              type="text"
+              id="new-name"
+              name="new_name"
+              placeholder="Enter new username"
+              class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+            />
+          </div>
 
-                <div class="pt-4 border-t border-slate-700">
-                    <h3 class="text-lg font-semibold text-white mb-4">Change Password</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label for="current-password" class="block text-sm font-medium text-slate-300 mb-2">Current Password</label>
-                            <input 
-                                type="password" 
-                                id="current-password" 
-                                name="current_password" 
-                                placeholder="Enter current password"
-                                class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
-                            >
-                        </div>
+          <div class="pt-4 border-t border-slate-700">
+            <h3 class="text-lg font-semibold text-white mb-4">
+              Change Password
+            </h3>
+            <div class="space-y-4">
+              <div>
+                <label
+                  for="current-password"
+                  class="block text-sm font-medium text-slate-300 mb-2"
+                  >Current Password</label
+                >
+                <input
+                  type="password"
+                  id="current-password"
+                  name="current_password"
+                  placeholder="Enter current password"
+                  class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                />
+              </div>
 
-                        <div>
-                            <label for="new-password" class="block text-sm font-medium text-slate-300 mb-2">New Password</label>
-                            <input 
-                                type="password" 
-                                id="new-password" 
-                                name="new_password" 
-                                placeholder="Enter new password"
-                                class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
-                            >
-                        </div>
+              <div>
+                <label
+                  for="new-password"
+                  class="block text-sm font-medium text-slate-300 mb-2"
+                  >New Password</label
+                >
+                <input
+                  type="password"
+                  id="new-password"
+                  name="new_password"
+                  placeholder="Enter new password"
+                  class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                />
+              </div>
 
-                        <div>
-                            <label for="confirm-password" class="block text-sm font-medium text-slate-300 mb-2">Confirm New Password</label>
-                            <input 
-                                type="password" 
-                                id="confirm-password" 
-                                name="confirm_password" 
-                                placeholder="Confirm new password"
-                                class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
-                            >
-                        </div>
-                    </div>
-                </div>
+              <div>
+                <label
+                  for="confirm-password"
+                  class="block text-sm font-medium text-slate-300 mb-2"
+                  >Confirm New Password</label
+                >
+                <input
+                  type="password"
+                  id="confirm-password"
+                  name="confirm_password"
+                  placeholder="Confirm new password"
+                  class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+                />
+              </div>
+            </div>
+          </div>
 
-                <button type="submit" class="w-full bg-ap-accent hover:bg-sky-600 text-slate-900 font-medium py-3 px-6 rounded-lg transition-colors">
-                    <i class="fa-solid fa-user-pen mr-2"></i>Update Account
-                </button>
-            </form>
-        </div>
+          <button
+            type="submit"
+            class="w-full bg-ap-accent hover:bg-sky-600 text-slate-900 font-medium py-3 px-6 rounded-lg transition-colors"
+          >
+            <i class="fa-solid fa-user-pen mr-2"></i>Update Account
+          </button>
+        </form>
+      </div>
 
-        <!-- Profile Settings -->
-        <div class="glass rounded-xl p-8">
-            <h2 class="text-2xl font-bold text-white mb-6">Profile Settings</h2>
-            <form id="settings-form" class="space-y-6">
-                <div>
-                    <label for="profile-pic" class="block text-sm font-medium text-slate-300 mb-2">Profile Picture</label>
-                    <input 
-                        type="url" 
-                        id="profile-pic" 
-                        name="profile_pic" 
-                        placeholder="https://example.com/avatar.jpg"
-                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
-                    >
-                    <img id="pic-preview" class="preview-image mt-3 w-24 h-24 rounded-full object-cover hidden" alt="Preview">
-                </div>
+      <!-- Profile Settings -->
+      <div class="glass rounded-xl p-8">
+        <h2 class="text-2xl font-bold text-white mb-6">Profile Settings</h2>
+        <form id="settings-form" class="space-y-6">
+          <div>
+            <label
+              for="profile-pic"
+              class="block text-sm font-medium text-slate-300 mb-2"
+              >Profile Picture</label
+            >
+            <input
+              type="url"
+              id="profile-pic"
+              name="profile_pic"
+              placeholder="https://example.com/avatar.jpg"
+              class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+            />
+            <img
+              id="pic-preview"
+              class="preview-image mt-3 w-24 h-24 rounded-full object-cover hidden"
+              alt="Preview"
+            />
+          </div>
 
-                <div>
-                    <label for="bio" class="block text-sm font-medium text-slate-300 mb-2">Bio</label>
-                    <textarea 
-                        id="bio" 
-                        name="bio" 
-                        placeholder="Tell us about yourself..."
-                        rows="4"
-                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors resize-vertical"
-                    ></textarea>
-                </div>
+          <div>
+            <label
+              for="bio"
+              class="block text-sm font-medium text-slate-300 mb-2"
+              >Bio</label
+            >
+            <textarea
+              id="bio"
+              name="bio"
+              placeholder="Tell us about yourself..."
+              rows="4"
+              class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors resize-vertical"
+            ></textarea>
+          </div>
 
-                <div>
-                    <label for="pronouns" class="block text-sm font-medium text-slate-300 mb-2">Pronouns</label>
-                    <input 
-                        type="text" 
-                        id="pronouns" 
-                        name="pronouns" 
-                        placeholder="they/them"
-                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
-                    >
-                </div>
+          <div>
+            <label
+              for="pronouns"
+              class="block text-sm font-medium text-slate-300 mb-2"
+              >Pronouns</label
+            >
+            <input
+              type="text"
+              id="pronouns"
+              name="pronouns"
+              placeholder="they/them"
+              class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+            />
+          </div>
 
-                <div>
-                    <label for="discord" class="block text-sm font-medium text-slate-300 mb-2">Discord Username</label>
-                    <input 
-                        type="text" 
-                        id="discord" 
-                        name="discord" 
-                        placeholder="username"
-                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
-                    >
-                </div>
+          <div>
+            <label
+              for="discord"
+              class="block text-sm font-medium text-slate-300 mb-2"
+              >Discord Username</label
+            >
+            <input
+              type="text"
+              id="discord"
+              name="discord"
+              placeholder="username"
+              class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent focus:ring-1 focus:ring-ap-accent transition-colors"
+            />
+          </div>
 
-                <button type="submit" class="w-full bg-ap-success hover:bg-green-600 text-white font-medium py-3 px-6 rounded-lg transition-colors">
-                    Save Changes
-                </button>
-            </form>
-        </div>
+          <button
+            type="submit"
+            class="w-full bg-ap-success hover:bg-green-600 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+          >
+            Save Changes
+          </button>
+        </form>
+      </div>
     </main>
 
-    <footer class="border-t border-slate-800 py-6 text-center text-slate-500 text-sm">
-        <p>Powered by <a href="https://github.com" class="underline" target="_blank" rel="noopener noreferrer">GitHub</a> & <a href="https://vercel.com" class="underline" target="_blank" rel="noopener noreferrer">Vercel</a> • Data is stored directly in the <a href="https://github.com/Ayden123kitten/The-Ultimate-Challenge" class="underline">repository</a></p>
+    <footer
+      class="border-t border-slate-800 py-6 text-center text-slate-500 text-sm"
+    >
+      <p>
+        Powered by
+        <a
+          href="https://github.com"
+          class="underline"
+          target="_blank"
+          rel="noopener noreferrer"
+          >GitHub</a
+        >
+        &
+        <a
+          href="https://vercel.com"
+          class="underline"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Vercel</a
+        >
+        • Data is stored directly in the
+        <a
+          href="https://github.com/Ayden123kitten/The-Ultimate-Challenge"
+          class="underline"
+          >repository</a
+        >
+      </p>
     </footer>
 
     <script src="auth.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const form = document.getElementById('settings-form');
-            const picInput = document.getElementById('profile-pic');
-            const picPreview = document.getElementById('pic-preview');
-            
-            // Check auth and load data
-            const user = AUTH.getName();
-            if (!user) {
-                window.location.href = 'index.html'; // Redirect if not logged in
-                return;
-            }
+      document.addEventListener("DOMContentLoaded", async () => {
+        const form = document.getElementById("settings-form");
+        const picInput = document.getElementById("profile-pic");
+        const picPreview = document.getElementById("pic-preview");
 
-            // Display logged-in user
-            const currentPlayerNameEl = document.getElementById('current-player-name');
-            if (currentPlayerNameEl) {
-                currentPlayerNameEl.textContent = user;
-            }
+        // Check auth and load data
+        const user = AUTH.getName();
+        if (!user) {
+          window.location.href = "index.html"; // Redirect if not logged in
+          return;
+        }
 
-            // Set current name in account form
-            const currentNameInput = document.getElementById('current-name');
-            if (currentNameInput) {
-                currentNameInput.value = user;
-            }
+        // Display logged-in user
+        const currentPlayerNameEl = document.getElementById(
+          "current-player-name"
+        );
+        if (currentPlayerNameEl) {
+          currentPlayerNameEl.textContent = user;
+        }
 
-            let isModerator = false;
-            let players = [];
-            let awards = [];
+        // Set current name in account form
+        const currentNameInput = document.getElementById("current-name");
+        if (currentNameInput) {
+          currentNameInput.value = user;
+        }
+
+        let isModerator = false;
+        let players = [];
+        let awards = [];
+
+        try {
+          // Check moderator status
+          isModerator = await AUTH.checkModerator();
+
+          const res = await fetch("/api/get-data?type=players");
+          players = await res.json();
+          const currentPlayer = players.find(
+            (p) => p.name.toLowerCase() === user.toLowerCase()
+          );
+
+          if (currentPlayer) {
+            document.getElementById("profile-pic").value =
+              currentPlayer.pfp_link || "";
+            document.getElementById("bio").value = currentPlayer.bio || "";
+            document.getElementById("pronouns").value =
+              currentPlayer.pronouns || "";
+            document.getElementById("discord").value =
+              currentPlayer.discord || "";
+
+            if (currentPlayer.pfp_link) {
+              picPreview.src = currentPlayer.pfp_link;
+              picPreview.classList.remove("hidden");
+            }
+          }
+
+          // Load awards for dropdown
+          const awardsRes = await fetch("/api/manage-awards");
+          if (awardsRes.ok) {
+            const awardsData = await awardsRes.json();
+            awards = awardsData.awards || [];
+          }
+
+          // Show moderator section if user is a moderator
+          if (isModerator) {
+            document.getElementById("moderator-section").style.display =
+              "block";
+
+            // Populate player dropdown
+            const playerSelect = document.getElementById("award-player");
+            players.forEach((player) => {
+              const option = document.createElement("option");
+              option.value = player.name;
+              option.textContent = player.name;
+              playerSelect.appendChild(option);
+            });
+
+            // Populate award dropdown
+            const awardSelect = document.getElementById("award-select");
+            awards.forEach((award) => {
+              const option = document.createElement("option");
+              option.value = JSON.stringify({
+                name: award.name,
+                icon: award.icon,
+                description: award.description
+              });
+              option.textContent = `${award.icon} ${award.name}`;
+              awardSelect.appendChild(option);
+            });
+          }
+        } catch (err) {
+          console.error("Failed to load settings", err);
+        }
+
+        // Image preview listener
+        picInput.addEventListener("input", (e) => {
+          if (e.target.value) {
+            picPreview.src = e.target.value;
+            picPreview.classList.remove("hidden");
+          } else {
+            picPreview.classList.add("hidden");
+          }
+        });
+
+        // Save handler
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+
+          try {
+            const res = await fetch("/api/update-profile", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...AUTH.authHeader()
+              },
+              body: JSON.stringify({
+                data: {
+                  pfp_link: data.profile_pic,
+                  bio: data.bio,
+                  pronouns: data.pronouns,
+                  discord: data.discord
+                }
+              })
+            });
+
+            if (res.ok) {
+              alert("Settings saved successfully!");
+            } else {
+              const err = await res.json();
+              alert("Error saving settings: " + err.error);
+            }
+          } catch (err) {
+            alert("Failed to save settings.");
+          }
+        });
+
+        // Account form handler (change name and password)
+        const accountForm = document.getElementById("account-form");
+        accountForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(accountForm);
+          const data = Object.fromEntries(formData.entries());
+
+          // Validate password fields if any are filled
+          if (
+            data.current_password ||
+            data.new_password ||
+            data.confirm_password
+          ) {
+            if (!data.current_password) {
+              alert("Current password is required to change password.");
+              return;
+            }
+            if (!data.new_password) {
+              alert("New password is required.");
+              return;
+            }
+            if (data.new_password !== data.confirm_password) {
+              alert("New passwords do not match.");
+              return;
+            }
+          }
+
+          try {
+            const res = await fetch("/api/update-profile", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                ...AUTH.authHeader()
+              },
+              body: JSON.stringify({
+                data: {
+                  new_name: data.new_name || undefined,
+                  current_password: data.current_password || undefined,
+                  new_password: data.new_password || undefined
+                }
+              })
+            });
+
+            if (res.ok) {
+              // If name was changed, update localStorage and reload
+              if (data.new_name && data.new_name !== user) {
+                AUTH.setSession(data.new_name, AUTH.getToken());
+                alert(
+                  "Account updated successfully! Please log in again with your new credentials."
+                );
+                AUTH.logout();
+              } else {
+                alert("Account updated successfully!");
+                accountForm.reset();
+                document.getElementById("current-name").value =
+                  data.new_name || user;
+              }
+            } else {
+              const err = await res.json();
+              alert("Error updating account: " + err.error);
+            }
+          } catch (err) {
+            alert("Failed to update account.");
+          }
+        });
+
+        // Add Award handler (moderator only)
+        if (isModerator) {
+          const addAwardForm = document.getElementById("add-award-form");
+          addAwardForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const awardData = {
+              name: document.getElementById("award-name").value,
+              icon: document.getElementById("award-icon").value,
+              description: document.getElementById("award-description").value
+            };
 
             try {
-                // Check moderator status
-                isModerator = await AUTH.checkModerator();
-                
-                const res = await fetch('/api/get-data?type=players');
-                players = await res.json();
-                const currentPlayer = players.find(p => p.name.toLowerCase() === user.toLowerCase());
+              const res = await fetch("/api/manage-awards", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  ...AUTH.authHeader()
+                },
+                body: JSON.stringify({
+                  action: "addAward",
+                  awardData: awardData
+                })
+              });
 
-                if (currentPlayer) {
-                    document.getElementById('profile-pic').value = currentPlayer.pfp_link || '';
-                    document.getElementById('bio').value = currentPlayer.bio || '';
-                    document.getElementById('pronouns').value = currentPlayer.pronouns || '';
-                    document.getElementById('discord').value = currentPlayer.discord || '';
-                    
-                    if(currentPlayer.pfp_link) {
-                        picPreview.src = currentPlayer.pfp_link;
-                        picPreview.classList.remove('hidden');
-                    }
-                }
-                
-                // Load awards for dropdown
-                const awardsRes = await fetch('/api/manage-awards');
+              if (res.ok) {
+                alert("Award created successfully!");
+                addAwardForm.reset();
+                // Reload awards
+                const awardsRes = await fetch("/api/get-awards");
                 if (awardsRes.ok) {
-                    const awardsData = await awardsRes.json();
-                    awards = awardsData.awards || [];
-                }
-                
-                // Show moderator section if user is a moderator
-                if (isModerator) {
-                    document.getElementById('moderator-section').style.display = 'block';
-                    
-                    // Populate player dropdown
-                    const playerSelect = document.getElementById('award-player');
-                    players.forEach(player => {
-                        const option = document.createElement('option');
-                        option.value = player.name;
-                        option.textContent = player.name;
-                        playerSelect.appendChild(option);
+                  const awardsData = await awardsRes.json();
+                  awards = awardsData.awards || [];
+                  // Refresh award dropdown
+                  const awardSelect = document.getElementById("award-select");
+                  awardSelect.innerHTML =
+                    '<option value="">Choose an award...</option>';
+                  awards.forEach((award) => {
+                    const option = document.createElement("option");
+                    option.value = JSON.stringify({
+                      name: award.name,
+                      icon: award.icon,
+                      description: award.description
                     });
-                    
-                    // Populate award dropdown
-                    const awardSelect = document.getElementById('award-select');
-                    awards.forEach(award => {
-                        const option = document.createElement('option');
-                        option.value = JSON.stringify({ name: award.name, icon: award.icon, description: award.description });
-                        option.textContent = `${award.icon} ${award.name}`;
-                        awardSelect.appendChild(option);
-                    });
+                    option.textContent = `${award.icon} ${award.name}`;
+                    awardSelect.appendChild(option);
+                  });
                 }
+              } else {
+                const err = await res.json();
+                alert("Error creating award: " + err.error);
+              }
             } catch (err) {
-                console.error('Failed to load settings', err);
+              alert("Failed to create award.");
             }
+          });
 
-            // Image preview listener
-            picInput.addEventListener('input', (e) => {
-                if(e.target.value) {
-                    picPreview.src = e.target.value;
-                    picPreview.classList.remove('hidden');
-                } else {
-                    picPreview.classList.add('hidden');
-                }
-            });
+          // Assign Award handler
+          const assignAwardForm = document.getElementById("assign-award-form");
+          assignAwardForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const playerName = document.getElementById("award-player").value;
+            const awardInfo = JSON.parse(
+              document.getElementById("award-select").value
+            );
 
-            // Save handler
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(form);
-                const data = Object.fromEntries(formData.entries());
+            try {
+              const res = await fetch("/api/manage-awards", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  ...AUTH.authHeader()
+                },
+                body: JSON.stringify({
+                  action: "assignAward",
+                  assignAwardData: {
+                    playerName: playerName,
+                    awardName: awardInfo.name,
+                    icon: awardInfo.icon,
+                    description: awardInfo.description,
+                    action: "add"
+                  }
+                })
+              });
 
-                try {
-                    const res = await fetch('/api/update-profile', {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            ...AUTH.authHeader()
-                        },
-                        body: JSON.stringify({
-                            data: {
-                                pfp_link: data.profile_pic,
-                                bio: data.bio,
-                                pronouns: data.pronouns,
-                                discord: data.discord
-                            }
-                        })
-                    });
-
-                    if (res.ok) {
-                        alert('Settings saved successfully!');
-                    } else {
-                        const err = await res.json();
-                        alert('Error saving settings: ' + err.error);
-                    }
-                } catch (err) {
-                    alert('Failed to save settings.');
-                }
-            });
-
-            // Account form handler (change name and password)
-            const accountForm = document.getElementById('account-form');
-            accountForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const formData = new FormData(accountForm);
-                const data = Object.fromEntries(formData.entries());
-
-                // Validate password fields if any are filled
-                if (data.current_password || data.new_password || data.confirm_password) {
-                    if (!data.current_password) {
-                        alert('Current password is required to change password.');
-                        return;
-                    }
-                    if (!data.new_password) {
-                        alert('New password is required.');
-                        return;
-                    }
-                    if (data.new_password !== data.confirm_password) {
-                        alert('New passwords do not match.');
-                        return;
-                    }
-                }
-
-                try {
-                    const res = await fetch('/api/update-profile', {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            ...AUTH.authHeader()
-                        },
-                        body: JSON.stringify({
-                            data: {
-                                new_name: data.new_name || undefined,
-                                current_password: data.current_password || undefined,
-                                new_password: data.new_password || undefined
-                            }
-                        })
-                    });
-
-                    if (res.ok) {
-                        // If name was changed, update localStorage and reload
-                        if (data.new_name && data.new_name !== user) {
-                            AUTH.setSession(data.new_name, AUTH.getToken());
-                            alert('Account updated successfully! Please log in again with your new credentials.');
-                            AUTH.logout();
-                        } else {
-                            alert('Account updated successfully!');
-                            accountForm.reset();
-                            document.getElementById('current-name').value = data.new_name || user;
-                        }
-                    } else {
-                        const err = await res.json();
-                        alert('Error updating account: ' + err.error);
-                    }
-                } catch (err) {
-                    alert('Failed to update account.');
-                }
-            });
-            
-            // Add Award handler (moderator only)
-            if (isModerator) {
-                const addAwardForm = document.getElementById('add-award-form');
-                addAwardForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const awardData = {
-                        name: document.getElementById('award-name').value,
-                        icon: document.getElementById('award-icon').value,
-                        description: document.getElementById('award-description').value
-                    };
-                    
-                    try {
-                        const res = await fetch('/api/manage-awards', {
-                            method: 'POST',
-                            headers: { 
-                                'Content-Type': 'application/json',
-                                ...AUTH.authHeader()
-                            },
-                            body: JSON.stringify({
-                                action: 'addAward',
-                                awardData: awardData
-                            })
-                        });
-                        
-                        if (res.ok) {
-                            alert('Award created successfully!');
-                            addAwardForm.reset();
-                            // Reload awards
-                            const awardsRes = await fetch('/api/get-awards');
-                            if (awardsRes.ok) {
-                                const awardsData = await awardsRes.json();
-                                awards = awardsData.awards || [];
-                                // Refresh award dropdown
-                                const awardSelect = document.getElementById('award-select');
-                                awardSelect.innerHTML = '<option value="">Choose an award...</option>';
-                                awards.forEach(award => {
-                                    const option = document.createElement('option');
-                                    option.value = JSON.stringify({ name: award.name, icon: award.icon, description: award.description });
-                                    option.textContent = `${award.icon} ${award.name}`;
-                                    awardSelect.appendChild(option);
-                                });
-                            }
-                        } else {
-                            const err = await res.json();
-                            alert('Error creating award: ' + err.error);
-                        }
-                    } catch (err) {
-                        alert('Failed to create award.');
-                    }
-                });
-                
-                // Assign Award handler
-                const assignAwardForm = document.getElementById('assign-award-form');
-                assignAwardForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const playerName = document.getElementById('award-player').value;
-                    const awardInfo = JSON.parse(document.getElementById('award-select').value);
-                    
-                    try {
-                        const res = await fetch('/api/manage-awards', {
-                            method: 'POST',
-                            headers: { 
-                                'Content-Type': 'application/json',
-                                ...AUTH.authHeader()
-                            },
-                            body: JSON.stringify({
-                                action: 'assignAward',
-                                assignAwardData: {
-                                    playerName: playerName,
-                                    awardName: awardInfo.name,
-                                    icon: awardInfo.icon,
-                                    description: awardInfo.description,
-                                    action: 'add'
-                                }
-                            })
-                        });
-                        
-                        if (res.ok) {
-                            alert('Award assigned successfully!');
-                            assignAwardForm.reset();
-                        } else {
-                            const err = await res.json();
-                            alert('Error assigning award: ' + err.error);
-                        }
-                    } catch (err) {
-                        alert('Failed to assign award.');
-                    }
-                });
+              if (res.ok) {
+                alert("Award assigned successfully!");
+                assignAwardForm.reset();
+              } else {
+                const err = await res.json();
+                alert("Error assigning award: " + err.error);
+              }
+            } catch (err) {
+              alert("Failed to assign award.");
             }
-        });
-        
-        // Mobile menu toggle functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            
-            if (mobileMenuBtn && mobileMenu) {
-                mobileMenuBtn.addEventListener('click', function() {
-                    mobileMenu.classList.toggle('hidden');
-                });
-            }
-            
-            // Sync player name between desktop and mobile displays
-            const playerNameDesktop = document.getElementById('current-player-name');
-            const playerNameMobile = document.getElementById('current-player-name-mobile');
-            
-            if (playerNameDesktop && playerNameMobile) {
-                const observer = new MutationObserver(function(mutations) {
-                    playerNameMobile.textContent = playerNameDesktop.textContent;
-                });
-                observer.observe(playerNameDesktop, { childList: true, subtree: true, characterData: true });
-            }
-        });
+          });
+        }
+      });
+
+      // Mobile menu toggle functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+        const mobileMenu = document.getElementById("mobile-menu");
+
+        if (mobileMenuBtn && mobileMenu) {
+          mobileMenuBtn.addEventListener("click", function () {
+            mobileMenu.classList.toggle("hidden");
+          });
+        }
+
+        // Sync player name between desktop and mobile displays
+        const playerNameDesktop = document.getElementById(
+          "current-player-name"
+        );
+        const playerNameMobile = document.getElementById(
+          "current-player-name-mobile"
+        );
+
+        if (playerNameDesktop && playerNameMobile) {
+          const observer = new MutationObserver(function (mutations) {
+            playerNameMobile.textContent = playerNameDesktop.textContent;
+          });
+          observer.observe(playerNameDesktop, {
+            childList: true,
+            subtree: true,
+            characterData: true
+          });
+        }
+      });
     </script>
-</body>
+  </body>
 </html>

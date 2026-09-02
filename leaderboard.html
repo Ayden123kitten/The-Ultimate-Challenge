@@ -101,6 +101,12 @@
       table.w-full {
         table-layout: fixed;
       }
+      /* Reduce leaderboard table cell padding to avoid horizontal overflow */
+      .leaderboard-table th,
+      .leaderboard-table td {
+        padding-left: 0.75rem; /* px-3 equivalent */
+        padding-right: 0.75rem;
+      }
       /* Mobile responsive styles */
       @media (max-width: 768px) {
         .ranking-tab {
@@ -177,18 +183,22 @@
             <div class="w-px h-5 bg-slate-600 hidden sm:block"></div>
             <a
               href="/"
-              class="text-slate-400 hover:text-white transition-colors flex items-center gap-2"
+              class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
             >
-              <i class="fa-solid fa-arrow-left"></i>
+              <i
+                class="fa-solid fa-arrow-left group-hover:text-white transition-colors"
+              ></i>
               <span class="hidden sm:inline">Back to Games</span>
               <span class="sm:hidden">Back</span>
             </a>
             <a
               href="/settings.html"
               id="settings-nav-link"
-              class="text-slate-400 hover:text-white transition-colors flex items-center gap-2"
+              class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
             >
-              <i class="fa-solid fa-gear"></i>
+              <i
+                class="fa-solid fa-gear group-hover:text-slate-300 transition-colors"
+              ></i>
               <span class="hidden sm:inline">Settings</span>
             </a>
           </nav>
@@ -248,7 +258,7 @@
       <!-- Leaderboard Table -->
       <div class="glass rounded-xl overflow-hidden">
         <div class="overflow-x-auto">
-          <table class="w-full">
+          <table class="w-full leaderboard-table">
             <thead class="bg-slate-800/50">
               <tr>
                 <th

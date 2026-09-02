@@ -990,6 +990,18 @@ function renderPlayerPreview(player, containerId) {
   const container = $(containerId);
   if (!container) return;
 
+  // If all fields empty, show placeholder
+  const allEmpty =
+    !(player && player.name && player.name.trim()) &&
+    !(player && player.pfp_link && player.pfp_link.trim()) &&
+    !(player && player.bio && player.bio.trim()) &&
+    !(player && player.pronouns && player.pronouns.trim()) &&
+    !(player && player.discord && player.discord.trim());
+  if (allEmpty) {
+    container.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
+    return;
+  }
+
   const avatar =
     player.pfp_link && player.pfp_link.trim() !== ""
       ? `<img src="${player.pfp_link}" alt="${player.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>\'">`

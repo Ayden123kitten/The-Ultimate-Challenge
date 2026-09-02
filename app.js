@@ -59,6 +59,11 @@ async function loadData() {
       throw new Error(`Settings file: ${settingsRes.status}`);
 
     games = await gamesRes.json();
+    // Ensure every game has a slot_count; default to 1 when missing
+    games = games.map((g) => ({
+      ...g,
+      slot_count: g.slot_count !== undefined ? g.slot_count : 1
+    }));
     players = await playersRes.json();
     settings = await settingsRes.json();
 
@@ -247,6 +252,13 @@ function renderGames() {
     card.className =
       "glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50";
 
+    // Slot display: show "No limit" when slot_count is 0
+    const slotText =
+      game.slot_count === 0
+        ? "No limit"
+        : `${game.slot_count} slot${game.slot_count > 1 ? "s" : ""}`;
+    const slotHtml = `<div class="text-xs text-slate-400 mt-2">${slotText}</div>`;
+
     // Add inline edit button for moderator
     const inlineEditButtonHtml =
       inlineEditMode && isModerator
@@ -278,6 +290,7 @@ function renderGames() {
                         <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold ${isClaimed ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}">
                             ${isClaimed ? `Playing: ${game.current_player}` : "Available"}
                         </span>
+                        ${slotHtml}
                     </div>
                     ${
                       showEventTime
@@ -605,17 +618,30 @@ function openEventTimerSettingsModal() {
   const endInput = $("event-end-time-input");
 
   function updatePreview() {
-    const previewTimer = $("preview-timer");
-    const previewStatus = $("preview-status");
-
+    const previewContainer = $("event-timer-preview");
     const startTime = startInput.value;
     const endTime = endInput.value;
 
+    // If no start time set, show placeholder
     if (!startTime) {
-      previewTimer.textContent = "000000:00:00";
-      previewStatus.textContent = "Not Set";
+      if (previewContainer) {
+        previewContainer.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
+      }
       return;
     }
+
+    // Ensure the preview structure exists
+    if (previewContainer) {
+      previewContainer.innerHTML = `
+        <div class="text-center">
+          <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent"></div>
+          <div id="preview-status" class="text-xs text-slate-400 uppercase"></div>
+        </div>
+      `;
+    }
+
+    const previewTimer = $("preview-timer");
+    const previewStatus = $("preview-status");
 
     const now = Date.now();
     const start = new Date(startTime).getTime();
@@ -815,15 +841,15 @@ function openModeratorModal() {
                     <input type="text" id="game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-logo" placeholder="Logo URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-apworld-link" placeholder="Apworld Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="text" id="game-apworld-version" placeholder="Apworld Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="game-apworld-version" placeholder="Apworld Version (or 'Core')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-mod-link" placeholder="Mod Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="text" id="game-mod-version" placeholder="Mod Version (or 'Core')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="game-mod-version" placeholder="Mod Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-mod-setup-guide-link" placeholder="Setup Guide Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-tracker-link" placeholder="Tracker Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-support-link" placeholder="Support Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-save-file-link" placeholder="Save File Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-game-info-link" placeholder="Game Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="number" id="game-slot-count" placeholder="Slot Count" min="1" value="1" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="number" id="game-slot-count" placeholder="Slot Count (0 = no limit)" min="0" value="1" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <textarea id="game-rules" placeholder="Rules" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                     <textarea id="game-extra-information" placeholder="Extra Information" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                     <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg md:col-span-2">Add Game</button>
@@ -854,7 +880,7 @@ function openModeratorModal() {
                     <input type="text" id="edit-game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-logo" placeholder="Logo URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-apworld-link" placeholder="Apworld Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="text" id="edit-game-apworld-version" placeholder="Apworld Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="edit-game-apworld-version" placeholder="Apworld Version (or 'Core')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-mod-link" placeholder="Mod Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="text" id="edit-game-mod-version" placeholder="Mod Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-mod-setup-guide-link" placeholder="Setup Guide Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
@@ -862,7 +888,7 @@ function openModeratorModal() {
                     <input type="url" id="edit-game-support-link" placeholder="Support Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-save-file-link" placeholder="Save File Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-game-info-link" placeholder="Game Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="number" id="edit-game-slot-count" placeholder="Slot Count" min="1" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="number" id="edit-game-slot-count" placeholder="Slot Count (0 = no limit)" min="0" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <textarea id="edit-game-rules" placeholder="Rules" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                     <textarea id="edit-game-extra-information" placeholder="Extra Information" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                     <button onclick="saveEditedGame()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg md:col-span-2">Save Changes</button>
@@ -873,6 +899,23 @@ function openModeratorModal() {
                     <div id="edit-game-preview" class="glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50"></div>
                 </div>
             </div>
+
+                <!-- Remove Game Section -->
+                <div class="glass rounded-lg p-4">
+                  <h3 class="text-lg font-bold text-white mb-4">Remove Game</h3>
+                  <p class="text-sm text-slate-400 mb-3">Select a game to permanently remove it (this also deletes logs and Cheesetracker entries).</p>
+                  <select id="remove-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
+                    <option value="">Select a game...</option>
+                    ${games
+                      .slice()
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((g) => `<option value="${g.id}">${g.name}</option>`)
+                      .join("")}
+                  </select>
+                  <div class="flex gap-2">
+                    <button id="remove-game-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg w-full">Remove Game</button>
+                  </div>
+                </div>
             
             <!-- Edit Player Section -->
             <div class="glass rounded-lg p-4">
@@ -1172,7 +1215,10 @@ function openModeratorModal() {
         name: $("game-name").value.trim(),
         logo: $("game-logo").value.trim(),
         yaml_slot_name: $("game-yaml-slot-name").value.trim(),
-        slot_count: parseInt($("game-slot-count").value) || 1,
+        slot_count: (function () {
+          const v = parseInt($("game-slot-count").value, 10);
+          return isNaN(v) ? 1 : v;
+        })(),
         apworld_link: $("game-apworld-link").value.trim(),
         apworld_version: $("game-apworld-version").value.trim(),
         mod_link: $("game-mod-link").value.trim(),
@@ -1238,6 +1284,38 @@ function openModeratorModal() {
       $("edit-game-extra-information").value = game.extra_information || "";
       container.classList.remove("hidden");
     };
+  }
+
+  // Remove Game handler for moderation panel
+  const removeGameBtn = $("remove-game-btn");
+  if (removeGameBtn) {
+    removeGameBtn.addEventListener("click", async () => {
+      const sel = $("remove-game-select");
+      if (!sel) return;
+      const gameIdToRemove = sel.value;
+      if (!gameIdToRemove) return alert("Please select a game to remove.");
+      if (
+        !confirm(
+          "Are you sure you want to permanently remove this game? This will also delete logs and Cheesetracker entries."
+        )
+      )
+        return;
+
+      try {
+        const res = await fetch("/api/moderator-actions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
+          body: JSON.stringify({ action: "removeGame", gameId: gameIdToRemove })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to remove game");
+        alert("Game removed successfully!");
+        loadData();
+        closeModeratorModal();
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
   }
 
   const editPlayerSelect = $("edit-player-select");
@@ -1306,6 +1384,19 @@ function openModeratorModal() {
       game.apworld_version && game.apworld_version.trim() !== "";
     const hasModVersion = game.mod_version && game.mod_version.trim() !== "";
 
+    // If all major fields are empty, show placeholder
+    const allEmpty =
+      !(game.name && game.name.trim()) &&
+      !hasCoverImage &&
+      !game.apworld_link &&
+      !game.mod_link &&
+      !hasRules &&
+      !hasExtraInfo;
+    if (allEmpty) {
+      previewElement.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
+      return;
+    }
+
     const links = [
       {
         url: game.apworld_link,
@@ -1334,9 +1425,9 @@ function openModeratorModal() {
                 ${
                   hasCoverImage
                     ? `
-                    <img src="${game.logo}" alt="${game.name}" class="w-12 h-12 object-contain bg-slate-800 rounded" onerror="this.style.display='none'">
+                    <img src="${game.logo}" alt="${game.name}" class="bg-slate-800 rounded" style="max-width:160px; width:100%; height:auto; object-fit:contain;" onerror="this.style.display='none'">
                 `
-                    : '<div class="w-12 h-12 bg-slate-800 rounded flex items-center justify-center text-slate-600"><i class="fa-solid fa-gamepad"></i></div>'
+                    : '<div style="max-width:160px; width:100%; height:auto;" class="bg-slate-800 rounded flex items-center justify-center text-slate-600"><i class="fa-solid fa-gamepad"></i></div>'
                 }
                 <div class="flex-1">
                     <h2 class="text-xl font-bold text-white">${game.name || "Game Name"}</h2>
@@ -1495,27 +1586,29 @@ function openModeratorModal() {
         previewContainer.classList.remove("hidden");
 
         const playerName = $("edit-player-select").value;
-        const player = players.find((p) => p.name === playerName);
+        const player = players.find((p) => p.name === playerName) || {};
         const displayName =
           $("edit-player-new-name").value.trim() ||
-          player?.name ||
+          player.name ||
           "Player Name";
-        const pfpLink = $("edit-player-pfp").value.trim();
-        const bio = $("edit-player-bio").value.trim();
-        const pronouns = $("edit-player-pronouns").value.trim();
-        const discord = $("edit-player-discord").value.trim();
+        const pfpLink =
+          $("edit-player-pfp").value.trim() || player.pfp_link || "";
+        const bio = $("edit-player-bio").value.trim() || player.bio || "";
+        const pronouns =
+          $("edit-player-pronouns").value.trim() || player.pronouns || "";
+        const discord =
+          $("edit-player-discord").value.trim() || player.discord || "";
 
-        previewEl.innerHTML = `
-                    ${pfpLink ? `<img src="${pfpLink}" alt="${displayName}" class="w-16 h-16 rounded-full object-cover border-2 border-ap-accent">` : '<div class="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center text-slate-400"><i class="fa-solid fa-user text-2xl"></i></div>'}
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2">
-                            <h3 class="text-lg font-bold text-white">${displayName}</h3>
-                            ${pronouns ? `<span class="text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">${pronouns}</span>` : ""}
-                        </div>
-                        ${bio ? `<p class="text-sm text-slate-400 mt-1">${bio}</p>` : ""}
-                        ${discord ? `<p class="text-xs text-slate-500 mt-1"><i class="fa-brands fa-discord mr-1"></i>${discord}</p>` : ""}
-                    </div>
-                `;
+        const previewPlayer = {
+          name: displayName,
+          pfp_link: pfpLink,
+          bio: bio,
+          pronouns: pronouns,
+          discord: discord,
+          roles: player.roles || []
+        };
+
+        renderPlayerPreview(previewPlayer, "edit-player-preview");
       });
     }
   });
@@ -1531,9 +1624,16 @@ function openModeratorModal() {
   function updateRolePreview() {
     const previewEl = $("add-role-preview");
     if (!previewEl || !newRoleNameInput || !newRoleColorInput) return;
-
-    const roleName = newRoleNameInput.value.trim() || "Role Name";
+    const roleName = newRoleNameInput.value.trim();
     const roleColor = newRoleColorInput.value || "#ff0000";
+
+    // If name is empty, show start-typing placeholder
+    if (!roleName) {
+      previewEl.style.color = "";
+      previewEl.style.borderColor = "";
+      previewEl.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
+      return;
+    }
 
     previewEl.style.color = roleColor;
     previewEl.style.borderColor = roleColor + "40";
@@ -1553,7 +1653,10 @@ async function saveEditedGame() {
   const gameData = {
     name: $("edit-game-name").value.trim(),
     yaml_slot_name: $("edit-game-yaml-slot-name").value.trim(),
-    slot_count: parseInt($("edit-game-slot-count").value) || 1,
+    slot_count: (function () {
+      const v = parseInt($("edit-game-slot-count").value, 10);
+      return isNaN(v) ? 1 : v;
+    })(),
     logo: $("edit-game-logo").value.trim(),
     apworld_link: $("edit-game-apworld-link").value.trim(),
     apworld_version: $("edit-game-apworld-version").value.trim(),
@@ -1607,21 +1710,22 @@ function openGameInlineEditor(gameId, event) {
                     <input type="text" id="inline-edit-game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" value="${game.yaml_slot_name || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-logo" placeholder="Logo URL" value="${game.logo || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-apworld-link" placeholder="Apworld Link" value="${game.apworld_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="text" id="inline-edit-game-apworld-version" placeholder="Apworld Version" value="${game.apworld_version || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="inline-edit-game-apworld-version" placeholder="Apworld Version (or 'Core')" value="${game.apworld_version || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-mod-link" placeholder="Mod Link" value="${game.mod_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="text" id="inline-edit-game-mod-version" placeholder="Mod Version (or 'Core')" value="${game.mod_version || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="inline-edit-game-mod-version" placeholder="Mod Version" value="${game.mod_version || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-mod-setup-guide-link" placeholder="Setup Guide Link" value="${game.mod_setup_guide_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-tracker-link" placeholder="Tracker Link" value="${game.tracker_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-support-link" placeholder="Support Link" value="${game.support_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-save-file-link" placeholder="Save File Link" value="${game.save_file_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-game-info-link" placeholder="Game Info Link" value="${game.game_info_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="number" id="inline-edit-game-slot-count" placeholder="Slot Count" min="1" value="${game.slot_count || 1}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="number" id="inline-edit-game-slot-count" placeholder="Slot Count (0 = no limit)" min="0" value="${game.slot_count || 1}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <textarea id="inline-edit-game-rules" placeholder="Rules" rows="2" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2">${game.rules || ""}</textarea>
                     <textarea id="inline-edit-game-extra-information" placeholder="Extra Information" rows="2" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2">${game.extra_information || ""}</textarea>
                 </div>
                 <div class="flex gap-2 mt-4">
-                    <button onclick="saveInlineEditedGame('${game.id}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
-                    <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
+                  <button onclick="saveInlineEditedGame('${game.id}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg">Save Changes</button>
+                  <button onclick="deleteInlineGame('${game.id}')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Delete Game</button>
+                  <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg">Cancel</button>
                 </div>
             </div>
             
@@ -1637,6 +1741,31 @@ function openGameInlineEditor(gameId, event) {
 
   // Setup live preview
   setupInlineGamePreview(game);
+}
+
+// Delete a game from inline editor
+async function deleteInlineGame(gameId) {
+  if (
+    !confirm(
+      "Are you sure you want to permanently remove this game? This cannot be undone."
+    )
+  )
+    return;
+
+  try {
+    const res = await fetch("/api/moderator-actions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
+      body: JSON.stringify({ action: "removeGame", gameId })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to remove game");
+    alert("Game removed successfully!");
+    closeModeratorModal();
+    loadData();
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
 }
 
 // Setup live preview for game editing
@@ -1664,7 +1793,10 @@ function setupInlineGamePreview(originalGame) {
       ...originalGame,
       name: $("inline-edit-game-name").value || originalGame.name,
       yaml_slot_name: $("inline-edit-game-yaml-slot-name").value,
-      slot_count: parseInt($("inline-edit-game-slot-count").value) || 1,
+      slot_count: (function () {
+        const v = parseInt($("inline-edit-game-slot-count").value, 10);
+        return isNaN(v) ? 1 : v;
+      })(),
       logo: $("inline-edit-game-logo").value,
       apworld_link: $("inline-edit-game-apworld-link").value,
       apworld_version: $("inline-edit-game-apworld-version").value,
@@ -1778,12 +1910,67 @@ function renderGamePreview(game, containerId) {
     `;
 }
 
+// Render player preview (same look as inline edit players preview)
+function renderPlayerPreview(player, containerId) {
+  const container = $(containerId);
+  if (!container) return;
+
+  // If all fields empty, show placeholder
+  const allEmpty =
+    !(player && player.name && player.name.trim()) &&
+    !(player && player.pfp_link && player.pfp_link.trim()) &&
+    !(player && player.bio && player.bio.trim()) &&
+    !(player && player.pronouns && player.pronouns.trim()) &&
+    !(player && player.discord && player.discord.trim());
+  if (allEmpty) {
+    container.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
+    return;
+  }
+
+  const avatar =
+    player.pfp_link && player.pfp_link.trim() !== ""
+      ? `<img src="${player.pfp_link}" alt="${player.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
+      : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
+
+  const playerRoles = player && player.roles ? player.roles : [];
+
+  let rolesHtml = "";
+  if (playerRoles.length > 0) {
+    rolesHtml =
+      '<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 4px;">';
+    playerRoles.forEach((roleName) => {
+      const role = availableRoles.find((r) => r.name === roleName);
+      if (role) {
+        const roleColor = role.color;
+        rolesHtml += `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; background-color: ${roleColor}33; color: ${roleColor}; border: 1px solid ${roleColor};"><span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${roleColor};"></span>${role.name}</span>`;
+      }
+    });
+    rolesHtml += "</div>";
+  }
+
+  container.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%;">
+      <div style="position: relative;">${avatar}</div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
+        <h3 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${player.name}</h3>
+        ${rolesHtml}
+        ${player.pronouns ? `<p style="margin: 0; font-size: 0.8rem; padding: 2px 10px; border-radius: 9999px; color: #38bdf8; border: 1px solid #38bdf838; background-color: #38bdf822;">${player.pronouns}</p>` : ""}
+        ${player.bio ? `<p style="margin: 0; font-size: 0.75rem; color: #94a3b8; text-align: center; max-width: 100%; overflow-wrap: anywhere; word-break: break-word; max-height: 40px; overflow-y: auto;">${player.bio}</p>` : ""}
+        ${player.discord ? `<p style="margin: 0; font-size: 0.7rem; color: #5865F2;"><i class="fa-brands fa-discord" style="margin-right: 4px;"></i>${player.discord}</p>` : ""}
+      </div>
+    </div>
+  `;
+}
+
 // Save inline edited game
 async function saveInlineEditedGame(gameId) {
   const gameData = {
     name: $("inline-edit-game-name").value.trim(),
     yaml_slot_name: $("inline-edit-game-yaml-slot-name").value.trim(),
-    slot_count: parseInt($("inline-edit-game-slot-count").value) || 1,
+    slot_count: (function () {
+      const v = parseInt($("inline-edit-game-slot-count").value, 10);
+      return isNaN(v) ? 1 : v;
+    })(),
     logo: $("inline-edit-game-logo").value.trim(),
     apworld_link: $("inline-edit-game-apworld-link").value.trim(),
     apworld_version: $("inline-edit-game-apworld-version").value.trim(),
@@ -2253,19 +2440,40 @@ async function createAward() {
 }
 
 function updateAwardPreview() {
-  const name = $("award-name-input")?.value.trim() || "Award Name";
+  const name = $("award-name-input")?.value.trim() || "";
   const icon = $("award-icon-input")?.value.trim() || "";
-  const description =
-    $("award-description-input")?.value.trim() ||
-    "Description will appear here";
+  const description = $("award-description-input")?.value.trim() || "";
+
+  const previewContainer = $("award-preview");
+
+  // If all fields are empty, show the placeholder message
+  if (!name && !icon && !description) {
+    if (previewContainer) {
+      previewContainer.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
+    }
+    return;
+  }
+
+  // Ensure preview structure exists
+  if (previewContainer) {
+    previewContainer.innerHTML = `
+      <span id="preview-icon" class="text-2xl w-8 text-center"></span>
+      <div>
+        <div id="preview-name" class="font-bold text-white"></div>
+        <div id="preview-description" class="text-xs text-slate-400"></div>
+      </div>
+    `;
+  }
 
   const previewName = document.getElementById("preview-name");
   const previewIcon = document.getElementById("preview-icon");
   const previewDescription = document.getElementById("preview-description");
 
-  if (previewName) previewName.textContent = name;
-  if (previewIcon) previewIcon.textContent = icon;
-  if (previewDescription) previewDescription.textContent = description;
+  if (previewName) previewName.textContent = name || "Award Name";
+  if (previewIcon) previewIcon.textContent = icon || "";
+  if (previewDescription)
+    previewDescription.textContent =
+      description || "Description will appear here";
 }
 
 function attachAwardPreviewListeners() {
