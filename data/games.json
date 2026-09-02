@@ -1769,5 +1769,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "bumperstickers",
+    "name": "Bumper Stickers",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "yaml_slot_name": "BumperStickers",
+    "slot_count": 1,
+    "apworld_link": "https://archipelago.gg/games/Bumper%20Stickers/info/en",
+    "apworld_version": "Core",
+    "mod_link": "https://github.com/FelicitusNeko/FlixelBumpStik/releases/download/0.9.0%CE%B13/bumpstik-ap-0.9.0a3-windows.zip",
+    "mod_version": "0.9.3a3",
+    "mod_setup_guide_link": "https://archipelago.gg/tutorial/Bumper%20Stickers/setup_en",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1148330200891932742",
+    "save_file_link": "https://drive.google.com/drive/folders/1saPesvjFsgrY-ySV1l6Lq7FGhIbCmd14?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
