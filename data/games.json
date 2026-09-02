@@ -1608,5 +1608,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "bksim",
+    "name": "BK Simulator",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "yaml_slot_name": "BKSimulator",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/BK-Simulator/BK-Simulator/releases/download/1.0.2/bksim.apworld",
+    "apworld_version": "1.0.2",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://github.com/BK-Simulator/BK-Simulator/blob/main/apworld/bksim/docs/setup_en.md",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1445553022917808302",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
