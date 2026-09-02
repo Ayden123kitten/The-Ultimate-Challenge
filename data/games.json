@@ -1700,5 +1700,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "bombrushcyberfunk",
+    "name": "Bomb Rush Cyberfunk",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/f06f03a970353985cf4f02ccb07f1c38.png",
+    "yaml_slot_name": "BRC",
+    "slot_count": 1,
+    "apworld_link": "https://archipelago.gg/games/Bomb%20Rush%20Cyberfunk/info/en",
+    "apworld_version": "Core",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://archipelago.gg/tutorial/Bomb%20Rush%20Cyberfunk/setup_en",
+    "tracker_link": "https://thunderstore.io/c/bomb-rush-cyberfunk/p/TRPG/MoreMap/",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1257453065083031642",
+    "save_file_link": "https://drive.google.com/drive/folders/1JIrVUZTia3toQnVsZ-wX_Ce6Knx8a_n2?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
