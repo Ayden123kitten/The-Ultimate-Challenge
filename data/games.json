@@ -1585,5 +1585,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "tboir",
+    "name": "The Binding of Isaac: Repentance",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/795daa0834ca092ed52b5d0a5848387d.png",
+    "yaml_slot_name": "TBoIR",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/NaveTK/Archipelago/releases/download/v0.4.3/tboir.apworld",
+    "apworld_version": "0.4.3",
+    "mod_link": "https://steamcommunity.com/sharedfiles/filedetails/?id=3640861678",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://github.com/NaveTK/Archipelago/blob/main/worlds/tboir/docs/setup_en.md",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1454262765047775326",
+    "save_file_link": "https://drive.google.com/drive/folders/1dK6CBZqOtecrI3XVyS2Nbx1xg6UbPrH0?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
