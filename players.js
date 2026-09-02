@@ -75,8 +75,6 @@ async function loadAwards() {
 // RENDER AUTH PANEL
 // ==========================================
 function renderAuthPanel() {
-
-function getModeratorIcon(playerName) {
   const role = moderatorRoles[playerName];
   if (role === "admin") {
     return '<i class="fa-solid fa-crown text-yellow-400" title="Admin"></i>';
