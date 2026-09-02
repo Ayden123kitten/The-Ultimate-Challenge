@@ -1539,5 +1539,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "axiomverge",
+    "name": "Axiom Verge",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/e197f2c0db6860022477e8300a8fd922.png",
+    "yaml_slot_name": "AxiomVerge",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/mail-liam/Archipelago/releases/download/beta3.3/axiomverge.apworld",
+    "apworld_version": "Beta3.3",
+    "mod_link": "https://github.com/mail-liam/Archipelago/releases/download/beta3.3/AxiomVergeAP.zip",
+    "mod_version": "Beta3.3",
+    "mod_setup_guide_link": "",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1032831597583536208",
+    "save_file_link": "https://drive.google.com/drive/folders/13mPgiMtKVlzcElBQuyn4lqCrX8N1Roxk?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
