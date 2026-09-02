@@ -1838,5 +1838,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "castlevania64",
+    "name": "Castlevania 64",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/72a7dd9f91089b8fabd3edc4c9db7ed1.png",
+    "yaml_slot_name": "Castlevania64",
+    "slot_count": 1,
+    "apworld_link": "https://archipelago.gg/games/Castlevania%2064/info/en",
+    "apworld_version": "Core",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://archipelago.gg/tutorial/Castlevania%2064/setup_en",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1224387731782893731",
+    "save_file_link": "https://drive.google.com/drive/folders/1HWu00zw3Du7XXS8LiG9-AEP6rmOPHNTn?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
