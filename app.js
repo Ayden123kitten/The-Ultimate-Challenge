@@ -714,7 +714,6 @@ function openModeratorModal() {
                     <input type="text" id="game-name" placeholder="Game Name *" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white" required>
                     <input type="text" id="game-id" placeholder="Game ID (unique) *" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white" required>
                     <input type="text" id="game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="number" id="game-slot-count" placeholder="Slot Count" min="1" value="1" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-logo" placeholder="Logo URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-apworld-link" placeholder="Apworld Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="text" id="game-apworld-version" placeholder="Apworld Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
@@ -722,9 +721,10 @@ function openModeratorModal() {
                     <input type="text" id="game-mod-version" placeholder="Mod Version (or 'Core')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-mod-setup-guide-link" placeholder="Setup Guide Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-tracker-link" placeholder="Tracker Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="url" id="game-game-info-link" placeholder="Game Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-support-link" placeholder="Support Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="game-save-file-link" placeholder="Save File Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="game-game-info-link" placeholder="Game Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="number" id="game-slot-count" placeholder="Slot Count" min="1" value="1" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <textarea id="game-rules" placeholder="Rules" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                     <textarea id="game-extra-information" placeholder="Extra Information" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                     <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg md:col-span-2">Add Game</button>
@@ -749,7 +749,6 @@ function openModeratorModal() {
                     <input type="text" id="edit-game-name" placeholder="Game Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="text" id="edit-game-id" placeholder="Game ID" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white" disabled>
                     <input type="text" id="edit-game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="number" id="edit-game-slot-count" placeholder="Slot Count" min="1" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-logo" placeholder="Logo URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-apworld-link" placeholder="Apworld Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="text" id="edit-game-apworld-version" placeholder="Apworld Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
@@ -757,9 +756,10 @@ function openModeratorModal() {
                     <input type="text" id="edit-game-mod-version" placeholder="Mod Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-mod-setup-guide-link" placeholder="Setup Guide Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-tracker-link" placeholder="Tracker Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="url" id="edit-game-game-info-link" placeholder="Game Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-support-link" placeholder="Support Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="edit-game-save-file-link" placeholder="Save File Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="edit-game-game-info-link" placeholder="Game Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="number" id="edit-game-slot-count" placeholder="Slot Count" min="1" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <textarea id="edit-game-rules" placeholder="Rules" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                     <textarea id="edit-game-extra-information" placeholder="Extra Information" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                     <button onclick="saveEditedGame()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg md:col-span-2">Save Changes</button>
@@ -1394,7 +1394,6 @@ function openGameInlineEditor(gameId, event) {
                     <input type="text" id="inline-edit-game-name" placeholder="Game Name" value="${game.name}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="text" id="inline-edit-game-id" placeholder="Game ID" value="${game.id}" disabled class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white opacity-50">
                     <input type="text" id="inline-edit-game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" value="${game.yaml_slot_name || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="number" id="inline-edit-game-slot-count" placeholder="Slot Count" min="1" value="${game.slot_count || 1}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-logo" placeholder="Logo URL" value="${game.logo || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-apworld-link" placeholder="Apworld Link" value="${game.apworld_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="text" id="inline-edit-game-apworld-version" placeholder="Apworld Version" value="${game.apworld_version || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
@@ -1402,9 +1401,10 @@ function openGameInlineEditor(gameId, event) {
                     <input type="text" id="inline-edit-game-mod-version" placeholder="Mod Version (or 'Core')" value="${game.mod_version || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-mod-setup-guide-link" placeholder="Setup Guide Link" value="${game.mod_setup_guide_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-tracker-link" placeholder="Tracker Link" value="${game.tracker_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                    <input type="url" id="inline-edit-game-game-info-link" placeholder="Game Info Link" value="${game.game_info_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-support-link" placeholder="Support Link" value="${game.support_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <input type="url" id="inline-edit-game-save-file-link" placeholder="Save File Link" value="${game.save_file_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="inline-edit-game-game-info-link" placeholder="Game Info Link" value="${game.game_info_link || ''}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="number" id="inline-edit-game-slot-count" placeholder="Slot Count" min="1" value="${game.slot_count || 1}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                     <textarea id="inline-edit-game-rules" placeholder="Rules" rows="2" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2">${game.rules || ''}</textarea>
                     <textarea id="inline-edit-game-extra-information" placeholder="Extra Information" rows="2" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2">${game.extra_information || ''}</textarea>
                 </div>
