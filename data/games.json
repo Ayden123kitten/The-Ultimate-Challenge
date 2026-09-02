@@ -1562,5 +1562,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "banjotooie",
+    "name": "Banjo-Tooie",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/000c076c390a4c357313fca29e390ece.png",
+    "yaml_slot_name": "BanjoTooie",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/jjjj12212/Archipelago-BanjoTooie/releases/download/V4.13.1/banjo_tooie.apworld",
+    "apworld_version": "4.13.1",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://github.com/jjjj12212/Archipelago-BanjoTooie/blob/main/worlds/banjo_tooie/docs/setup_en.md",
+    "tracker_link": "https://github.com/Ozone31/banjo-tooie-ap-tracker/archive/refs/tags/v0.10.9.zip",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1380609128753532948",
+    "save_file_link": "https://drive.google.com/drive/folders/1UNPqkjN1n-hwZhGn4rXvV9v_k1txMV1O?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
