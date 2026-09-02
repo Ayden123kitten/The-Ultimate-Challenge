@@ -16,6 +16,7 @@ let availableRoles = []; // [{ name, color }]
 let availableAwards = []; // [{ name, icon, description }]
 let moderatorRoles = {}; // { playerName: 'admin' | 'moderator' }
 let currentPlayer = AUTH.getName();
+let leaderboardPositions = {}; // { playerName: rank }
 let currentAuthTab = "login"; // Track which auth tab is active: 'login' or 'signup'
 let authPanelRendered = false; // Track if auth panel has been rendered
 let isModerator = false; // Track moderator status
@@ -100,12 +101,13 @@ async function loadData() {
                 <i class="fa-solid fa-circle-exclamation text-4xl mb-4"></i>
                 <p class="text-lg font-bold">Error loading player stats</p>
                 <p class="text-sm mt-2">${err.message}</p>
-            </div>`;
-  }
-}
-
-// ==========================================
-// AUTH PANEL (login / signup / logged-in state)
+            </div>
+              ${modIcon ? `<div style="position: absolute; top: -5px; left: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">${modIcon}</div>` : ""}
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
+              <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ""}</h2>
+            </div>
+            <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(11,17,32,0.7); border: 1px solid #38bdf8; color: #38bdf8; padding: 4px 8px; border-radius: 8px; font-weight: 700; font-size: 0.85rem;">#${leaderboardPositions[stat.name] || "-"}</div>
+          `;
 // ==========================================
 function renderAuthPanel() {
   const panel = $("auth-panel");
@@ -350,6 +352,40 @@ function renderPlayers() {
     };
   });
 
+  // Compute combined score and leaderboard positions (weights match leaderboard.js)
+  (function computePositions() {
+    const statsForRanking = playerStats.map((s) => ({ ...s }));
+    const weights = { games: 0.3, time: 0.3, claims: 0.25, completion: 0.15 };
+    // Compute completion rates
+    statsForRanking.forEach((s) => {
+      s.completionRate =
+        games.length > 0 ? (s.gamesPlayed / games.length) * 100 : 0;
+    });
+    const maxGames = Math.max(...statsForRanking.map((s) => s.gamesPlayed), 1);
+    const maxTime = Math.max(...statsForRanking.map((s) => s.totalTimeMs), 1);
+    const maxClaims = Math.max(...statsForRanking.map((s) => s.totalClaims), 1);
+    const maxCompletion = Math.max(
+      ...statsForRanking.map((s) => s.completionRate),
+      0.0001
+    );
+    statsForRanking.forEach((s) => {
+      const ng = s.gamesPlayed / maxGames;
+      const nt = s.totalTimeMs / maxTime;
+      const nc = s.totalClaims / maxClaims;
+      const ncomp = s.completionRate / (maxCompletion || 100);
+      s.combinedScore =
+        ng * weights.games +
+        nt * weights.time +
+        nc * weights.claims +
+        ncomp * weights.completion;
+    });
+    statsForRanking.sort((a, b) => b.combinedScore - a.combinedScore);
+    leaderboardPositions = {};
+    statsForRanking.forEach((s, i) => {
+      leaderboardPositions[s.name] = i + 1;
+    });
+  })();
+
   // Apply sorting
   if (playersSortOption === "az") {
     playerStats.sort((a, b) => a.name.localeCompare(b.name));
@@ -376,7 +412,7 @@ function renderPlayers() {
     const isSelected = stat.name === currentPlayer;
     card.className = `glass rounded-xl p-4 transition-all cursor-pointer hover:shadow-lg ${isSelected ? "border-2 border-ap-accent" : ""}`;
     card.style.cssText =
-      "display: flex; flex-direction: column; align-items: center; gap: 10px; aspect-ratio: 1; justify-content: center;";
+      "position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; aspect-ratio: 1; justify-content: center;";
 
     card.onmouseover = function () {
       this.style.transform = "translateY(-4px)";
@@ -569,6 +605,21 @@ function showPlayerModal(stat) {
 
   header.innerHTML = avatar;
   header.appendChild(info);
+  // Show leaderboard rank in header (aligned right)
+  const rank = leaderboardPositions[stat.name] || null;
+  if (rank) {
+    const rankDiv = document.createElement("div");
+    rankDiv.style.cssText = `margin-left: auto; display: flex; flex-direction: column; align-items: center; gap: 4px;`;
+    const rankLabel = document.createElement("div");
+    rankLabel.textContent = "Rank";
+    rankLabel.style.cssText = `font-size: 0.75rem; color: #94a3b8;`;
+    const rankValue = document.createElement("div");
+    rankValue.textContent = `#${rank}`;
+    rankValue.style.cssText = `font-size: 1.1rem; font-weight: 700; color: #38bdf8;`;
+    rankDiv.appendChild(rankLabel);
+    rankDiv.appendChild(rankValue);
+    header.appendChild(rankDiv);
+  }
 
   // Player Settings Section (Bio, Pronouns, Discord, Website)
   const settingsSection = document.createElement("div");
@@ -649,11 +700,11 @@ function showPlayerModal(stat) {
     }
   }
 
-  // Awards Section
+  // Awards Section (build but append later between stats and history)
   const playerAwards = playerObj && playerObj.awards ? playerObj.awards : [];
-
+  let awardsSection = null;
   if (playerAwards.length > 0) {
-    const awardsSection = document.createElement("div");
+    awardsSection = document.createElement("div");
     awardsSection.style.cssText = `margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
     const awardsTitle = document.createElement("h3");
     awardsTitle.textContent = "Awards";
@@ -696,7 +747,6 @@ function showPlayerModal(stat) {
     });
 
     awardsSection.appendChild(awardsList);
-    content.appendChild(awardsSection);
   }
 
   // Stats Grid
@@ -787,6 +837,8 @@ function showPlayerModal(stat) {
     content.appendChild(websiteDiv);
   }
   content.appendChild(statsGrid);
+  // Insert awards between stats and games played if present
+  if (awardsSection) content.appendChild(awardsSection);
   content.appendChild(historySection);
   modal.appendChild(content);
 
@@ -864,7 +916,7 @@ loadData();
 setInterval(loadData, 10000);
 
 // Open inline editor for a specific player
-function openPlayerInlineEditor(playerName, event) {
+async function openPlayerInlineEditor(playerName, event) {
   if (event) event.stopPropagation();
 
   const player = players.find((p) => p.name === playerName);
@@ -910,6 +962,14 @@ function openPlayerInlineEditor(playerName, event) {
   }
 
   content = document.getElementById("moderator-panel-content");
+
+  // Fetch permissions to determine whether to show Manage Awards button
+  let permissions = { manageAwards: false };
+  try {
+    permissions = await AUTH.getPermissions();
+  } catch (err) {
+    console.warn("Could not fetch permissions for inline editor:", err);
+  }
 
   // Build roles HTML
   let rolesHtml = "";
@@ -973,8 +1033,9 @@ function openPlayerInlineEditor(playerName, event) {
                 ${awardsHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${awardsHtml}</div>` : ""}
                 
                 <div class="flex gap-2 mt-4">
-                    <button onclick="saveInlineEditedPlayer('${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
-                    <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
+                  ${permissions.manageAwards ? `<button id="manage-awards-btn" onclick="window.open('/settings.html#awards','_blank')" class="bg-transparent text-slate-400 hover:text-white font-bold py-2 px-4 rounded-lg">Manage Awards</button>` : ""}
+                  <button onclick="saveInlineEditedPlayer('${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
+                  <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
                 </div>
             </div>
             

@@ -16,22 +16,31 @@
         theme: {
           extend: {
             colors: {
-              ap: {
-                bg: "#0f172a",
-                card: "#1e293b",
-                accent: "#38bdf8",
-                success: "#22c55e",
-                danger: "#ef4444"
-              }
-            }
-          }
-        }
-      };
-    </script>
-    <style>
-      body {
-        background-color: #0f172a;
-        color: #e2e8f0;
+            <a
+              href="#"
+              id="moderation-nav-link"
+              onclick="openModeratorModal()"
+              class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+            >
+              <i class="fa-solid fa-shield-halved group-hover:text-blue-400 transition-colors"></i>
+              <span class="hidden sm:inline">Moderation</span>
+            </a>
+              <a
+                href="/leaderboard.html"
+                class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+              >
+                <i class="fa-solid fa-trophy group-hover:text-yellow-400 transition-colors"></i>
+                <span class="hidden sm:inline">Leaderboard</span>
+              </a>
+              <a
+                href="#"
+                id="moderation-nav-link"
+                onclick="openModeratorModal()"
+                class="moderation-nav hidden group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+              >
+                <i class="fa-solid fa-shield-halved group-hover:text-blue-400 transition-colors"></i>
+                <span class="hidden sm:inline">Moderation</span>
+              </a>
         font-family: "Segoe UI", system-ui, sans-serif;
       }
       .glass {
@@ -128,8 +137,17 @@
               <i
                 class="fa-solid fa-arrow-left group-hover:text-white transition-colors"
               ></i>
-              <span class="hidden sm:inline">Back to Games</span>
+              <span class="hidden sm:inline">Back to Main Page</span>
               <span class="sm:hidden">Back</span>
+            </a>
+            <a
+              href="/leaderboard.html"
+              class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+            >
+              <i
+                class="fa-solid fa-trophy group-hover:text-yellow-400 transition-colors"
+              ></i>
+              <span class="hidden sm:inline">Leaderboard</span>
             </a>
             <a
               href="/settings.html"
@@ -166,6 +184,15 @@
               >
                 <i class="fa-solid fa-trophy"></i>
                 <span class="text-sm">Leaderboard</span>
+              </a>
+              <a
+                href="#"
+                onclick="openModeratorModal()"
+                class="mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+                data-page="moderation"
+              >
+                <i class="fa-solid fa-shield-halved"></i>
+                <span class="text-sm">Moderation</span>
               </a>
               <a
                 href="/settings.html"

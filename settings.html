@@ -16,6 +16,15 @@
         theme: {
           extend: {
             colors: {
+            <a
+              href="#"
+              id="moderation-nav-link"
+              onclick="openModeratorModal()"
+              class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+            >
+              <i class="fa-solid fa-shield-halved group-hover:text-blue-400 transition-colors"></i>
+              <span class="hidden sm:inline">Moderation</span>
+            </a>
               ap: {
                 bg: "#0f172a",
                 card: "#1e293b",
@@ -134,8 +143,26 @@
               <i
                 class="fa-solid fa-arrow-left group-hover:text-white transition-colors"
               ></i>
-              <span class="hidden sm:inline">Back to Games</span>
+              <span class="hidden sm:inline">Back to Main Page</span>
               <span class="sm:hidden">Back</span>
+            </a>
+            <a
+              href="/players.html"
+              class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+            >
+              <i
+                class="fa-solid fa-users group-hover:text-ap-accent transition-colors"
+              ></i>
+              <span class="hidden sm:inline">Players</span>
+            </a>
+            <a
+              href="/leaderboard.html"
+              class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+            >
+              <i
+                class="fa-solid fa-trophy group-hover:text-yellow-400 transition-colors"
+              ></i>
+              <span class="hidden sm:inline">Leaderboard</span>
             </a>
           </nav>
         </div>
@@ -170,6 +197,15 @@
               >
                 <i class="fa-solid fa-trophy"></i>
                 <span class="text-sm">Leaderboard</span>
+              </a>
+              <a
+                href="#"
+                onclick="openModeratorModal()"
+                class="mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
+                data-page="moderation"
+              >
+                <i class="fa-solid fa-shield-halved"></i>
+                <span class="text-sm">Moderation</span>
               </a>
             </div>
             <div class="flex items-center justify-center gap-2">

@@ -145,26 +145,33 @@ function renderLeaderboard() {
   const topCardsContainer = $("top-players-cards");
 
   const playerStats = calculatePlayerStats();
+  // Compute combined score across metrics and sort by it
+  // Weights: games 30%, time 30%, claims 25%, completion 15%
+  const weights = { games: 0.3, time: 0.3, claims: 0.25, completion: 0.15 };
+  const maxGames = Math.max(...playerStats.map((s) => s.gamesPlayed), 1);
+  const maxTime = Math.max(...playerStats.map((s) => s.totalTimeMs), 1);
+  const maxClaims = Math.max(...playerStats.map((s) => s.totalClaims), 1);
+  const maxCompletion = Math.max(
+    ...playerStats.map((s) => s.completionRate),
+    0.0001
+  );
 
-  // Sort based on current sort type
-  if (currentSortType === "games") {
-    playerStats.sort((a, b) => b.gamesPlayed - a.gamesPlayed);
-  } else if (currentSortType === "time") {
-    playerStats.sort((a, b) => b.totalTimeMs - a.totalTimeMs);
-  } else if (currentSortType === "claims") {
-    playerStats.sort((a, b) => b.totalClaims - a.totalClaims);
-  } else if (currentSortType === "completion") {
-    playerStats.sort((a, b) => b.completionRate - a.completionRate);
-  }
+  playerStats.forEach((s) => {
+    const ng = s.gamesPlayed / maxGames;
+    const nt = s.totalTimeMs / maxTime;
+    const nc = s.totalClaims / maxClaims;
+    const ncomp = s.completionRate / (maxCompletion || 100);
+    s.combinedScore =
+      ng * weights.games +
+      nt * weights.time +
+      nc * weights.claims +
+      ncomp * weights.completion;
+  });
 
-  // Update header text
-  const headerTexts = {
-    games: "Games Played",
-    time: "Total Time",
-    claims: "Total Claims",
-    completion: "Completion Rate"
-  };
-  $("metric-header").textContent = headerTexts[currentSortType];
+  playerStats.sort((a, b) => b.combinedScore - a.combinedScore);
+
+  // Update header text to reflect consolidated scoring
+  $("metric-header").textContent = "Overall Score";
 
   // Render table rows
   container.innerHTML = "";
@@ -206,17 +213,10 @@ function renderLeaderboard() {
       : "";
     const fallbackAvatar = `<div class="w-10 h-10 rounded-full bg-ap-accent/20 flex items-center justify-center" style="${stat.pfpLink ? "display:none;" : ""}"><i class="fa-solid fa-user text-ap-accent"></i></div>`;
 
-    // Metric value based on sort type
-    let metricValue = "";
-    if (currentSortType === "games") {
-      metricValue = `<span class="text-lg font-bold text-ap-accent">${stat.gamesPlayed}</span>`;
-    } else if (currentSortType === "time") {
-      metricValue = `<span class="text-lg font-bold text-ap-accent">${formatTime(stat.totalTimeMs)}</span>`;
-    } else if (currentSortType === "claims") {
-      metricValue = `<span class="text-lg font-bold text-ap-accent">${stat.totalClaims}</span>`;
-    } else if (currentSortType === "completion") {
-      metricValue = `<span class="text-lg font-bold text-ap-accent">${stat.completionRate.toFixed(1)}%</span>`;
-    }
+    // Metric value now shows the consolidated score as percent
+    const metricValue = `<span class="text-lg font-bold text-ap-accent">${(
+      stat.combinedScore * 100
+    ).toFixed(1)}%</span>`;
 
     row.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap col-rank">
