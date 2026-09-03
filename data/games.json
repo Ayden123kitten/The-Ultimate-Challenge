@@ -1861,5 +1861,27 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
-  }
+  },
+  {
+    "id": "newsupermariobrosds",
+    "name": "New Super Mario Bros.",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/02785fa8c305e5f22c101f65923d6de4.png",
+    "yaml_slot_name": "NewSMarioBrosDS",
+    "apworld_link": "https://github.com/Lemix028/Archipelago-NewSuperMarioBrosDS/releases/download/nsmbds-v0.4.6-alpha/nsmbds.apworld",
+    "apworld_version": "0.4.6",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://github.com/Lemix028/Archipelago-NewSuperMarioBrosDS/blob/nsmbds/worlds/nsmbds/docs/setup_en.md",
+    "tracker_link": "https://discord.com/channels/731205301247803413/1389178071873097770/1541617083434143834"
+    "support_link": "https://discord.com/channels/731205301247803413/1389178071873097770",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "The poptracker may not currently support 0.4.6. If that is the case, check the support link and make sure there isn't a newer version that does.",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": [],
+    "slot_count": 1
+   }
 ]
