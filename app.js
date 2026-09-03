@@ -291,138 +291,44 @@ function renderGames() {
         : "";
 
     card.innerHTML = `
-            ${inlineEditButtonHtml}
-            <div class="game-card-header">
-                ${
-                  hasCoverImage
-                    ? `
-                    <div class="cover-art-container">
-                        <img src="${game.logo}" alt="${game.name}"
-                             class="cover-art-logo"
-                             onerror="this.style.display='none'">
-                    </div>
-                `
-                    : '<div class="cover-art-container"></div>'
-                }
+      ${inlineEditButtonHtml}
+      <div class="game-card-header">
+        ${
+          hasCoverImage
+            ? `<div class="cover-art-container"><img src="${game.logo}" alt="${game.name}" class="cover-art-logo" onerror="this.style.display='none'"></div>`
+            : '<div class="cover-art-container"></div>'
+        }
+        <div class="game-card-title-time-row">
+          <div class="game-card-title">
+            <h2 class="text-xl font-bold text-white">${game.name}</h2>
+            <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold ${isClaimed ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
+              ${isClaimed ? `Playing: ${game.current_player}` : 'Available'}
+            </span>
+            ${slotHtml}
+          </div>
+          ${
+            showEventTime
+              ? `<div class="game-card-time"><div class="text-xs text-slate-400 uppercase">Total Time</div><div class="text-lg font-mono font-bold text-ap-accent">${formatTime(totalTimeMs)}</div></div>`
+              : ''
+          }
+        </div>
+      </div>
 
-                <div class="game-card-title-time-row">
-                    <div class="game-card-title">
-                        <h2 class="text-xl font-bold text-white">${game.name}</h2>
-                        <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold ${isClaimed ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}">
-                            ${isClaimed ? `Playing: ${game.current_player}` : "Available"}
-                        </span>
-                        ${slotHtml}
-                    </div>
-                    ${
-                      showEventTime
-                        ? `
-                    <div class="game-card-time">
-                        <div class="text-xs text-slate-400 uppercase">Total Time</div>
-                        <div class="text-lg font-mono font-bold text-ap-accent">${formatTime(totalTimeMs)}</div>
-                    </div>
-                    `
-                        : ""
-                    }
-                </div>
-            </div>
+      ${hasRules ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Rules:</span> <span class="break-words overflow-wrap-anywhere">${game.rules}</span></div>` : ''}
 
-            ${
-              hasRules
-                ? `
-                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden">
-                    <span class="text-ap-accent font-semibold">Rules:</span> <span class="break-words overflow-wrap-anywhere">${game.rules}</span>
-                </div>
-            `
-                : ""
-            }
+      ${hasExtraInfo ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Information:</span> <span class="break-words overflow-wrap-anywhere">${game.extra_information}</span></div>` : ''}
 
-            ${
-              hasExtraInfo
-                ? `
-                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden">
-                    <span class="text-ap-accent font-semibold">Information:</span> <span class="break-words overflow-wrap-anywhere">${game.extra_information}</span>
-                </div>
-            `
-                : ""
-            }
+      ${hasCheesetracker ? `<div class="bg-slate-800/50 rounded-lg p-3 border border-slate-700"><div class="flex justify-between items-center mb-2"><span class="text-xs font-bold text-slate-400 uppercase">Cheesetracker Progress</span><span class="text-sm font-mono text-ap-accent">${completedChecks}/${totalChecks} (${checkPercentage}%)</span></div><div class="w-full bg-slate-700 rounded-full h-3 overflow-hidden"><div class="bg-gradient-to-r from-green-500 to-green-400 h-full transition-all duration-500" style="width: ${checkPercentage}%"></div></div></div>` : ''}
 
-            ${
-              hasCheesetracker
-                ? `
-                <div class="bg-slate-800/50 rounded-lg p-3 border border-slate-700">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold text-slate-400 uppercase">Cheesetracker Progress</span>
-                        <span class="text-sm font-mono text-ap-accent">${completedChecks}/${totalChecks} (${checkPercentage}%)</span>
-                    </div>
-                    <div class="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
-                        <div class="bg-gradient-to-r from-green-500 to-green-400 h-full transition-all duration-500" style="width: ${checkPercentage}%"></div>
-                    </div>
-                </div>
-            `
-                : ""
-            }
+      ${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary)).join('')}</div>` : ''}
 
-            ${
-              links.length > 0
-                document.getElementById("inline-new-award-name") || { value: "" }
-                <div class="grid grid-cols-2 gap-2 text-sm min-w-0">
-                    ${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary)).join("")}
-                document.getElementById("inline-new-award-icon") || { value: "" }
-            `
-                : ""
-                document.getElementById("inline-new-award-desc") || { value: "" }
+      <div class="mt-4">
+        <div class="text-center text-xs text-slate-400 mt-2">Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span></div>
+        ${isMyClaim ? `<button onclick="unclaimGame('${game.id}', event)" class="w-full mt-3 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-upload"></i> Mark as Done</button>` : canClaim ? `<button onclick="claimGame('${game.id}', event)" class="w-full mt-3 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Claim Game</button>` : `<button disabled class="w-full mt-3 bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"><i class="fa-solid fa-lock"></i> ${eventNotStarted ? "Event hasn't started" : currentPlayer === '' ? 'Log In on Players Page' : 'Currently Unavailable'}</button>`}
+      </div>
 
-            <div class="mt-auto">
-                alert("Award name is required");
-                  isMyClaim
-                    ? `
-                    <button onclick="unclaimGame('${game.id}', event)" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-upload"></i> Mark as Done
-                const payload = editingAwardOriginal
-                  ? { action: "updateAward", originalName: editingAwardOriginal, awardData: { name, icon, description } }
-                  : { action: "addAward", awardData: { name, icon, description } };
-                    <div class="text-center text-xs text-slate-400 mt-2">
-                        Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span>
-                    </div>
-                `
-                  body: JSON.stringify(payload)
-                      ? `
-                    <button onclick="claimGame('${game.id}', event)" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-play"></i> Claim Game
-                    </button>
-                `
-                      : `
-                      <button disabled class="w-full bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-lock"></i> ${eventNotStarted ? "Event hasn't started" : currentPlayer === "" ? "Log In on Players Page" : "Currently Unavailable"}
-                      </button>
-                    `
-                }
-            </div>
-
-            ${
-              game.logs && game.logs.length > 0
-                ? `
-                <div class="mt-4 border-t border-slate-700 pt-3">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Session Logs</h3>
-                    <div class="max-h-32 overflow-y-auto scrollbar-hide space-y-1">
-                        ${game.logs
-                          .slice()
-                          .reverse()
-                          .map(
-                            (log) => `
-                            <div class="text-xs flex justify-between text-slate-300 bg-slate-800/50 p-2 rounded min-w-0">
-                                <span class="truncate max-w-[60%]"><span class="text-ap-accent">${log.player}</span></span>
-                                <span class="font-mono flex-shrink-0">${formatTime(log.duration_ms)}</span>
-                            </div>
-                        `
-                          )
-                          .join("")}
-                    </div>
-                </div>
-            `
-                : ""
-            }
-        `;
+      ${game.logs && game.logs.length > 0 ? `<div class="mt-4 border-t border-slate-700 pt-3"><h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Session Logs</h3><div class="max-h-32 overflow-y-auto scrollbar-hide space-y-1">${game.logs.slice().reverse().map((log) => `<div class="text-xs flex justify-between text-slate-300 bg-slate-800/50 p-2 rounded min-w-0"><span class="truncate max-w-[60%]"><span class="text-ap-accent">${log.player}</span></span><span class="font-mono flex-shrink-0">${formatTime(log.duration_ms)}</span></div>`).join('')}</div></div>` : ''}
+    `;
     container.appendChild(card);
   });
 }
