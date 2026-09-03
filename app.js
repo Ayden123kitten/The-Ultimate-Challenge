@@ -2775,5 +2775,8 @@ async function assignAward(action) {
   }
 }
 
-loadData();
-setInterval(loadData, 10000);
+// Initialize on DOM ready
+document.addEventListener("DOMContentLoaded", () => {
+  loadData();
+  setInterval(loadData, 10000);
+});
