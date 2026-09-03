@@ -616,4 +616,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Refresh data every 10 seconds
   setInterval(loadData, 10000);
+
+  // Add moderation button to header/nav if user is a moderator
+  (async () => {
+    try {
+      if (AUTH.isLoggedIn()) {
+        const isModerator = await AUTH.checkModerator();
+        if (isModerator) {
+          const nav = document.querySelector("header nav");
+          if (nav) {
+            const modBtn = document.createElement("button");
+            modBtn.id = "moderator-toggle-btn-leaderboard";
+            modBtn.className =
+              "group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all";
+            modBtn.innerHTML =
+              '<i class="fa-solid fa-shield-halved group-hover:text-ap-accent transition-colors"></i><span class="text-sm font-medium hidden xl:inline">Moderation</span>';
+            modBtn.onclick = () => {
+              if (typeof openModeratorModal === "function")
+                openModeratorModal();
+              else window.location = "/settings.html#moderation";
+            };
+            nav.appendChild(modBtn);
+          }
+          const mobileModContainer = $("mobile-moderation-container");
+          if (mobileModContainer) {
+            const modBtnMobile = document.createElement("button");
+            modBtnMobile.className =
+              "flex items-center gap-2 text-slate-400 hover:text-ap-accent transition-colors";
+            modBtnMobile.innerHTML =
+              '<i class="fa-solid fa-shield-halved"></i><span class="text-sm">Moderation</span>';
+            modBtnMobile.onclick = () => {
+              if (typeof openModeratorModal === "function")
+                openModeratorModal();
+              else window.location = "/settings.html#moderation";
+            };
+            mobileModContainer.appendChild(modBtnMobile);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Could not add moderation button:", e);
+    }
+  })();
 });

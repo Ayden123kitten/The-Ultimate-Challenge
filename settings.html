@@ -428,6 +428,39 @@
 
     <script src="auth.js"></script>
     <script>
+      // Add moderation button on Settings page when moderator
+      (async () => {
+        try {
+          if (
+            typeof AUTH !== "undefined" &&
+            AUTH.isLoggedIn &&
+            AUTH.isLoggedIn()
+          ) {
+            const isMod = await AUTH.checkModerator();
+            if (isMod) {
+              const nav = document.querySelector("header nav");
+              if (nav) {
+                const modBtn = document.createElement("button");
+                modBtn.id = "moderator-toggle-btn-settings";
+                modBtn.className =
+                  "group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all";
+                modBtn.innerHTML =
+                  '<i class="fa-solid fa-shield-halved group-hover:text-ap-accent transition-colors"></i><span class="hidden sm:inline">Moderation</span>';
+                modBtn.onclick = () => {
+                  if (typeof openModeratorModal === "function")
+                    openModeratorModal();
+                  else window.location = "/settings.html#moderation";
+                };
+                nav.appendChild(modBtn);
+              }
+            }
+          }
+        } catch (e) {
+          console.warn("Error adding moderation button on settings page", e);
+        }
+      })();
+    </script>
+    <script>
       document.addEventListener("DOMContentLoaded", async () => {
         const form = document.getElementById("settings-form");
         const picInput = document.getElementById("profile-pic");

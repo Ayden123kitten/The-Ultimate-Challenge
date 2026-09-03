@@ -431,6 +431,7 @@ function renderPlayers() {
     // Get moderator icon (admin or moderator)
     const modIcon = getModeratorIcon(stat.name);
     const playerObj = players.find((p) => p.name === stat.name);
+    const playerRank = leaderboardPositions[stat.name] || null;
 
     card.innerHTML = `
             <div style="position: relative;">
@@ -444,6 +445,7 @@ function renderPlayers() {
                 `
                     : ""
                 }
+          ${playerRank ? `<div title="Leaderboard Position" style="position: absolute; bottom: -8px; right: -8px; background: rgba(17,24,39,0.95); border: 2px solid #0ea5e9; color: #0ea5e9; padding: 4px 6px; border-radius: 9999px; font-weight: 700; font-size: 0.75rem;">#${playerRank}</div>` : ""}
             </div>
                 ${modIcon ? `<div style="position: absolute; top: -5px; left: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">${modIcon}</div>` : ""}
             <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
@@ -714,7 +716,20 @@ function showPlayerModal(stat) {
     const awardsList = document.createElement("div");
     awardsList.style.cssText = `display: flex; flex-direction: column; gap: 10px;`;
 
-    playerAwards.forEach((award) => {
+    // Support both award objects stored on the player and award names (strings).
+    playerAwards.forEach((awardEntry) => {
+      // Resolve award data: if stored as string, look up in availableAwards
+      let awardData = null;
+      if (typeof awardEntry === "string") {
+        awardData = availableAwards.find((a) => a.name === awardEntry) || {
+          name: awardEntry
+        };
+      } else if (awardEntry && typeof awardEntry === "object") {
+        awardData = awardEntry;
+      } else {
+        awardData = { name: String(awardEntry) };
+      }
+
       const awardItem = document.createElement("div");
       awardItem.style.cssText = `
                 display: flex; align-items: center; gap: 12px;
@@ -723,21 +738,22 @@ function showPlayerModal(stat) {
 
       // Render icon - check if it's a FontAwesome class or emoji
       let iconHtml = "";
-      if (award.icon && award.icon.startsWith("fa-")) {
-        iconHtml = `<i class="fa-solid ${award.icon}" style="font-size: 1.5rem; color: #38bdf8; min-width: 24px;"></i>`;
+      const icon = awardData.icon || "";
+      if (icon && icon.startsWith && icon.startsWith("fa-")) {
+        iconHtml = `<i class="fa-solid ${icon}" style="font-size: 1.5rem; color: #38bdf8; min-width: 24px;"></i>`;
       } else {
-        iconHtml = `<span style="font-size: 1.5rem; min-width: 24px;">${award.icon || "🏆"}</span>`;
+        iconHtml = `<span style="font-size: 1.5rem; min-width: 24px;">${icon || "🏆"}</span>`;
       }
 
       const awardInfo = document.createElement("div");
       awardInfo.style.cssText = `flex: 1; min-width: 0;`;
 
       const awardName = document.createElement("div");
-      awardName.innerHTML = `${iconHtml} <strong style="color: #38bdf8;">${award.name}</strong>`;
+      awardName.innerHTML = `${iconHtml} <strong style="color: #38bdf8;">${awardData.name}</strong>`;
       awardName.style.cssText = `display: flex; align-items: center; gap: 8px; margin-bottom: 4px;`;
 
       const awardDesc = document.createElement("div");
-      awardDesc.textContent = award.description || "";
+      awardDesc.textContent = awardData.description || "";
       awardDesc.style.cssText = `font-size: 0.85rem; color: #94a3b8; overflow-wrap: anywhere; word-break: break-word;`;
 
       awardInfo.appendChild(awardName);
@@ -884,10 +900,22 @@ try {
     isModerator = await AUTH.checkModerator();
     console.log("Moderator status:", isModerator);
 
-    // Add inline edit mode toggle button to nav if moderator
+    // Add moderation + inline edit buttons to nav if moderator
     if (isModerator) {
       const nav = document.querySelector("header nav");
       if (nav) {
+        const modBtn = document.createElement("button");
+        modBtn.id = "moderator-toggle-btn-players";
+        modBtn.className =
+          "text-slate-400 hover:text-white transition-colors flex items-center gap-2";
+        modBtn.innerHTML =
+          '<i class="fa-solid fa-shield-halved text-slate-400"></i><span class="hidden sm:inline">Moderation</span>';
+        modBtn.onclick = () => {
+          if (typeof openModeratorModal === "function") openModeratorModal();
+          else window.location = "/settings.html#moderation";
+        };
+        nav.appendChild(modBtn);
+
         const inlineEditBtn = document.createElement("button");
         inlineEditBtn.id = "inline-edit-toggle-btn-players";
         inlineEditBtn.className =
@@ -906,6 +934,38 @@ try {
           renderPlayers();
         };
         nav.appendChild(inlineEditBtn);
+      }
+
+      // Also add a mobile moderation link if mobile container exists
+      const mobileModContainer = $("mobile-moderation-container");
+      if (mobileModContainer) {
+        const modBtnMobile = document.createElement("button");
+        modBtnMobile.className =
+          "flex items-center gap-2 text-slate-400 hover:text-ap-accent transition-colors";
+        modBtnMobile.innerHTML =
+          '<i class="fa-solid fa-shield-halved"></i><span class="text-sm">Moderation</span>';
+        modBtnMobile.onclick = () => {
+          if (typeof openModeratorModal === "function") openModeratorModal();
+          else window.location = "/settings.html#moderation";
+        };
+        mobileModContainer.appendChild(modBtnMobile);
+
+        const inlineEditBtnMobile = document.createElement("button");
+        inlineEditBtnMobile.className =
+          "flex items-center gap-2 transition-colors " +
+          (inlineEditMode
+            ? "text-ap-accent"
+            : "text-slate-400 hover:text-white");
+        inlineEditBtnMobile.innerHTML =
+          '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm">Inline Edit</span>';
+        inlineEditBtnMobile.onclick = () => {
+          inlineEditMode = !inlineEditMode;
+          try {
+            localStorage.setItem("inlineEditMode", inlineEditMode.toString());
+          } catch (e) {}
+          renderPlayers();
+        };
+        mobileModContainer.appendChild(inlineEditBtnMobile);
       }
     }
   }
@@ -1031,9 +1091,55 @@ async function openPlayerInlineEditor(playerName, event) {
                 
                 ${rolesHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${rolesHtml}</div>` : ""}
                 ${awardsHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${awardsHtml}</div>` : ""}
-                
+
+                ${
+                  permissions.manageAwards
+                    ? `
+                  <div id="inline-awards-management" class="mt-4 border-t border-slate-700 pt-4">
+                    <label class="text-sm font-semibold text-slate-300">Manage Awards</label>
+                    <div id="inline-awards-list" class="mt-2 space-y-2">
+                      ${
+                        availableAwards.length > 0
+                          ? availableAwards
+                              .map(
+                                (a) => `
+                        <div class="flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded">
+                          <div class="flex items-center gap-3">
+                            ${a.icon && a.icon.startsWith && a.icon.startsWith("fa-") ? `<i class="fa-solid ${a.icon}" style="color: #38bdf8;"></i>` : `<span style="font-size:1.2rem;">${a.icon || "🏆"}</span>`}
+                            <div style="min-width:0;">
+                              <div style="color:#e2e8f0; font-weight:700;">${a.name}</div>
+                              <div style="color:#94a3b8; font-size:0.85rem;">${a.description || ""}</div>
+                            </div>
+                          </div>
+                          <div style="display:flex; gap:8px;">
+                            <button onclick="assignAwardToPlayer('add', ${JSON.stringify(player.name)}, ${JSON.stringify(a.name)}, ${JSON.stringify(a.icon || "")}, ${JSON.stringify(a.description || "")})" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">Assign</button>
+                            <button onclick="assignAwardToPlayer('remove', ${JSON.stringify(player.name)}, ${JSON.stringify(a.name)})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Remove</button>
+                          </div>
+                        </div>
+                      `
+                              )
+                              .join("")
+                          : '<div class="text-slate-500">No awards defined.</div>'
+                      }
+                    </div>
+
+                    <div class="mt-3">
+                      <label class="text-sm font-semibold text-slate-300">Add Award</label>
+                      <div class="mt-2 grid grid-cols-1 gap-2">
+                        <input id="inline-new-award-name" type="text" placeholder="Award name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <input id="inline-new-award-icon" type="text" placeholder="Icon (fa-class or emoji)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <input id="inline-new-award-desc" type="text" placeholder="Short description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <div class="flex gap-2">
+                          <button onclick="addNewAward(${JSON.stringify(player.name)})" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Create Award</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `
+                    : ""
+                }
+
                 <div class="flex gap-2 mt-4">
-                  ${permissions.manageAwards ? `<button id="manage-awards-btn" onclick="window.open('/settings.html#awards','_blank')" class="bg-transparent text-slate-400 hover:text-white font-bold py-2 px-4 rounded-lg">Manage Awards</button>` : ""}
                   <button onclick="saveInlineEditedPlayer('${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
                   <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
                 </div>
@@ -1201,6 +1307,76 @@ async function saveInlineEditedPlayer(playerName) {
     alert("Player updated successfully!");
     closeModeratorModal();
     loadData();
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+}
+
+// Assign or remove an award for a player via /api/manage-awards
+async function assignAwardToPlayer(
+  action,
+  playerName,
+  awardName,
+  icon = "",
+  description = ""
+) {
+  try {
+    const body = {
+      action: "assignAward",
+      assignAwardData: {
+        playerName,
+        awardName,
+        action,
+        icon,
+        description
+      }
+    };
+
+    const res = await fetch("/api/manage-awards", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok)
+      throw new Error(data.error || data.message || "Failed to update award");
+    alert(data.message || "Award updated");
+    await loadData();
+    openPlayerInlineEditor(playerName);
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+}
+
+// Add a new award to the awards list
+async function addNewAward(playerName) {
+  const name = (
+    document.getElementById("inline-new-award-name") || { value: "" }
+  ).value.trim();
+  const icon = (
+    document.getElementById("inline-new-award-icon") || { value: "" }
+  ).value.trim();
+  const description = (
+    document.getElementById("inline-new-award-desc") || { value: "" }
+  ).value.trim();
+  if (!name) {
+    alert("Award name is required");
+    return;
+  }
+
+  try {
+    const body = { action: "addAward", awardData: { name, icon, description } };
+    const res = await fetch("/api/manage-awards", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok)
+      throw new Error(data.error || data.message || "Failed to add award");
+    alert(data.message || "Award added");
+    await loadData();
+    openPlayerInlineEditor(playerName);
   } catch (err) {
     alert("Error: " + err.message);
   }
