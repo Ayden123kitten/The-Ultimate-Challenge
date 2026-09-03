@@ -68,9 +68,9 @@ async function loadData() {
     const baseRawUrl = `https://raw.githubusercontent.com/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/${CONFIG.BRANCH}/data`;
 
     const [gamesRes, playersRes, settingsRes] = await Promise.all([
-      fetch(`/api/get-data?type=games&t=${Date.now()}`), // ✅ Fixed
-      fetch(`/api/get-data?type=players&t=${Date.now()}`), // ✅ Fixed
-      fetch(`${baseRawUrl}/settings.json?t=${Date.now()}`)
+      fetch(`/api/get-data?type=games&t=${Date.now()}`),
+      fetch(`/api/get-data?type=players&t=${Date.now()}`),
+      fetch(`/api/get-data?type=settings&t=${Date.now()}`)
     ]);
 
     if (!gamesRes.ok) throw new Error(`Games API: ${gamesRes.status}`);
