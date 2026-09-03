@@ -29,27 +29,21 @@ function formatTime(ms) {
 let editingAwardOriginal = null;
 
 async function deleteAwardInline(awardName) {
-  if (
-    !confirm(
-      `Delete award "${awardName}"? This will remove it from all players.`
-    )
-  )
-    return;
+  if (!confirm(`Delete award "${awardName}"? This will remove it from all players.`)) return;
   try {
-    const res = await fetch("/api/manage-awards", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
-      body: JSON.stringify({ action: "deleteAward", awardName })
+    const res = await fetch('/api/manage-awards', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+      body: JSON.stringify({ action: 'deleteAward', awardName })
     });
     const data = await res.json();
-    if (!res.ok)
-      throw new Error(data.error || data.message || "Failed to delete award");
-    alert(data.message || "Award deleted");
+    if (!res.ok) throw new Error(data.error || data.message || 'Failed to delete award');
+    alert(data.message || 'Award deleted');
     await loadAwards();
     await loadData();
     openModeratorModal();
   } catch (err) {
-    alert("Error: " + err.message);
+    alert('Error: ' + err.message);
   }
 }
 
@@ -370,26 +364,28 @@ function renderGames() {
 
             ${
               links.length > 0
-                ? `
+                document.getElementById("inline-new-award-name") || { value: "" }
                 <div class="grid grid-cols-2 gap-2 text-sm min-w-0">
                     ${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary)).join("")}
-                </div>
+                document.getElementById("inline-new-award-icon") || { value: "" }
             `
                 : ""
-            }
+                document.getElementById("inline-new-award-desc") || { value: "" }
 
             <div class="mt-auto">
-                ${
+                alert("Award name is required");
                   isMyClaim
                     ? `
                     <button onclick="unclaimGame('${game.id}', event)" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <i class="fa-solid fa-upload"></i> Mark as Done
-                    </button>
+                const payload = editingAwardOriginal
+                  ? { action: "updateAward", originalName: editingAwardOriginal, awardData: { name, icon, description } }
+                  : { action: "addAward", awardData: { name, icon, description } };
                     <div class="text-center text-xs text-slate-400 mt-2">
                         Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span>
                     </div>
                 `
-                    : canClaim
+                  body: JSON.stringify(payload)
                       ? `
                     <button onclick="claimGame('${game.id}', event)" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <i class="fa-solid fa-play"></i> Claim Game
@@ -694,6 +690,648 @@ function openEventTimerSettingsModal() {
   startInput.addEventListener("change", updatePreview);
   endInput.addEventListener("change", updatePreview);
   updatePreview();
+}
+
+// Save event time settings
+async function saveEventTimeSettings() {
+  const startTime = $("event-start-time-input").value;
+  const endTime = $("event-end-time-input").value;
+
+  try {
+    const res = await fetch("/api/moderator-actions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
+      body: JSON.stringify({
+        action: "updateSettings",
+        settingsData: {
+          start_time: startTime,
+          end_time: endTime
+        }
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    alert("Event timer settings updated successfully!");
+    closeModeratorModal();
+    loadData();
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+}
+
+// Initialize
+setInterval(updateGlobalTimer, 1000);
+setInterval(() => {
+  if (games.some((g) => g.current_player === currentPlayer)) {
+    renderGames();
+  }
+}, 1000);
+
+// Also periodically update completed games count in case data is refreshed
+setInterval(updateCompletedGamesCount, 5000);
+
+// Search functionality
+const searchInput = $("games-search");
+if (searchInput) {
+  searchInput.addEventListener("input", (e) => {
+    searchQuery = e.target.value;
+    renderGames();
+  });
+}
+
+// Sort functionality
+const sortSelect = $("games-sort");
+if (sortSelect) {
+  sortSelect.addEventListener("change", (e) => {
+    gamesSortOption = e.target.value;
+    renderGames();
+  });
+}
+
+// Filter functionality
+const filterSelect = $("games-filter");
+if (filterSelect) {
+  filterSelect.addEventListener("change", (e) => {
+    gamesFilterOption = e.target.value;
+    renderGames();
+  });
+}
+
+// Logout button (if present on this page)
+const logoutBtn = $("logout-btn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => AUTH.logout());
+}
+
+// Moderator status check and panel setup
+let isModerator = false;
+let isAdmin = false;
+let inlineEditMode = false; // Track inline edit mode state
+
+// Load inline edit mode preference from localStorage
+try {
+  const savedMode = localStorage.getItem("inlineEditMode");
+  inlineEditMode = savedMode === "true";
+} catch (e) {
+  console.warn("Could not load inline edit mode preference:", e);
+}
+
+(async () => {
+  if (AUTH.isLoggedIn()) {
+    isModerator = await AUTH.checkModerator();
+    isAdmin = await AUTH.checkAdmin();
+    console.log("Moderator status:", isModerator);
+    console.log("Admin status:", isAdmin);
+
+    // Add moderator button to header if user is a moderator
+    if (isModerator) {
+      const navSection = $("nav-container");
+      if (navSection) {
+        const modBtn = document.createElement("button");
+        modBtn.id = "moderator-toggle-btn";
+        modBtn.className =
+          "group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all";
+        modBtn.innerHTML =
+          '<i class="fa-solid fa-shield-halved group-hover:text-ap-accent transition-colors"></i><span class="text-sm font-medium hidden xl:inline">Moderation</span>';
+        modBtn.onclick = openModeratorModal;
+        navSection.appendChild(modBtn);
+
+        // Add inline edit mode toggle button
+        const inlineEditBtn = document.createElement("button");
+        inlineEditBtn.id = "inline-edit-toggle-btn";
+        inlineEditBtn.className =
+          "group flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
+          (inlineEditMode
+            ? "text-ap-accent bg-ap-accent/20"
+            : "text-slate-400 hover:text-white hover:bg-slate-700/50");
+        inlineEditBtn.innerHTML =
+          '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm font-medium hidden xl:inline">Inline Edit</span>';
+        inlineEditBtn.onclick = toggleInlineEditMode;
+        inlineEditBtn.title = "Toggle inline editing mode";
+        navSection.appendChild(inlineEditBtn);
+      }
+
+      // Add to mobile menu as well
+      const mobileModContainer = $("mobile-moderation-container");
+      if (mobileModContainer) {
+        const modBtnMobile = document.createElement("button");
+        // Use the same mobile nav button classes as other pages for consistency
+        modBtnMobile.className =
+          "mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all";
+        modBtnMobile.innerHTML =
+          '<i class="fa-solid fa-shield-halved"></i><span class="text-sm">Moderation</span>';
+        modBtnMobile.onclick = openModeratorModal;
+        mobileModContainer.appendChild(modBtnMobile);
+
+        const inlineEditBtnMobile = document.createElement("button");
+        inlineEditBtnMobile.className =
+          "mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
+          (inlineEditMode
+            ? "text-ap-accent bg-ap-accent/20"
+            : "text-slate-400 hover:text-white hover:bg-slate-700/50");
+        inlineEditBtnMobile.innerHTML =
+          '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm">Inline Edit</span>';
+        inlineEditBtnMobile.onclick = toggleInlineEditMode;
+        inlineEditBtnMobile.title = "Toggle inline editing mode";
+        mobileModContainer.appendChild(inlineEditBtnMobile);
+      }
+    }
+  }
+})();
+
+// Toggle inline edit mode
+function toggleInlineEditMode() {
+  inlineEditMode = !inlineEditMode;
+  try {
+    localStorage.setItem("inlineEditMode", inlineEditMode.toString());
+  } catch (e) {
+    console.warn("Could not save inline edit mode preference:", e);
+  }
+
+  // Update button appearance
+  const btn = $("inline-edit-toggle-btn");
+  if (btn) {
+    btn.className =
+      "group flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
+      (inlineEditMode
+        ? "text-ap-accent bg-ap-accent/20"
+        : "text-slate-400 hover:text-white hover:bg-slate-700/50");
+  }
+
+  // Re-render components with inline edit buttons
+  renderGames();
+  updateGlobalTimer(); // This will add edit button to timer
+
+  // If on players page, re-render players
+  if (typeof renderPlayers === "function") {
+    renderPlayers();
+  }
+
+  // If on leaderboard page, re-render leaderboard
+  if (typeof renderLeaderboard === "function") {
+    renderLeaderboard(currentTab || "games");
+  }
+}
+
+// Moderator modal functions
+async function openModeratorModal() {
+  const modal = $("moderator-modal");
+  const content = $("moderator-panel-content");
+
+  if (!modal || !content) return;
+
+  // Fetch current user's permissions
+  let permissions = {
+    manageModerators: false,
+    manageGames: false,
+    managePlayers: false,
+    manageRoles: false,
+    manageAwards: false,
+    manageSettings: false
+  };
+
+  try {
+    permissions = await AUTH.getPermissions();
+  } catch (error) {
+    console.error("Failed to fetch permissions:", error);
+  }
+
+  // Build HTML based on permissions
+  let htmlContent = '<div class="space-y-6">';
+
+  // ========== GAME MANAGEMENT SECTION ==========
+  
+  // Add Game Section (requires manageGames permission)
+  if (permissions.manageGames) {
+    htmlContent += `
+            <!-- Add Game Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-plus text-green-400 mr-2"></i>Add New Game</h3>
+                <form id="add-game-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="game-name" placeholder="Game Name *" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white" required>
+                    <input type="text" id="game-id" placeholder="Game ID (unique) *" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white" required>
+                    <input type="text" id="game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="game-logo" placeholder="Logo URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="game-apworld-link" placeholder="Apworld Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="game-apworld-version" placeholder="Apworld Version (or 'Core')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="game-mod-link" placeholder="Mod Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="game-mod-version" placeholder="Mod Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="game-mod-setup-guide-link" placeholder="Setup Guide Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="game-tracker-link" placeholder="Tracker Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="game-support-link" placeholder="Support Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="game-save-file-link" placeholder="Save File Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="game-game-info-link" placeholder="Game Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="number" id="game-slot-count" placeholder="Slot Count (0 = no limit)" min="0" value="1" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <textarea id="game-rules" placeholder="Rules" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
+                    <textarea id="game-extra-information" placeholder="Extra Information" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg md:col-span-2">Add Game</button>
+                </form>
+                <!-- Live Preview -->
+                <div class="mt-6 pt-4 border-t border-slate-700">
+                    <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                    <div id="add-game-preview" class="glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50">
+                        <div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>
+                    </div>
+                </div>
+            </div>`;
+  }
+
+  // Edit Game Section (requires manageGames permission)
+  if (permissions.manageGames) {
+    htmlContent += `
+            <!-- Edit Game Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-pen-to-square text-ap-accent mr-2"></i>Edit Game</h3>
+                <select id="edit-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
+                    <option value="">Select a game...</option>
+                    ${games
+                      .slice()
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((g) => `<option value="${g.id}">${g.name}</option>`)
+                      .join("")}
+                </select>
+                <div id="edit-game-form-container" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="edit-game-name" placeholder="Game Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="edit-game-id" placeholder="Game ID" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white" disabled>
+                    <input type="text" id="edit-game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="edit-game-logo" placeholder="Logo URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="edit-game-apworld-link" placeholder="Apworld Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="edit-game-apworld-version" placeholder="Apworld Version (or 'Core')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="edit-game-mod-link" placeholder="Mod Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="text" id="edit-game-mod-version" placeholder="Mod Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="edit-game-mod-setup-guide-link" placeholder="Setup Guide Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="edit-game-tracker-link" placeholder="Tracker Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="edit-game-support-link" placeholder="Support Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="edit-game-save-file-link" placeholder="Save File Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="url" id="edit-game-game-info-link" placeholder="Game Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <input type="number" id="edit-game-slot-count" placeholder="Slot Count (0 = no limit)" min="0" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                    <textarea id="edit-game-rules" placeholder="Rules" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
+                    <textarea id="edit-game-extra-information" placeholder="Extra Information" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
+                    <button onclick="saveEditedGame()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg md:col-span-2">Save Changes</button>
+                </div>
+                <!-- Live Preview -->
+                <div id="edit-game-preview-container" class="hidden mt-6 pt-4 border-t border-slate-700">
+                    <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                    <div id="edit-game-preview" class="glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50"></div>
+                </div>
+            </div>`;
+  }
+
+  // Remove Game Section (requires manageGames permission)
+  if (permissions.manageGames) {
+    htmlContent += `
+            <!-- Remove Game Section -->
+            <div class="glass rounded-lg p-4">
+              <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-trash text-red-400 mr-2"></i>Remove Game</h3>
+              <p class="text-sm text-slate-400 mb-3">Select a game to permanently remove it (this also deletes logs and Cheesetracker entries).</p>
+              <select id="remove-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
+                <option value="">Select a game...</option>
+                ${games
+                  .slice()
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((g) => `<option value="${g.id}">${g.name}</option>`)
+                  .join("")}
+              </select>
+              <div class="flex gap-2">
+                <button id="remove-game-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg w-full">Remove Game</button>
+              </div>
+            </div>`;
+  }
+
+  // Edit Player Section (requires managePlayers permission)
+  if (permissions.managePlayers) {
+    htmlContent += `
+            <!-- Edit Player Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-user-pen text-ap-accent mr-2"></i>Edit Player</h3>
+                <select id="edit-player-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
+                    <option value="">Select a player...</option>
+                    ${players
+                      .slice()
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map(
+                        (p) => `<option value="${p.name}">${p.name}</option>`
+                      )
+                      .join("")}
+                </select>
+                <div id="edit-player-form-container" class="hidden space-y-4">
+                    <input type="text" id="edit-player-new-name" placeholder="New Name (optional)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                    <input type="url" id="edit-player-pfp" placeholder="Profile Picture URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                    <textarea id="edit-player-bio" placeholder="Bio" rows="3" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full"></textarea>
+                    <input type="text" id="edit-player-pronouns" placeholder="Pronouns" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                    <input type="text" id="edit-player-discord" placeholder="Discord Username" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                    <button onclick="saveEditedPlayer()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Changes</button>
+                    <button onclick="deletePlayer()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg w-full">Delete Player</button>
+                </div>
+                <!-- Live Preview -->
+                <div id="edit-player-preview-container" class="hidden mt-6 pt-4 border-t border-slate-700">
+                    <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                    <div id="edit-player-preview" class="glass rounded-xl p-6 flex items-center gap-4"></div>
+                </div>
+            </div>`;
+  }
+
+  // Edit Logs Section (requires managePlayers permission)
+  if (permissions.managePlayers) {
+    htmlContent += `
+            <!-- Edit Logs Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-list-check text-ap-accent mr-2"></i>Edit Game Logs</h3>
+                <select id="edit-log-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
+                    <option value="">Select a game...</option>
+                    ${games
+                      .slice()
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map(
+                        (g) =>
+                          `<option value="${g.id}">${g.name} (${g.logs?.length || 0} logs)</option>`
+                      )
+                      .join("")}
+                </select>
+                <div id="edit-logs-container" class="hidden space-y-2 max-h-64 overflow-y-auto"></div>
+            </div>`;
+  }
+
+  // Player Roles Section (requires manageRoles permission)
+  if (permissions.manageRoles) {
+    htmlContent += `
+            <!-- Player Roles Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-shield text-purple-400 mr-2"></i>Manage Player Roles</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Add New Role</h4>
+                        <div class="flex gap-2">
+                            <input type="text" id="new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
+                            <input type="color" id="new-role-color" value="#ff0000" class="bg-slate-800/50 border border-slate-700 rounded-lg px-2 py-2 h-10 w-12">
+                            <button onclick="addNewRole()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Role</button>
+                        </div>
+                        <!-- Live Preview -->
+                        <div class="mt-3 pt-3 border-t border-slate-700">
+                            <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
+                            <div id="add-role-preview" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700">
+                                <span class="text-sm text-slate-400">Start typing to see preview...</span>
+                            </div>
+                        </div>
+                        <!-- Tabs: Create / Edit Roles -->
+                        <div class="mt-3">
+                          <div class="flex gap-2">
+                            <button id="roles-tab-create" class="px-3 py-1 rounded bg-ap-accent text-slate-900 text-sm" onclick="switchRolesTab('create')">Create Role</button>
+                            <button id="roles-tab-edit" class="px-3 py-1 rounded bg-slate-700 text-sm text-slate-300" onclick="switchRolesTab('edit')">Edit Roles</button>
+                          </div>
+                          <div id="roles-tab-content-create" class="mt-3"></div>
+                          <div id="roles-tab-content-edit" class="mt-3 hidden">
+                            <div id="roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
+                          </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Roles</h4>
+                        <select id="role-player-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+                            <option value="">Select a player...</option>
+                            ${players
+                              .slice()
+                              .sort((a, b) => a.name.localeCompare(b.name))
+                              .map(
+                                (p) =>
+                                  `<option value="${p.name}">${p.name}</option>`
+                              )
+                              .join("")}
+                        </select>
+                        <select id="role-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+                            <option value="">Select a role...</option>
+                        </select>
+                        <div class="flex gap-2">
+                            <button onclick="assignRole('add')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Assign Role</button>
+                            <button onclick="assignRole('remove')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Role</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+  }
+
+  // Manage Awards Section (requires manageAwards permission)
+  if (permissions.manageAwards) {
+    htmlContent += `
+            <!-- Manage Awards Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-trophy text-yellow-300 mr-2"></i>Manage Awards</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Create New Award</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="award-name-input" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                            <input type="text" id="award-icon-input" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                            <textarea id="award-description-input" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
+                            <!-- Tabs: Create / Edit Awards -->
+                            <div class="md:col-span-2 mt-3">
+                              <div class="flex gap-2">
+                                <button id="awards-tab-create" class="px-3 py-1 rounded bg-ap-accent text-slate-900 text-sm" onclick="switchAwardsTab('create')">Create Award</button>
+                                <button id="awards-tab-edit" class="px-3 py-1 rounded bg-slate-700 text-sm text-slate-300" onclick="switchAwardsTab('edit')">Edit Awards</button>
+                              </div>
+                              <div id="awards-tab-content-create" class="mt-3"></div>
+                              <div id="awards-tab-content-edit" class="mt-3 hidden">
+                                <div id="awards-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-4 glass rounded-lg">
+                            <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
+                            <div id="award-preview" class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                                <span id="preview-icon" class="text-2xl w-8 text-center"></span>
+                                <div>
+                                    <div id="preview-name" class="font-bold text-white">Award Name</div>
+                                    <div id="preview-description" class="text-xs text-slate-400">Description will appear here</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="createAward()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg mt-4 w-full">Create Award</button>
+                    </div>
+                    <div class="border-t border-slate-700 pt-4">
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Award</h4>
+                        <select id="award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+                            <option value="">Select an award...</option>
+                        </select>
+                        <select id="award-player-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+                            <option value="">Select a player...</option>
+                        </select>
+                        <div class="flex gap-2">
+                            <button onclick="assignAward('add')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Give Award</button>
+                            <button onclick="assignAward('remove')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Award</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+  }
+
+  // Manage Moderators Section (requires manageModerators permission - inherently admin)
+  if (permissions.manageModerators) {
+    htmlContent += `
+            <!-- Manage Moderators Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-shield-halved text-yellow-400 mr-2"></i>Manage Moderators</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Add/Remove Moderator</h4>
+                        <div class="flex gap-2 mb-2">
+                            <select id="moderator-name-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
+                                <option value="">Select a player...</option>
+                                ${players
+                                  .slice()
+                                  .sort((a, b) => a.name.localeCompare(b.name))
+                                  .map(
+                                    (p) =>
+                                      `<option value="${p.name}">${p.name}</option>`
+                                  )
+                                  .join("")}
+                            </select>
+                            <button onclick="manageModerator('add')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Moderator</button>
+                            <button onclick="manageModerator('remove')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg">Remove Moderator</button>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Set Admin</h4>
+                        <div class="flex gap-2 mb-2">
+                            <select id="admin-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
+                                <option value="">Select a moderator...</option>
+                            </select>
+                            <button onclick="setAdmin()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg">Set as Admin</button>
+                        </div>
+                        <p class="text-xs text-slate-400">Warning: This will transfer admin privileges to the selected moderator. The current admin will remain as a regular moderator unless removed.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Edit Moderator Permissions</h4>
+                        <select id="moderator-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+                            <option value="">Select a moderator...</option>
+                        </select>
+                        <div id="moderator-permissions-container" class="hidden space-y-2">
+                            <label class="flex items-center gap-2 text-sm text-slate-300">
+                                <input type="checkbox" id="perm-manageModerators" class="rounded bg-slate-800 border-slate-700">
+                                Manage Moderators
+                            </label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300">
+                                <input type="checkbox" id="perm-manageGames" class="rounded bg-slate-800 border-slate-700">
+                                Manage Games
+                            </label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300">
+                                <input type="checkbox" id="perm-managePlayers" class="rounded bg-slate-800 border-slate-700">
+                                Manage Players
+                            </label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300">
+                                <input type="checkbox" id="perm-manageRoles" class="rounded bg-slate-800 border-slate-700">
+                                Manage Roles
+                            </label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300">
+                                <input type="checkbox" id="perm-manageAwards" class="rounded bg-slate-800 border-slate-700">
+                                Manage Awards
+                            </label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300">
+                                <input type="checkbox" id="perm-manageSettings" class="rounded bg-slate-800 border-slate-700">
+                                Manage Settings
+                            </label>
+                            <button onclick="updateModeratorPermissions()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full mt-2">Update Permissions</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+  }
+
+  // Cheesetracker Settings Section (requires manageSettings permission)
+  if (permissions.manageSettings) {
+    htmlContent += `
+            <!-- Cheesetracker Settings Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-link text-orange-400 mr-2"></i>Cheesetracker Integration</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Cheesetracker URL</label>
+                        <input type="url" id="cheesetracker-url-input" value="${settings.cheesetracker_url || ""}" placeholder="https://cheesetrackers.theincrediblewheelofchee.se/..." class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                        <p class="text-xs text-slate-400 mt-2">Enter the URL to your Cheesetracker page to enable automatic check tracking and progress display.</p>
+                    </div>
+                    <button onclick="updateCheesetrackerSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Cheesetracker Settings</button>
+                </div>
+            </div>`;
+  }
+
+  // Event Time Settings Section (requires manageSettings permission)
+  if (permissions.manageSettings) {
+    htmlContent += `
+            <!-- Event Time Settings Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-cyan-400 mr-2"></i>Event Time Settings</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
+                        <input type="datetime-local" id="event-start-time-input" value="${settings.start_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                        <p class="text-xs text-slate-400 mt-2">Set when the event starts. Before this time, a countdown will be shown.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Event End Time (optional)</label>
+                        <input type="datetime-local" id="event-end-time-input" value="${settings.end_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                        <p class="text-xs text-slate-400 mt-2">Set when the event ends. Leave empty for an ongoing event.</p>
+                    </div>
+                    <button onclick="updateEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Event Time Settings</button>
+                </div>
+            </div>`;
+  }
+
+  // Event Timer Preview (always show)
+  htmlContent += `
+            <!-- Live Preview -->
+            <div class="glass rounded-lg p-4">
+                <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                <div id="event-timer-preview" class="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                    <div class="text-center">
+                        <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent">${formatTime(Date.now() - (settings.start_time ? new Date(settings.start_time).getTime() : 0))}</div>
+                        <div id="preview-status" class="text-xs text-slate-400 uppercase">${settings.start_time ? "Event Live" : "Not Set"}</div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+  content.innerHTML = htmlContent;
+
+  modal.classList.remove("hidden");
+
+  // Update preview on input change
+  const startInput = $("event-start-time-input");
+  const endInput = $("event-end-time-input");
+
+  function updatePreview() {
+    const previewTimer = $("preview-timer");
+    const previewStatus = $("preview-status");
+
+    const startTime = startInput.value;
+    const endTime = endInput.value;
+
+    if (!startTime) {
+      previewTimer.textContent = "0:00:00";
+      previewStatus.textContent = "Not Set";
+      return;
+    }
+
+    const now = Date.now();
+    const start = new Date(startTime).getTime();
+    const end = endTime ? new Date(endTime).getTime() : null;
+
+    if (now < start) {
+      previewTimer.textContent = formatTime(start - now);
+      previewStatus.textContent = "Starts In";
+      previewStatus.className = "text-xs text-yellow-400 uppercase";
+    } else if (end === null || (now >= start && now <= end)) {
+      previewTimer.textContent = formatTime(now - start);
+      previewStatus.textContent = "Event Live";
+      previewStatus.className = "text-xs text-green-400 uppercase";
+    } else {
+      previewTimer.textContent = formatTime(now - end);
+      previewStatus.textContent = "Event Ended";
+      previewStatus.className = "text-xs text-red-400 uppercase";
+    }
+  }
+
+  startInput.addEventListener("change", updatePreview);
+  endInput.addEventListener("change", updatePreview);
+  updatePreview();
 
   // Setup form handlers
   const addGameForm = $("add-game-form");
@@ -911,55 +1549,225 @@ function openEventTimerSettingsModal() {
     ].filter((l) => l.url && l.url.trim() !== "");
 
     previewElement.innerHTML = `
-      <div class="game-card-header">
-        ${
-          hasCoverImage
-            ? `
-              <div class="cover-art-container">
-                <img src="${game.logo}" alt="${game.name}" class="cover-art-logo" onerror="this.style.display='none'">
+            <div class="game-card-header flex gap-4">
+          <div class="glass rounded-lg p-4">
+            <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-ap-accent mr-2"></i>Event Timer Settings & Preview</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+              <div>
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
+                    <input type="datetime-local" id="event-start-time-input" value="${settings.start_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                    <p class="text-xs text-slate-400 mt-2">Set when the event starts. Before this time, a countdown will be shown.</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">Event End Time (optional)</label>
+                    <input type="datetime-local" id="event-end-time-input" value="${settings.end_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                    <p class="text-xs text-slate-400 mt-2">Set when the event ends. Leave empty for an ongoing event.</p>
+                  </div>
+                  <div class="flex gap-2">
+                    <button onclick="saveEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Settings</button>
+                    <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
+                  </div>
+                </div>
               </div>
-            `
-            : '<div class="cover-art-container"></div>'
-        }
-
-        <div class="game-card-title-time-row">
-          <div class="game-card-title">
-            <h2 class="text-xl font-bold text-white">${game.name}</h2>
-            <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold bg-green-500/20 text-green-400">Available</span>
+              <div>
+                <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                <div id="event-timer-preview" class="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                  <div class="text-center w-full">
+                    <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent">${formatTime(Date.now() - (settings.start_time ? new Date(settings.start_time).getTime() : 0))}</div>
+                    <div id="preview-status" class="text-xs text-slate-400 uppercase">${settings.start_time ? "Event Live" : "Not Set"}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+          </div>
+              links.length > 0
+                ? `
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    ${links
+                      .map(
+                        (link) => `
+                        <a href="#" class="flex items-center gap-2 p-2 rounded border ${link.primary ? "bg-ap-accent/20 text-ap-accent border-ap-accent/30" : "bg-slate-800 text-slate-400 border-slate-700"}">
+                            <i class="fa-solid ${link.icon}"></i>
+                            <span class="truncate">${link.label}</span>
+                        </a>
+                    `
+                      )
+                      .join("")}
+                </div>
+            `
+                : '<p class="text-sm text-slate-500 italic">No links added yet</p>'
+            }
+        `;
+  }
 
-      ${
-        hasRules
-          ? `
-            <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden">
-              <span class="text-ap-accent font-semibold">Rules:</span> <span class="break-words overflow-wrap-anywhere">${game.rules}</span>
-            </div>
-        `
-          : ""
-      }
+  // Add Game Live Preview
+  const addGameInputs = [
+    "game-name",
+    "game-id",
+    "game-logo",
+    "game-apworld-link",
+    "game-apworld-version",
+    "game-mod-link",
+    "game-mod-version",
+    "game-mod-setup-guide-link",
+    "game-tracker-link",
+    "game-game-info-link",
+    "game-support-link",
+    "game-save-file-link",
+    "game-rules",
+    "game-extra-information"
+  ];
+  addGameInputs.forEach((id) => {
+    const input = $(id);
+    if (input) {
+      input.addEventListener("input", () => {
+        const previewEl = $("add-game-preview");
+        if (!previewEl) return;
 
-      ${
-        hasExtraInfo
-          ? `
-            <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden">
-              <span class="text-ap-accent font-semibold">Information:</span> <span class="break-words overflow-wrap-anywhere">${game.extra_information}</span>
-            </div>
-        `
-          : ""
-      }
+        const gameData = {
+          name: $("game-name").value.trim() || "Game Name",
+          logo: $("game-logo").value.trim(),
+          apworld_link: $("game-apworld-link").value.trim(),
+          apworld_version: $("game-apworld-version").value.trim(),
+          mod_link: $("game-mod-link").value.trim(),
+          mod_version: $("game-mod-version").value.trim(),
+          mod_setup_guide_link: $("game-mod-setup-guide-link").value.trim(),
+          tracker_link: $("game-tracker-link").value.trim(),
+          game_info_link: $("game-game-info-link").value.trim(),
+          support_link: $("game-support-link").value.trim(),
+          save_file_link: $("game-save-file-link").value.trim(),
+          rules: $("game-rules").value.trim(),
+          extra_information: $("game-extra-information").value.trim()
+        };
 
-      ${
-        links.length > 0
-          ? `
-            <div class="grid grid-cols-2 gap-2 text-sm min-w-0">
-              ${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary)).join("")}
-            </div>
-        `
-          : '<p class="text-sm text-slate-500 italic">No links added yet</p>'
-      }
-    `;
+        renderGameCardPreview(gameData, previewEl);
+      });
+    }
+  });
+
+  // Edit Game Live Preview
+  const editGameInputs = [
+    "edit-game-name",
+    "edit-game-logo",
+    "edit-game-apworld-link",
+    "edit-game-apworld-version",
+    "edit-game-mod-link",
+    "edit-game-mod-version",
+    "edit-game-mod-setup-guide-link",
+    "edit-game-tracker-link",
+    "edit-game-game-info-link",
+    "edit-game-support-link",
+    "edit-game-save-file-link",
+    "edit-game-rules",
+    "edit-game-extra-information"
+  ];
+  editGameInputs.forEach((id) => {
+    const input = $(id);
+    if (input) {
+      input.addEventListener("input", () => {
+        const previewContainer = $("edit-game-preview-container");
+        const previewEl = $("edit-game-preview");
+        if (!previewContainer || !previewEl) return;
+
+        previewContainer.classList.remove("hidden");
+
+        const gameData = {
+          name: $("edit-game-name").value.trim() || "Game Name",
+          logo: $("edit-game-logo").value.trim(),
+          apworld_link: $("edit-game-apworld-link").value.trim(),
+          apworld_version: $("edit-game-apworld-version").value.trim(),
+          mod_link: $("edit-game-mod-link").value.trim(),
+          mod_version: $("edit-game-mod-version").value.trim(),
+          mod_setup_guide_link: $(
+            "edit-game-mod-setup-guide-link"
+          ).value.trim(),
+          tracker_link: $("edit-game-tracker-link").value.trim(),
+          game_info_link: $("edit-game-game-info-link").value.trim(),
+          support_link: $("edit-game-support-link").value.trim(),
+          save_file_link: $("edit-game-save-file-link").value.trim(),
+          rules: $("edit-game-rules").value.trim(),
+          extra_information: $("edit-game-extra-information").value.trim()
+        };
+
+        renderGameCardPreview(gameData, previewEl);
+      });
+    }
+  });
+
+  // Edit Player Live Preview
+  const editPlayerInputs = [
+    "edit-player-new-name",
+    "edit-player-pfp",
+    "edit-player-bio",
+    "edit-player-pronouns",
+    "edit-player-discord"
+  ];
+  editPlayerInputs.forEach((id) => {
+    const input = $(id);
+    if (input) {
+      input.addEventListener("input", () => {
+        const previewContainer = $("edit-player-preview-container");
+        const previewEl = $("edit-player-preview");
+        if (!previewContainer || !previewEl) return;
+
+        previewContainer.classList.remove("hidden");
+
+        const playerName = $("edit-player-select").value;
+        const player = players.find((p) => p.name === playerName) || {};
+        const displayName =
+          $("edit-player-new-name").value.trim() ||
+          player.name ||
+          "Player Name";
+        const pfpLink =
+          $("edit-player-pfp").value.trim() || player.pfp_link || "";
+        const bio = $("edit-player-bio").value.trim() || player.bio || "";
+        const pronouns =
+          $("edit-player-pronouns").value.trim() || player.pronouns || "";
+        const discord =
+          $("edit-player-discord").value.trim() || player.discord || "";
+
+        const previewPlayer = {
+          name: displayName,
+          pfp_link: pfpLink,
+          bio: bio,
+          pronouns: pronouns,
+          discord: discord,
+          roles: player.roles || []
+        };
+
+        renderPlayerPreview(previewPlayer, "edit-player-preview");
+      });
+    }
+  });
+
+  // Add New Role Live Preview
+  const newRoleNameInput = $("new-role-name");
+  const newRoleColorInput = $("new-role-color");
+  if (newRoleNameInput && newRoleColorInput) {
+    newRoleNameInput.addEventListener("input", updateRolePreview);
+    newRoleColorInput.addEventListener("input", updateRolePreview);
+  }
+
+  function updateRolePreview() {
+    const previewEl = $("add-role-preview");
+    if (!previewEl || !newRoleNameInput || !newRoleColorInput) return;
+    const roleName = newRoleNameInput.value.trim();
+    const roleColor = newRoleColorInput.value || "#ff0000";
+
+    // If name is empty, show start-typing placeholder
+    if (!roleName) {
+      previewEl.style.color = "";
+      previewEl.style.borderColor = "";
+      previewEl.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
+      return;
+    }
+
+    previewEl.style.color = roleColor;
+    previewEl.style.borderColor = roleColor + "40";
+    previewEl.innerHTML = `<span class="text-sm">${roleName}</span>`;
   }
 }
 
@@ -1161,12 +1969,12 @@ function renderGamePreview(game, containerId) {
     {
       url: game.apworld_link,
       icon: "fa-globe",
-      label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === "Core" ? "Core" : "v" + game.apworld_version})` : ""}`
+      label: `Apworld${hasApworldVersion ? ` (${game.apworld_version})` : ""}`
     },
     {
       url: game.mod_link,
       icon: "fa-puzzle-piece",
-      label: `Mod${hasModVersion ? ` (${game.mod_version === "Core" ? "" : "v"}${game.mod_version})` : ""}`
+      label: `Mod${hasModVersion ? ` (${game.mod_version})` : ""}`
     },
     { url: game.mod_setup_guide_link, icon: "fa-book", label: "Setup Guide" },
     { url: game.tracker_link, icon: "fa-map", label: "Tracker" },
@@ -1191,7 +1999,7 @@ function renderGamePreview(game, containerId) {
             `
                 : '<div class="cover-art-container"></div>'
             }
-
+            
             <div class="game-card-title-time-row">
                 <div class="game-card-title">
                     <h2 class="text-xl font-bold text-white">${game.name}</h2>
@@ -1199,7 +2007,7 @@ function renderGamePreview(game, containerId) {
                 </div>
             </div>
         </div>
-
+        
         ${
           hasRules
             ? `
@@ -1209,7 +2017,7 @@ function renderGamePreview(game, containerId) {
         `
             : ""
         }
-
+        
         ${
           hasExtraInfo
             ? `
@@ -1219,7 +2027,7 @@ function renderGamePreview(game, containerId) {
         `
             : ""
         }
-
+        
         ${
           links.length > 0
             ? `
@@ -1426,11 +2234,7 @@ async function addNewRole() {
 
   try {
     const payload = editingRoleOriginal
-      ? {
-          action: "updateRole",
-          originalName: editingRoleOriginal,
-          roleData: { name: roleName, color: roleColor }
-        }
+      ? { action: "updateRole", originalName: editingRoleOriginal, roleData: { name: roleName, color: roleColor } }
       : { action: "addRole", roleData: { name: roleName, color: roleColor } };
 
     const res = await fetch("/api/moderator-actions", {
@@ -1440,11 +2244,7 @@ async function addNewRole() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || data.message);
-    alert(
-      editingRoleOriginal
-        ? "Role updated successfully!"
-        : "Role added successfully!"
-    );
+    alert(editingRoleOriginal ? "Role updated successfully!" : "Role added successfully!");
     $("new-role-name").value = "";
     editingRoleOriginal = null;
     loadRoles();
@@ -1456,24 +2256,20 @@ async function addNewRole() {
 
 // Delete role from inline modal
 async function deleteRoleInline(roleName) {
-  if (
-    !confirm(`Delete role "${roleName}"? This will remove it from all players.`)
-  )
-    return;
+  if (!confirm(`Delete role "${roleName}"? This will remove it from all players.`)) return;
   try {
-    const res = await fetch("/api/moderator-actions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
-      body: JSON.stringify({ action: "deleteRole", roleName })
+    const res = await fetch('/api/moderator-actions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+      body: JSON.stringify({ action: 'deleteRole', roleName })
     });
     const data = await res.json();
-    if (!res.ok)
-      throw new Error(data.error || data.message || "Failed to delete role");
-    alert(data.message || "Role deleted");
+    if (!res.ok) throw new Error(data.error || data.message || 'Failed to delete role');
+    alert(data.message || 'Role deleted');
     await loadRoles();
     openModeratorModal();
   } catch (err) {
-    alert("Error: " + err.message);
+    alert('Error: ' + err.message);
   }
 }
 
@@ -1668,6 +2464,198 @@ async function manageModerator(action) {
     alert(`Moderator ${action === "add" ? "added" : "removed"} successfully!`);
     $("moderator-name-select").value = "";
     openModeratorModal(); // Refresh the modal
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+}
+
+async function updateModeratorPermissions() {
+  const name = $("moderator-select").value;
+
+  if (!name) return alert("Please select a moderator");
+
+  const permissions = {
+    manageModerators: document.getElementById("perm-manageModerators").checked,
+    manageGames: document.getElementById("perm-manageGames").checked,
+    managePlayers: document.getElementById("perm-managePlayers").checked,
+    manageRoles: document.getElementById("perm-manageRoles").checked,
+    manageAwards: document.getElementById("perm-manageAwards").checked,
+    manageSettings: document.getElementById("perm-manageSettings").checked
+  };
+
+// Tab helpers for roles/awards in moderator modal
+function switchRolesTab(tab) {
+  const createBtn = $("roles-tab-create");
+  const editBtn = $("roles-tab-edit");
+  const createContent = $("roles-tab-content-create");
+  const editContent = $("roles-tab-content-edit");
+  if (!createBtn || !editBtn || !createContent || !editContent) return;
+  if (tab === "create") {
+    createBtn.classList.add("bg-ap-accent");
+    createBtn.classList.remove("bg-slate-700", "text-slate-300");
+    editBtn.classList.remove("bg-ap-accent");
+    editBtn.classList.add("bg-slate-700", "text-slate-300");
+    createContent.classList.remove("hidden");
+    editContent.classList.add("hidden");
+  } else {
+    createBtn.classList.remove("bg-ap-accent");
+    createBtn.classList.add("bg-slate-700", "text-slate-300");
+    editBtn.classList.add("bg-ap-accent");
+    editBtn.classList.remove("bg-slate-700", "text-slate-300");
+    createContent.classList.add("hidden");
+    editContent.classList.remove("hidden");
+    populateRolesEditList();
+  }
+}
+
+function switchAwardsTab(tab) {
+  const createBtn = $("awards-tab-create");
+  const editBtn = $("awards-tab-edit");
+  const createContent = $("awards-tab-content-create");
+  const editContent = $("awards-tab-content-edit");
+  if (!createBtn || !editBtn || !createContent || !editContent) return;
+  if (tab === "create") {
+    createBtn.classList.add("bg-ap-accent");
+    createBtn.classList.remove("bg-slate-700", "text-slate-300");
+    editBtn.classList.remove("bg-ap-accent");
+    editBtn.classList.add("bg-slate-700", "text-slate-300");
+    createContent.classList.remove("hidden");
+    editContent.classList.add("hidden");
+  } else {
+    createBtn.classList.remove("bg-ap-accent");
+    createBtn.classList.add("bg-slate-700", "text-slate-300");
+    editBtn.classList.add("bg-ap-accent");
+    editBtn.classList.remove("bg-slate-700", "text-slate-300");
+    createContent.classList.add("hidden");
+    editContent.classList.remove("hidden");
+    populateAwardsEditList();
+  }
+}
+
+function populateRolesEditList() {
+  const list = $("roles-edit-list");
+  if (!list) return;
+  list.innerHTML = "";
+  if (!availableRoles || availableRoles.length === 0) {
+    list.innerHTML = '<div class="text-slate-500">No roles defined.</div>';
+    return;
+  }
+  availableRoles
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .forEach((r) => {
+      const item = document.createElement("div");
+      item.className = "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
+      item.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.color}"></span>
+          <div style="min-width:0;"><div style="color:#e2e8f0;font-weight:700;">${r.name}</div></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillRoleForEdit(${JSON.stringify(r)})'>Edit</button>
+          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteRole(${JSON.stringify(r.name)})'>Delete</button>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+}
+
+function populateAwardsEditList() {
+  const list = $("awards-edit-list");
+  if (!list) return;
+  list.innerHTML = "";
+  if (!availableAwards || availableAwards.length === 0) {
+    list.innerHTML = '<div class="text-slate-500">No awards defined.</div>';
+    return;
+  }
+  availableAwards
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .forEach((a) => {
+      const item = document.createElement("div");
+      item.className = "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
+      const iconHtml = a.icon && a.icon.startsWith && a.icon.startsWith("fa-") ? `<i class="fa-solid ${a.icon}" style="color:${a.color};"></i>` : a.icon || "🏆";
+      item.innerHTML = `
+        <div class="flex items-center gap-3">
+          ${iconHtml}
+          <div style="min-width:0;"><div style="color:#e2e8f0;font-weight:700;">${a.name}</div><div style="color:#94a3b8;font-size:0.85rem;">${a.description || ''}</div></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillAwardForEdit(${JSON.stringify(a)})'>Edit</button>
+          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteAward(${JSON.stringify(a.name)})'>Delete</button>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+}
+
+// Prefill helpers: copy selected item into create inputs for quick editing
+function prefillRoleForEdit(role) {
+  const nameInput = $("new-role-name");
+  const colorInput = $("new-role-color");
+  if (nameInput && colorInput) {
+    nameInput.value = role.name;
+    colorInput.value = role.color || "#ff0000";
+    switchRolesTab("create");
+    nameInput.focus();
+    editingRoleOriginal = role.name;
+  }
+}
+
+function prefillAwardForEdit(award) {
+  const nameInput = $("award-name-input");
+  const iconInput = $("award-icon-input");
+  const descInput = $("award-description-input");
+  if (nameInput && iconInput && descInput) {
+    nameInput.value = award.name;
+    iconInput.value = award.icon || "";
+    descInput.value = award.description || "";
+    switchAwardsTab("create");
+    nameInput.focus();
+    editingAwardOriginal = award.name;
+  }
+}
+
+function promptDeleteRole(roleName) {
+  // call API deletion
+  if (!confirm(`Delete role "${roleName}"? This will remove it from all players.`)) return;
+  deleteRoleInline(roleName);
+}
+
+function promptDeleteAward(awardName) {
+  if (!confirm(`Delete award "${awardName}"? This will remove it from all players.`)) return;
+  // call API deletion
+  (async () => {
+    try {
+      const res = await fetch('/api/manage-awards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+        body: JSON.stringify({ action: 'deleteAward', awardName })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || data.message || 'Failed to delete award');
+      alert(data.message || 'Award deleted');
+      await loadAwards();
+      await loadData();
+      openModeratorModal();
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  })();
+}
+
+  try {
+    const res = await fetch("/api/moderator-actions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
+      body: JSON.stringify({
+        action: "manageModerators",
+        moderatorData: { name, action: "updatePermissions", permissions }
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    alert("Permissions updated successfully!");
   } catch (err) {
     alert("Error: " + err.message);
   }
