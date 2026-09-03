@@ -1876,12 +1876,13 @@
     "support_link": "https://discord.com/channels/731205301247803413/1389178071873097770",
     "save_file_link": "https://drive.google.com/drive/folders/1N1q8dbDdaAfAzS7W78hGnbCZbYuatW2H",
     "rules": "",
-    "extra_information": "The poptracker may not currently support 0.4.6. If that is the case, check the support link and make sure there isn't a newer version that does.",
+    "extra_information": "",
     "current_player": null,
     "claimed_at": null,
     "total_time_ms": 0,
     "completed": false,
     "logs": [],
-    "slot_count": 1
-   }
+    "slot_count": 1,
+    "game_info_link": ""
+  }
 ]
