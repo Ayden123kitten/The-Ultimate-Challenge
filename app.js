@@ -252,12 +252,13 @@ function renderGames() {
     card.className =
       "glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50";
 
-    // Slot display: show "No limit" when slot_count is 0
-    const slotText =
-      game.slot_count === 0
-        ? "No limit"
-        : `${game.slot_count} slot${game.slot_count > 1 ? "s" : ""}`;
-    const slotHtml = `<div class="text-xs text-slate-400 mt-2">${slotText}</div>`;
+    // Slot display: show "No limit" when slot_count is 0; hide when slot_count is 1
+    let slotHtml = "";
+    if (game.slot_count === 0) {
+      slotHtml = `<div class="text-xs text-slate-400 mt-2">No limit</div>`;
+    } else if (game.slot_count > 1) {
+      slotHtml = `<div class="text-xs text-slate-400 mt-2">${game.slot_count} slots</div>`;
+    }
 
     // Add inline edit button for moderator
     const inlineEditButtonHtml =
