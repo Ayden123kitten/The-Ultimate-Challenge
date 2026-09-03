@@ -26,6 +26,26 @@ function formatTime(ms) {
   const hours = Math.floor(ms / (1000 * 60 * 60));
   return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
+let editingAwardOriginal = null;
+
+async function deleteAwardInline(awardName) {
+  if (!confirm(`Delete award "${awardName}"? This will remove it from all players.`)) return;
+  try {
+    const res = await fetch('/api/manage-awards', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+      body: JSON.stringify({ action: 'deleteAward', awardName })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.message || 'Failed to delete award');
+    alert(data.message || 'Award deleted');
+    await loadAwards();
+    await loadData();
+    openModeratorModal();
+  } catch (err) {
+    alert('Error: ' + err.message);
+  }
+}
 
 async function loadCheesetrackerData() {
   if (!settings.cheesetracker_url) return;
@@ -344,26 +364,28 @@ function renderGames() {
 
             ${
               links.length > 0
-                ? `
+                document.getElementById("inline-new-award-name") || { value: "" }
                 <div class="grid grid-cols-2 gap-2 text-sm min-w-0">
                     ${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary)).join("")}
-                </div>
+                document.getElementById("inline-new-award-icon") || { value: "" }
             `
                 : ""
-            }
+                document.getElementById("inline-new-award-desc") || { value: "" }
 
             <div class="mt-auto">
-                ${
+                alert("Award name is required");
                   isMyClaim
                     ? `
                     <button onclick="unclaimGame('${game.id}', event)" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <i class="fa-solid fa-upload"></i> Mark as Done
-                    </button>
+                const payload = editingAwardOriginal
+                  ? { action: "updateAward", originalName: editingAwardOriginal, awardData: { name, icon, description } }
+                  : { action: "addAward", awardData: { name, icon, description } };
                     <div class="text-center text-xs text-slate-400 mt-2">
                         Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span>
                     </div>
                 `
-                    : canClaim
+                  body: JSON.stringify(payload)
                       ? `
                     <button onclick="claimGame('${game.id}', event)" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
                         <i class="fa-solid fa-play"></i> Claim Game
@@ -579,36 +601,38 @@ function openEventTimerSettingsModal() {
   content.innerHTML = `
         <div class="space-y-6">
             <!-- Event Time Settings Section -->
-            <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-ap-accent mr-2"></i>Event Timer Settings</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
-                        <input type="datetime-local" id="event-start-time-input" value="${settings.start_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-                        <p class="text-xs text-slate-400 mt-2">Set when the event starts. Before this time, a countdown will be shown.</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-300 mb-2">Event End Time (optional)</label>
-                        <input type="datetime-local" id="event-end-time-input" value="${settings.end_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-                        <p class="text-xs text-slate-400 mt-2">Set when the event ends. Leave empty for an ongoing event.</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="saveEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Settings</button>
-                        <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
-                    </div>
+        <div class="glass rounded-lg p-4">
+          <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-ap-accent mr-2"></i>Event Timer Settings & Preview</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+            <div>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
+                  <input type="datetime-local" id="event-start-time-input" value="${settings.start_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                  <p class="text-xs text-slate-400 mt-2">Set when the event starts. Before this time, a countdown will be shown.</p>
                 </div>
-            </div>
-            
-            <!-- Live Preview -->
-            <div class="glass rounded-lg p-4">
-                <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
-                <div id="event-timer-preview" class="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-                    <div class="text-center">
-                        <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent">${formatTime(Date.now() - (settings.start_time ? new Date(settings.start_time).getTime() : 0))}</div>
-                        <div id="preview-status" class="text-xs text-slate-400 uppercase">${settings.start_time ? "Event Live" : "Not Set"}</div>
-                    </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-300 mb-2">Event End Time (optional)</label>
+                  <input type="datetime-local" id="event-end-time-input" value="${settings.end_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                  <p class="text-xs text-slate-400 mt-2">Set when the event ends. Leave empty for an ongoing event.</p>
                 </div>
+                <div class="flex gap-2">
+                  <button onclick="saveEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Settings</button>
+                  <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
+                </div>
+              </div>
             </div>
+            <div>
+              <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+              <div id="event-timer-preview" class="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                <div class="text-center w-full">
+                  <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent">${formatTime(Date.now() - (settings.start_time ? new Date(settings.start_time).getTime() : 0))}</div>
+                  <div id="preview-status" class="text-xs text-slate-400 uppercase">${settings.start_time ? "Event Live" : "Not Set"}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         </div>
     `;
 
@@ -791,8 +815,9 @@ try {
       const mobileModContainer = $("mobile-moderation-container");
       if (mobileModContainer) {
         const modBtnMobile = document.createElement("button");
+        // Use the same mobile nav button classes as other pages for consistency
         modBtnMobile.className =
-          "flex items-center gap-2 text-slate-400 hover:text-ap-accent transition-colors";
+          "mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all";
         modBtnMobile.innerHTML =
           '<i class="fa-solid fa-shield-halved"></i><span class="text-sm">Moderation</span>';
         modBtnMobile.onclick = openModeratorModal;
@@ -800,10 +825,10 @@ try {
 
         const inlineEditBtnMobile = document.createElement("button");
         inlineEditBtnMobile.className =
-          "flex items-center gap-2 transition-colors " +
+          "mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
           (inlineEditMode
-            ? "text-ap-accent"
-            : "text-slate-400 hover:text-white");
+            ? "text-ap-accent bg-ap-accent/20"
+            : "text-slate-400 hover:text-white hover:bg-slate-700/50");
         inlineEditBtnMobile.innerHTML =
           '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm">Inline Edit</span>';
         inlineEditBtnMobile.onclick = toggleInlineEditMode;
@@ -874,12 +899,14 @@ async function openModeratorModal() {
   // Build HTML based on permissions
   let htmlContent = '<div class="space-y-6">';
 
+  // ========== GAME MANAGEMENT SECTION ==========
+  
   // Add Game Section (requires manageGames permission)
   if (permissions.manageGames) {
     htmlContent += `
             <!-- Add Game Section -->
             <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4">Add New Game</h3>
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-plus text-green-400 mr-2"></i>Add New Game</h3>
                 <form id="add-game-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" id="game-name" placeholder="Game Name *" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white" required>
                     <input type="text" id="game-id" placeholder="Game ID (unique) *" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white" required>
@@ -914,7 +941,7 @@ async function openModeratorModal() {
     htmlContent += `
             <!-- Edit Game Section -->
             <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4">Edit Game</h3>
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-pen-to-square text-ap-accent mr-2"></i>Edit Game</h3>
                 <select id="edit-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
                     <option value="">Select a game...</option>
                     ${games
@@ -955,7 +982,7 @@ async function openModeratorModal() {
     htmlContent += `
             <!-- Remove Game Section -->
             <div class="glass rounded-lg p-4">
-              <h3 class="text-lg font-bold text-white mb-4">Remove Game</h3>
+              <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-trash text-red-400 mr-2"></i>Remove Game</h3>
               <p class="text-sm text-slate-400 mb-3">Select a game to permanently remove it (this also deletes logs and Cheesetracker entries).</p>
               <select id="remove-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
                 <option value="">Select a game...</option>
@@ -976,7 +1003,7 @@ async function openModeratorModal() {
     htmlContent += `
             <!-- Edit Player Section -->
             <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4">Edit Player</h3>
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-user-pen text-ap-accent mr-2"></i>Edit Player</h3>
                 <select id="edit-player-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
                     <option value="">Select a player...</option>
                     ${players
@@ -1009,7 +1036,7 @@ async function openModeratorModal() {
     htmlContent += `
             <!-- Edit Logs Section -->
             <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4">Edit Game Logs</h3>
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-list-check text-ap-accent mr-2"></i>Edit Game Logs</h3>
                 <select id="edit-log-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
                     <option value="">Select a game...</option>
                     ${games
@@ -1030,7 +1057,7 @@ async function openModeratorModal() {
     htmlContent += `
             <!-- Player Roles Section -->
             <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4">Player Roles Management</h3>
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-shield text-purple-400 mr-2"></i>Manage Player Roles</h3>
                 <div class="space-y-4">
                     <div>
                         <h4 class="text-sm font-semibold text-slate-300 mb-2">Add New Role</h4>
@@ -1045,6 +1072,17 @@ async function openModeratorModal() {
                             <div id="add-role-preview" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700">
                                 <span class="text-sm text-slate-400">Start typing to see preview...</span>
                             </div>
+                        </div>
+                        <!-- Tabs: Create / Edit Roles -->
+                        <div class="mt-3">
+                          <div class="flex gap-2">
+                            <button id="roles-tab-create" class="px-3 py-1 rounded bg-ap-accent text-slate-900 text-sm" onclick="switchRolesTab('create')">Create Role</button>
+                            <button id="roles-tab-edit" class="px-3 py-1 rounded bg-slate-700 text-sm text-slate-300" onclick="switchRolesTab('edit')">Edit Roles</button>
+                          </div>
+                          <div id="roles-tab-content-create" class="mt-3"></div>
+                          <div id="roles-tab-content-edit" class="mt-3 hidden">
+                            <div id="roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
+                          </div>
                         </div>
                     </div>
                     <div>
@@ -1072,12 +1110,66 @@ async function openModeratorModal() {
             </div>`;
   }
 
+  // Manage Awards Section (requires manageAwards permission)
+  if (permissions.manageAwards) {
+    htmlContent += `
+            <!-- Manage Awards Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-trophy text-yellow-300 mr-2"></i>Manage Awards</h3>
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Create New Award</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="award-name-input" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                            <input type="text" id="award-icon-input" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                            <textarea id="award-description-input" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
+                            <!-- Tabs: Create / Edit Awards -->
+                            <div class="md:col-span-2 mt-3">
+                              <div class="flex gap-2">
+                                <button id="awards-tab-create" class="px-3 py-1 rounded bg-ap-accent text-slate-900 text-sm" onclick="switchAwardsTab('create')">Create Award</button>
+                                <button id="awards-tab-edit" class="px-3 py-1 rounded bg-slate-700 text-sm text-slate-300" onclick="switchAwardsTab('edit')">Edit Awards</button>
+                              </div>
+                              <div id="awards-tab-content-create" class="mt-3"></div>
+                              <div id="awards-tab-content-edit" class="mt-3 hidden">
+                                <div id="awards-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-4 glass rounded-lg">
+                            <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
+                            <div id="award-preview" class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                                <span id="preview-icon" class="text-2xl w-8 text-center"></span>
+                                <div>
+                                    <div id="preview-name" class="font-bold text-white">Award Name</div>
+                                    <div id="preview-description" class="text-xs text-slate-400">Description will appear here</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="createAward()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg mt-4 w-full">Create Award</button>
+                    </div>
+                    <div class="border-t border-slate-700 pt-4">
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Award</h4>
+                        <select id="award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+                            <option value="">Select an award...</option>
+                        </select>
+                        <select id="award-player-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+                            <option value="">Select a player...</option>
+                        </select>
+                        <div class="flex gap-2">
+                            <button onclick="assignAward('add')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Give Award</button>
+                            <button onclick="assignAward('remove')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Award</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+  }
+
   // Manage Moderators Section (requires manageModerators permission - inherently admin)
   if (permissions.manageModerators) {
     htmlContent += `
             <!-- Manage Moderators Section -->
             <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4">Manage Moderators</h3>
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-shield-halved text-yellow-400 mr-2"></i>Manage Moderators</h3>
                 <div class="space-y-4">
                     <div>
                         <h4 class="text-sm font-semibold text-slate-300 mb-2">Add/Remove Moderator</h4>
@@ -1144,55 +1236,12 @@ async function openModeratorModal() {
             </div>`;
   }
 
-  // Manage Awards Section (requires manageAwards permission)
-  if (permissions.manageAwards) {
-    htmlContent += `
-            <!-- Manage Awards Section -->
-            <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4">Manage Awards</h3>
-                <div class="space-y-4">
-                    <div>
-                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Create New Award</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="text" id="award-name-input" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                            <input type="text" id="award-icon-input" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                            <textarea id="award-description-input" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
-                        </div>
-                        <div class="mt-4 p-4 glass rounded-lg">
-                            <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
-                            <div id="award-preview" class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
-                                <span id="preview-icon" class="text-2xl w-8 text-center"></span>
-                                <div>
-                                    <div id="preview-name" class="font-bold text-white">Award Name</div>
-                                    <div id="preview-description" class="text-xs text-slate-400">Description will appear here</div>
-                                </div>
-                            </div>
-                        </div>
-                        <button onclick="createAward()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg mt-4 w-full">Create Award</button>
-                    </div>
-                    <div class="border-t border-slate-700 pt-4">
-                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Award</h4>
-                        <select id="award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
-                            <option value="">Select an award...</option>
-                        </select>
-                        <select id="award-player-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
-                            <option value="">Select a player...</option>
-                        </select>
-                        <div class="flex gap-2">
-                            <button onclick="assignAward('add')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Give Award</button>
-                            <button onclick="assignAward('remove')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Award</button>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-  }
-
   // Cheesetracker Settings Section (requires manageSettings permission)
   if (permissions.manageSettings) {
     htmlContent += `
             <!-- Cheesetracker Settings Section -->
             <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4">Cheesetracker Integration</h3>
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-link text-orange-400 mr-2"></i>Cheesetracker Integration</h3>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-slate-300 mb-2">Cheesetracker URL</label>
@@ -1209,7 +1258,7 @@ async function openModeratorModal() {
     htmlContent += `
             <!-- Event Time Settings Section -->
             <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4">Event Time Settings</h3>
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-cyan-400 mr-2"></i>Event Time Settings</h3>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
@@ -1501,37 +1550,39 @@ async function openModeratorModal() {
 
     previewElement.innerHTML = `
             <div class="game-card-header flex gap-4">
-                ${
-                  hasCoverImage
-                    ? `
-                    <img src="${game.logo}" alt="${game.name}" class="bg-slate-800 rounded" style="max-width:160px; width:100%; height:auto; object-fit:contain;" onerror="this.style.display='none'">
-                `
-                    : '<div style="max-width:160px; width:100%; height:auto;" class="bg-slate-800 rounded flex items-center justify-center text-slate-600"><i class="fa-solid fa-gamepad"></i></div>'
-                }
-                <div class="flex-1">
-                    <h2 class="text-xl font-bold text-white">${game.name || "Game Name"}</h2>
-                    <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold bg-green-500/20 text-green-400">Available</span>
+          <div class="glass rounded-lg p-4">
+            <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-ap-accent mr-2"></i>Event Timer Settings & Preview</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+              <div>
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
+                    <input type="datetime-local" id="event-start-time-input" value="${settings.start_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                    <p class="text-xs text-slate-400 mt-2">Set when the event starts. Before this time, a countdown will be shown.</p>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-2">Event End Time (optional)</label>
+                    <input type="datetime-local" id="event-end-time-input" value="${settings.end_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                    <p class="text-xs text-slate-400 mt-2">Set when the event ends. Leave empty for an ongoing event.</p>
+                  </div>
+                  <div class="flex gap-2">
+                    <button onclick="saveEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Settings</button>
+                    <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
+                  </div>
                 </div>
+              </div>
+              <div>
+                <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+                <div id="event-timer-preview" class="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                  <div class="text-center w-full">
+                    <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent">${formatTime(Date.now() - (settings.start_time ? new Date(settings.start_time).getTime() : 0))}</div>
+                    <div id="preview-status" class="text-xs text-slate-400 uppercase">${settings.start_time ? "Event Live" : "Not Set"}</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            ${
-              hasRules
-                ? `
-                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700">
-                    <span class="text-ap-accent font-semibold">Rules:</span> ${game.rules}
-                </div>
-            `
-                : ""
-            }
-            ${
-              hasExtraInfo
-                ? `
-                <div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700">
-                    <span class="text-ap-accent font-semibold">Information:</span> ${game.extra_information}
-                </div>
-            `
-                : ""
-            }
-            ${
+          </div>
+          </div>
               links.length > 0
                 ? `
                 <div class="grid grid-cols-2 gap-2 text-sm">
@@ -2162,6 +2213,7 @@ async function removeLog(gameId, logIndex) {
 }
 
 let availableRoles = [];
+let editingRoleOriginal = null;
 
 async function loadRoles() {
   try {
@@ -2181,22 +2233,43 @@ async function addNewRole() {
   if (!roleName) return alert("Please enter a role name");
 
   try {
+    const payload = editingRoleOriginal
+      ? { action: "updateRole", originalName: editingRoleOriginal, roleData: { name: roleName, color: roleColor } }
+      : { action: "addRole", roleData: { name: roleName, color: roleColor } };
+
     const res = await fetch("/api/moderator-actions", {
       method: "POST",
       headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
-      body: JSON.stringify({
-        action: "addRole",
-        roleData: { name: roleName, color: roleColor }
-      })
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
-    alert("Role added successfully!");
+    if (!res.ok) throw new Error(data.error || data.message);
+    alert(editingRoleOriginal ? "Role updated successfully!" : "Role added successfully!");
     $("new-role-name").value = "";
+    editingRoleOriginal = null;
     loadRoles();
     openModeratorModal();
   } catch (err) {
     alert("Error: " + err.message);
+  }
+}
+
+// Delete role from inline modal
+async function deleteRoleInline(roleName) {
+  if (!confirm(`Delete role "${roleName}"? This will remove it from all players.`)) return;
+  try {
+    const res = await fetch('/api/moderator-actions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+      body: JSON.stringify({ action: 'deleteRole', roleName })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.message || 'Failed to delete role');
+    alert(data.message || 'Role deleted');
+    await loadRoles();
+    openModeratorModal();
+  } catch (err) {
+    alert('Error: ' + err.message);
   }
 }
 
@@ -2409,6 +2482,167 @@ async function updateModeratorPermissions() {
     manageAwards: document.getElementById("perm-manageAwards").checked,
     manageSettings: document.getElementById("perm-manageSettings").checked
   };
+
+// Tab helpers for roles/awards in moderator modal
+function switchRolesTab(tab) {
+  const createBtn = $("roles-tab-create");
+  const editBtn = $("roles-tab-edit");
+  const createContent = $("roles-tab-content-create");
+  const editContent = $("roles-tab-content-edit");
+  if (!createBtn || !editBtn || !createContent || !editContent) return;
+  if (tab === "create") {
+    createBtn.classList.add("bg-ap-accent");
+    createBtn.classList.remove("bg-slate-700", "text-slate-300");
+    editBtn.classList.remove("bg-ap-accent");
+    editBtn.classList.add("bg-slate-700", "text-slate-300");
+    createContent.classList.remove("hidden");
+    editContent.classList.add("hidden");
+  } else {
+    createBtn.classList.remove("bg-ap-accent");
+    createBtn.classList.add("bg-slate-700", "text-slate-300");
+    editBtn.classList.add("bg-ap-accent");
+    editBtn.classList.remove("bg-slate-700", "text-slate-300");
+    createContent.classList.add("hidden");
+    editContent.classList.remove("hidden");
+    populateRolesEditList();
+  }
+}
+
+function switchAwardsTab(tab) {
+  const createBtn = $("awards-tab-create");
+  const editBtn = $("awards-tab-edit");
+  const createContent = $("awards-tab-content-create");
+  const editContent = $("awards-tab-content-edit");
+  if (!createBtn || !editBtn || !createContent || !editContent) return;
+  if (tab === "create") {
+    createBtn.classList.add("bg-ap-accent");
+    createBtn.classList.remove("bg-slate-700", "text-slate-300");
+    editBtn.classList.remove("bg-ap-accent");
+    editBtn.classList.add("bg-slate-700", "text-slate-300");
+    createContent.classList.remove("hidden");
+    editContent.classList.add("hidden");
+  } else {
+    createBtn.classList.remove("bg-ap-accent");
+    createBtn.classList.add("bg-slate-700", "text-slate-300");
+    editBtn.classList.add("bg-ap-accent");
+    editBtn.classList.remove("bg-slate-700", "text-slate-300");
+    createContent.classList.add("hidden");
+    editContent.classList.remove("hidden");
+    populateAwardsEditList();
+  }
+}
+
+function populateRolesEditList() {
+  const list = $("roles-edit-list");
+  if (!list) return;
+  list.innerHTML = "";
+  if (!availableRoles || availableRoles.length === 0) {
+    list.innerHTML = '<div class="text-slate-500">No roles defined.</div>';
+    return;
+  }
+  availableRoles
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .forEach((r) => {
+      const item = document.createElement("div");
+      item.className = "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
+      item.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.color}"></span>
+          <div style="min-width:0;"><div style="color:#e2e8f0;font-weight:700;">${r.name}</div></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillRoleForEdit(${JSON.stringify(r)})'>Edit</button>
+          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteRole(${JSON.stringify(r.name)})'>Delete</button>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+}
+
+function populateAwardsEditList() {
+  const list = $("awards-edit-list");
+  if (!list) return;
+  list.innerHTML = "";
+  if (!availableAwards || availableAwards.length === 0) {
+    list.innerHTML = '<div class="text-slate-500">No awards defined.</div>';
+    return;
+  }
+  availableAwards
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .forEach((a) => {
+      const item = document.createElement("div");
+      item.className = "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
+      const iconHtml = a.icon && a.icon.startsWith && a.icon.startsWith("fa-") ? `<i class="fa-solid ${a.icon}" style="color:${a.color};"></i>` : a.icon || "🏆";
+      item.innerHTML = `
+        <div class="flex items-center gap-3">
+          ${iconHtml}
+          <div style="min-width:0;"><div style="color:#e2e8f0;font-weight:700;">${a.name}</div><div style="color:#94a3b8;font-size:0.85rem;">${a.description || ''}</div></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillAwardForEdit(${JSON.stringify(a)})'>Edit</button>
+          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteAward(${JSON.stringify(a.name)})'>Delete</button>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+}
+
+// Prefill helpers: copy selected item into create inputs for quick editing
+function prefillRoleForEdit(role) {
+  const nameInput = $("new-role-name");
+  const colorInput = $("new-role-color");
+  if (nameInput && colorInput) {
+    nameInput.value = role.name;
+    colorInput.value = role.color || "#ff0000";
+    switchRolesTab("create");
+    nameInput.focus();
+    editingRoleOriginal = role.name;
+  }
+}
+
+function prefillAwardForEdit(award) {
+  const nameInput = $("award-name-input");
+  const iconInput = $("award-icon-input");
+  const descInput = $("award-description-input");
+  if (nameInput && iconInput && descInput) {
+    nameInput.value = award.name;
+    iconInput.value = award.icon || "";
+    descInput.value = award.description || "";
+    switchAwardsTab("create");
+    nameInput.focus();
+    editingAwardOriginal = award.name;
+  }
+}
+
+function promptDeleteRole(roleName) {
+  // call API deletion
+  if (!confirm(`Delete role "${roleName}"? This will remove it from all players.`)) return;
+  deleteRoleInline(roleName);
+}
+
+function promptDeleteAward(awardName) {
+  if (!confirm(`Delete award "${awardName}"? This will remove it from all players.`)) return;
+  // call API deletion
+  (async () => {
+    try {
+      const res = await fetch('/api/manage-awards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...AUTH.authHeader() },
+        body: JSON.stringify({ action: 'deleteAward', awardName })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || data.message || 'Failed to delete award');
+      alert(data.message || 'Award deleted');
+      await loadAwards();
+      await loadData();
+      openModeratorModal();
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  })();
+}
 
   try {
     const res = await fetch("/api/moderator-actions", {

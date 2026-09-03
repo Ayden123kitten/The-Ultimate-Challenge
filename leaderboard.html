@@ -219,8 +219,9 @@
               <span class="hidden sm:inline">Players</span>
             </a>
             <a
-              href="/settings.html"
+              href="#"
               id="settings-nav-link"
+              onclick="if (typeof openModeratorModal === 'function') { openModeratorModal(); } else { window.location='/settings.html'; }"
               class="group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all"
             >
               <i
@@ -361,8 +362,34 @@
       </p>
     </footer>
 
+    <!-- Include app.js so moderation modal and functions are available on this page -->
     <script src="auth.js"></script>
+    <script src="app.js"></script>
     <script src="leaderboard.js"></script>
+    <!-- Moderation Panel Modal -->
+    <div
+      id="moderator-modal"
+      class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4"
+      onclick="closeModeratorModalOnClick(event)"
+    >
+      <div
+        class="glass rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        onclick="event.stopPropagation()"
+      >
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-white">Moderation Panel</h2>
+            <button
+              onclick="closeModeratorModal()"
+              class="text-slate-400 hover:text-white"
+            >
+              <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
+          </div>
+          <div id="moderator-panel-content"></div>
+        </div>
+      </div>
+    </div>
     <script>
       // Mobile menu toggle functionality
       document.addEventListener("DOMContentLoaded", function () {

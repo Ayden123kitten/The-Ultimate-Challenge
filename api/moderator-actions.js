@@ -465,6 +465,183 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "Role added successfully!" });
     }
 
+    if (action === "updateRole") {
+      if (!hasPermission("manageRoles")) {
+        return res
+          .status(403)
+          .json({ error: "Access denied. Missing manageRoles permission." });
+      }
+      const rolesFilePath = "data/roles.json";
+      const rolesApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${rolesFilePath}?ref=${branch}`;
+
+      const rolesGetRes = await fetch(rolesApiUrl, {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json"
+        }
+      });
+
+      let roles = { roles: [] };
+      let sha = null;
+      if (rolesGetRes.ok) {
+        const rolesFileData = await rolesGetRes.json();
+        sha = rolesFileData.sha;
+        const rolesContent = Buffer.from(
+          rolesFileData.content,
+          "base64"
+        ).toString("utf-8");
+        roles = JSON.parse(rolesContent);
+      }
+
+      const { originalName, roleData } = req.body;
+      if (!originalName || !roleData || !roleData.name) {
+        return res.status(400).json({ error: "Missing role data" });
+      }
+
+      const idx = roles.roles.findIndex((r) => r.name === originalName);
+      if (idx === -1) return res.status(404).json({ error: "Role not found" });
+
+      // Prevent duplicate names when changing name
+      if (
+        roleData.name !== originalName &&
+        roles.roles.some((r) => r.name === roleData.name)
+      ) {
+        return res
+          .status(400)
+          .json({ error: "A role with that name already exists" });
+      }
+
+      roles.roles[idx] = { ...roles.roles[idx], ...roleData };
+
+      const newRolesContent = Buffer.from(
+        JSON.stringify(roles, null, 2)
+      ).toString("base64");
+
+      const putRes = await fetch(rolesApiUrl, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: `Update role: ${roleData.name}`,
+          content: newRolesContent,
+          sha: sha,
+          branch: branch
+        })
+      });
+
+      if (!putRes.ok) {
+        const errData = await putRes.json();
+        throw new Error(errData.message || "Failed to update role");
+      }
+
+      return res.status(200).json({ message: "Role updated successfully!" });
+    }
+
+    if (action === "deleteRole") {
+      if (!hasPermission("manageRoles")) {
+        return res
+          .status(403)
+          .json({ error: "Access denied. Missing manageRoles permission." });
+      }
+
+      const { roleName } = req.body;
+      if (!roleName) return res.status(400).json({ error: "Missing roleName" });
+
+      const rolesFilePath = "data/roles.json";
+      const rolesApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${rolesFilePath}?ref=${branch}`;
+      const rolesGetRes = await fetch(rolesApiUrl, {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json"
+        }
+      });
+
+      let roles = { roles: [] };
+      let sha = null;
+      if (rolesGetRes.ok) {
+        const rolesFileData = await rolesGetRes.json();
+        sha = rolesFileData.sha;
+        const rolesContent = Buffer.from(
+          rolesFileData.content,
+          "base64"
+        ).toString("utf-8");
+        roles = JSON.parse(rolesContent);
+      }
+
+      const newRoles = roles.roles.filter((r) => r.name !== roleName);
+      roles.roles = newRoles;
+
+      const newRolesContent = Buffer.from(
+        JSON.stringify(roles, null, 2)
+      ).toString("base64");
+
+      const putRes = await fetch(rolesApiUrl, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: `Delete role: ${roleName}`,
+          content: newRolesContent,
+          sha: sha,
+          branch: branch
+        })
+      });
+
+      if (!putRes.ok) {
+        const errData = await putRes.json();
+        throw new Error(errData.message || "Failed to delete role");
+      }
+
+      // Also remove role references from players
+      const playersFilePath = "data/players.json";
+      const playersApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${playersFilePath}?ref=${branch}`;
+      const playersGetRes = await fetch(playersApiUrl, {
+        headers: {
+          Authorization: `token ${token}`,
+          Accept: "application/vnd.github.v3+json"
+        }
+      });
+      if (playersGetRes.ok) {
+        const playersFileData = await playersGetRes.json();
+        const playersContent = Buffer.from(
+          playersFileData.content,
+          "base64"
+        ).toString("utf-8");
+        let players = JSON.parse(playersContent).map((p) =>
+          typeof p === "string" ? { name: p } : p
+        );
+        players = players.map((pl) => ({
+          ...pl,
+          roles: (pl.roles || []).filter((r) => r !== roleName)
+        }));
+        const newPlayersContent = Buffer.from(
+          JSON.stringify(players, null, 2)
+        ).toString("base64");
+        await fetch(playersApiUrl, {
+          method: "PUT",
+          headers: {
+            Authorization: `token ${token}`,
+            Accept: "application/vnd.github.v3+json",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: `Remove role references: ${roleName}`,
+            content: newPlayersContent,
+            sha: playersFileData.sha,
+            branch: branch
+          })
+        });
+      }
+
+      return res.status(200).json({ message: "Role deleted successfully!" });
+    }
+
     if (action === "assignRole") {
       if (!hasPermission("manageRoles")) {
         return res

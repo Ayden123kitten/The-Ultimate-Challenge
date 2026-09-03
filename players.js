@@ -1024,11 +1024,18 @@ async function openPlayerInlineEditor(playerName, event) {
   content = document.getElementById("moderator-panel-content");
 
   // Fetch permissions to determine whether to show Manage Awards button
-  let permissions = { manageAwards: false };
+  let permissions = { manageAwards: false, manageRoles: false };
   try {
     permissions = await AUTH.getPermissions();
   } catch (err) {
     console.warn("Could not fetch permissions for inline editor:", err);
+  }
+
+  // Ensure roles are loaded so we can render role creation UI
+  try {
+    await loadRoles();
+  } catch (e) {
+    console.warn("Could not load roles for inline editor:", e);
   }
 
   // Build roles HTML
@@ -1050,6 +1057,21 @@ async function openPlayerInlineEditor(playerName, event) {
       `;
     });
     rolesHtml += "</div>";
+  }
+
+  // Build create-role HTML (shown when moderator can manage roles)
+  let createRoleHtml = "";
+  if (permissions.manageRoles) {
+    createRoleHtml = `
+      <div class="mt-3">
+        <label class="text-sm font-semibold text-slate-300">Manage Roles</label>
+        <div class="mt-2">
+          <button onclick="(function(){ openModeratorModal(); setTimeout(function(){ const sel = document.getElementById('role-player-select'); if (sel) sel.value = ${JSON.stringify(
+            player.name
+          )}; switchRolesTab('edit'); }, 250); })()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg">Open Roles Manager</button>
+        </div>
+      </div>
+    `;
   }
 
   // Build awards HTML
@@ -1089,7 +1111,7 @@ async function openPlayerInlineEditor(playerName, event) {
                     <input type="text" id="inline-edit-player-discord" placeholder="Discord Username" value="${player.discord || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
                 </div>
                 
-                ${rolesHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${rolesHtml}</div>` : ""}
+                ${rolesHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${rolesHtml}${createRoleHtml}</div>` : createRoleHtml}
                 ${awardsHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${awardsHtml}</div>` : ""}
 
                 ${
@@ -1381,6 +1403,9 @@ async function addNewAward(playerName) {
     alert("Error: " + err.message);
   }
 }
+
+// Add a new role from the inline player editor
+// Inline role creation removed — use the global Roles Manager modal instead.
 
 // Close moderator modal
 function closeModeratorModal() {
