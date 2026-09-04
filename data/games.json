@@ -1873,6 +1873,7 @@
     "mod_version": "",
     "mod_setup_guide_link": "https://github.com/Lemix028/Archipelago-NewSuperMarioBrosDS/blob/nsmbds/worlds/nsmbds/docs/setup_en.md",
     "tracker_link": "https://discord.com/channels/731205301247803413/1389178071873097770/1541617083434143834",
+    "game_info_link": "",
     "support_link": "https://discord.com/channels/731205301247803413/1389178071873097770",
     "save_file_link": "https://drive.google.com/drive/folders/1N1q8dbDdaAfAzS7W78hGnbCZbYuatW2H",
     "rules": "",
@@ -1882,7 +1883,5 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": [],
-    "slot_count": 1,
-    "game_info_link": ""
   }
 ]
