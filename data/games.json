@@ -1883,6 +1883,6 @@
     "claimed_at": null,
     "total_time_ms": 0,
     "completed": false,
-    "logs": [],
+    "logs": []
   }
 ]
