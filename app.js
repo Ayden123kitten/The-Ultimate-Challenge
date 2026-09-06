@@ -1179,13 +1179,11 @@
                             </div>
                         </div>
                         <!-- Create Role and Existing Roles list -->
-                        <div class="mt-3">
-                          <div id="roles-tab-content-create" class="mt-3"></div>
-                          <div class="mt-3 pt-3 border-t border-slate-700">
-                            <h5 class="text-sm font-semibold text-white mb-2">Manage Roles</h5>
-                            <div id="roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
-                          </div>
-                        </div>
+                        <div id="roles-tab-content-create" class="mt-3"></div>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-slate-700">
+                        <h5 class="text-sm font-semibold text-slate-300 mb-2">Manage Roles</h5>
+                        <div id="roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
                     </div>
                     <div>
                         <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Roles</h4>
@@ -1241,7 +1239,7 @@
                             <div class="md:col-span-2 mt-3">
                                 <div id="awards-tab-content-create" class="mt-3"></div>
                                 <div class="mt-3 pt-3 border-t border-slate-700">
-                                  <h5 class="text-sm font-semibold text-white mb-2">Manage Awards</h5>
+                                  <h5 class="text-sm font-semibold text-slate-300 mb-2">Manage Awards</h5>
                                   <div id="awards-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
                                 </div>
                             </div>

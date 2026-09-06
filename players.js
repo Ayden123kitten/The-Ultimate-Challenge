@@ -1088,7 +1088,7 @@
     let rolesHtml = "";
     if (pageAvailableRoles.length > 0) {
       rolesHtml =
-        '<div class="space-y-2"><label class="text-sm font-semibold text-slate-300">Assign Roles</label>';
+        '<div class="space-y-2"><label class="text-sm font-semibold text-slate-300">Assign/Remove Roles</label>';
       pageAvailableRoles.forEach((role) => {
         const isChecked =
           player.roles && player.roles.includes(role.name) ? "checked" : "";
@@ -1255,6 +1255,33 @@
                     `
                         : ""
                     }
+                  </div>
+                `
+                    : ""
+                }
+
+                ${
+                  permissions.manageAwards
+                    ? `
+                  <div class="mt-4 border-t border-slate-700 pt-4">
+                    <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Awards</h4>
+                    <select id="inline-award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+                      <option value="">Select an award...</option>
+                      ${availableAwards
+                        .map(
+                          (a) =>
+                            `<option value="${JSON.stringify({
+                              name: a.name,
+                              icon: a.icon || "",
+                              description: a.description || ""
+                            })}">${a.icon ? (a.icon.startsWith("fa-") ? "" : a.icon + " ") : ""}${a.name}</option>`
+                        )
+                        .join("")}
+                    </select>
+                    <div class="flex gap-2">
+                      <button onclick="assignAwardInline('add', '${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Assign Award</button>
+                      <button onclick="assignAwardInline('remove', '${player.name}')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Award</button>
+                    </div>
                   </div>
                 `
                     : ""
@@ -1472,6 +1499,29 @@
       alert(data.message || "Award updated");
       await loadData();
       openPlayerInlineEditor(playerName);
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  }
+
+  // Assign or remove an award in the inline player editor
+  async function assignAwardInline(action, playerName) {
+    const selectElement = document.getElementById("inline-award-select");
+    if (!selectElement || !selectElement.value) {
+      alert("Please select an award");
+      return;
+    }
+
+    try {
+      const awardData = JSON.parse(selectElement.value);
+      await assignAwardToPlayer(
+        action,
+        playerName,
+        awardData.name,
+        awardData.icon,
+        awardData.description
+      );
+      selectElement.value = "";
     } catch (err) {
       alert("Error: " + err.message);
     }
@@ -1762,6 +1812,7 @@
     window.closeModeratorModal = closeModeratorModal;
     window.openModeratorModal = openModeratorModal;
     window.assignAwardToPlayer = assignAwardToPlayer;
+    window.assignAwardInline = assignAwardInline;
     window.addNewAward = addNewAward;
     // Expose inline role management helpers
     window.addRoleInline = addRoleInline;
