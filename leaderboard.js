@@ -105,7 +105,8 @@
 
         // Add current session time if player is currently playing this game
         if (game.current_player === playerName && game.claimed_at) {
-          const currentSessionMs = Date.now() - new Date(game.claimed_at).getTime();
+          const currentSessionMs =
+            Date.now() - new Date(game.claimed_at).getTime();
           gameTotalMs += currentSessionMs;
           totalTimeMs += currentSessionMs;
           claimCount++;
@@ -625,8 +626,7 @@
       try {
         if (AUTH.isLoggedIn()) {
           const isModerator = await AUTH.checkModerator();
-            // Moderation button is provided globally in `app.js`; avoid adding a duplicate here.
-          }
+          // Moderation button is provided globally in `app.js`; avoid adding a duplicate here.
         }
       } catch (e) {
         console.warn("Could not add moderation button:", e);
