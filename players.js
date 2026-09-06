@@ -302,6 +302,8 @@
 
   function renderPlayers() {
     const inlineEditMode = localStorage.getItem("inlineEditMode") === "true";
+    const cachedModerator = localStorage.getItem("isModerator") === "true";
+    const effectiveModerator = isModerator || cachedModerator;
     const container = $("players-container");
     container.innerHTML = "";
 
@@ -448,7 +450,7 @@
             <div style="position: relative;">
                 ${avatar}
                 ${
-                  inlineEditMode && isModerator
+                  inlineEditMode && effectiveModerator
                     ? `
                     <button onclick="openPlayerInlineEditor('${stat.name}', event)" style="position: absolute; top: -5px; right: -5px; background: #1e293b; border: 2px solid #38bdf8; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Edit Player">
                         <i class="fa-solid fa-gear" style="color: #38bdf8;"></i>
@@ -943,6 +945,11 @@
   (async () => {
     if (AUTH.isLoggedIn()) {
       isModerator = await AUTH.checkModerator();
+      try {
+        localStorage.setItem("isModerator", isModerator ? "true" : "false");
+      } catch (e) {
+        console.warn("Could not cache moderator status (players):", e);
+      }
       console.log("Moderator status:", isModerator);
 
       // Re-render players after moderator status resolves so inline-edit icons appear if enabled
@@ -1055,16 +1062,24 @@
       rolesHtml += "</div>";
     }
 
-    // Build create-role HTML (shown when moderator can manage roles)
+    // Build create-role / manage-roles HTML (shown when moderator can manage roles)
     let createRoleHtml = "";
     if (permissions.manageRoles) {
       createRoleHtml = `
       <div class="mt-3">
         <label class="text-sm font-semibold text-slate-300">Manage Roles</label>
-        <div class="mt-2">
-          <button onclick="(function(){ openModeratorModal(); setTimeout(function(){ const sel = document.getElementById('role-player-select'); if (sel) sel.value = ${JSON.stringify(
-            player.name
-          )}; switchRolesTab('edit'); }, 250); })()" class="bg-ap-accent hover:bg-ap-accent/80 text-white font-bold py-2 px-4 rounded-lg">Open Roles Manager</button>
+        <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 items-start">
+          <div>
+            <input type="text" id="inline-new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full">
+          </div>
+          <div class="flex gap-2">
+            <input type="color" id="inline-new-role-color" value="#ff0000" class="bg-slate-800/50 border border-slate-700 rounded-lg px-2 py-2 h-10 w-12">
+            <button onclick="addRoleInline(${JSON.stringify(player.name)})" id="inline-add-role-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Role</button>
+          </div>
+          <div class="md:col-span-2">
+            <div id="inline-role-preview" class="mt-2 p-2 inline-flex items-center gap-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400">Start typing to see preview...</div>
+            <div id="inline-roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto mt-2"></div>
+          </div>
         </div>
       </div>
     `;
@@ -1107,8 +1122,8 @@
                     <input type="text" id="inline-edit-player-discord" placeholder="Discord Username" value="${player.discord || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
                 </div>
                 
-                ${rolesHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${rolesHtml}${createRoleHtml}</div>` : createRoleHtml}
                 ${awardsHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${awardsHtml}</div>` : ""}
+                ${rolesHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${rolesHtml}${createRoleHtml}</div>` : createRoleHtml}
 
                 ${
                   permissions.manageAwards
@@ -1147,8 +1162,15 @@
                         <input id="inline-new-award-name" type="text" placeholder="Award name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
                         <input id="inline-new-award-icon" type="text" placeholder="Icon (fa-class or emoji)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
                         <input id="inline-new-award-desc" type="text" placeholder="Short description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <div id="inline-award-preview" class="mt-2 p-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400 flex items-center gap-3">
+                          <span id="inline-award-preview-icon" class="text-2xl w-8 text-center"></span>
+                          <div>
+                            <div id="inline-award-preview-name" class="font-bold text-white"></div>
+                            <div id="inline-award-preview-desc" class="text-xs text-slate-400"></div>
+                          </div>
+                        </div>
                         <div class="flex gap-2">
-                          <button onclick="addNewAward(${JSON.stringify(player.name)})" class="bg-ap-accent hover:bg-ap-accent/80 text-white font-bold py-2 px-4 rounded-lg flex-1">Create Award</button>
+                          <button onclick="addNewAward(${JSON.stringify(player.name)})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Create Award</button>
                         </div>
                       </div>
                     </div>
@@ -1158,22 +1180,30 @@
                 }
 
                 <div class="flex gap-2 mt-4">
-                  <button onclick="saveInlineEditedPlayer('${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-white font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
+                  <button onclick="saveInlineEditedPlayer('${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
                   <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
                 </div>
             </div>
             
             <!-- Live Preview -->
             <div class="glass rounded-lg p-4">
-                <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
-                <div id="inline-edit-player-preview" class="glass rounded-xl p-4 flex flex-col items-center justify-center gap-3" style="aspect-ratio: 1; min-height: 200px;"></div>
+              <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+              <div id="inline-edit-player-preview" class="glass rounded-xl p-4 flex flex-col items-center gap-3"></div>
             </div>
         </div>
     `;
 
     modal.classList.remove("hidden");
 
-    // Setup live preview
+    // Populate inline roles edit list and setup live preview
+    try {
+      populateInlineRolesList(player.name);
+    } catch (e) {}
+    // Attach inline preview listeners for roles and awards
+    try {
+      attachInlineRolePreviewListeners();
+      attachInlineAwardPreviewListeners();
+    } catch (e) {}
     setupInlinePlayerPreview(player);
   }
 
@@ -1406,6 +1436,215 @@
   // Add a new role from the inline player editor
   // Inline role creation removed — use the global Roles Manager modal instead.
 
+  // Inline role management helpers for the player inline editor
+  let editingRoleOriginalInline = null;
+
+  async function addRoleInline(currentPlayerName) {
+    const roleNameEl = document.getElementById("inline-new-role-name") || {
+      value: ""
+    };
+    const roleColorEl = document.getElementById("inline-new-role-color") || {
+      value: "#ff0000"
+    };
+    const roleName = roleNameEl.value.trim();
+    const roleColor = roleColorEl.value || "#ff0000";
+    if (!roleName) return alert("Please enter a role name");
+
+    try {
+      const payload = editingRoleOriginalInline
+        ? {
+            action: "updateRole",
+            originalName: editingRoleOriginalInline,
+            roleData: { name: roleName, color: roleColor }
+          }
+        : { action: "addRole", roleData: { name: roleName, color: roleColor } };
+
+      const res = await fetch("/api/moderator-actions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(data.error || data.message || "Failed to save role");
+      alert(
+        data.message ||
+          (editingRoleOriginalInline ? "Role updated" : "Role added")
+      );
+      editingRoleOriginalInline = null;
+      // reload roles and refresh inline editor
+      await loadRoles();
+      populateInlineRolesList(currentPlayerName);
+      openPlayerInlineEditor(currentPlayerName);
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  }
+
+  function populateInlineRolesList(currentPlayerName) {
+    const list = document.getElementById("inline-roles-edit-list");
+    if (!list) return;
+    list.innerHTML = "";
+    if (!pageAvailableRoles || pageAvailableRoles.length === 0) {
+      list.innerHTML = '<div class="text-slate-500">No roles defined.</div>';
+      return;
+    }
+    pageAvailableRoles
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .forEach((r) => {
+        const item = document.createElement("div");
+        item.className =
+          "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.color}"></span>
+            <div style="min-width:0;"><div style="color:#e2e8f0;font-weight:700;">${r.name}</div></div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillInlineRoleForEdit(${JSON.stringify(
+              r
+            )}, ${JSON.stringify(currentPlayerName)})'>Edit</button>
+            <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteRoleInline(${JSON.stringify(
+              r.name
+            )}, ${JSON.stringify(currentPlayerName)})'>Delete</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+  }
+
+  function prefillInlineRoleForEdit(role, currentPlayerName) {
+    const nameInput = document.getElementById("inline-new-role-name");
+    const colorInput = document.getElementById("inline-new-role-color");
+    if (nameInput && colorInput) {
+      nameInput.value = role.name;
+      colorInput.value = role.color || "#ff0000";
+      nameInput.focus();
+      editingRoleOriginalInline = role.name;
+      // update add button text to Save
+      const btn = document.getElementById("inline-add-role-btn");
+      if (btn) btn.textContent = "Save";
+    }
+  }
+
+  function promptDeleteRoleInline(roleName, currentPlayerName) {
+    if (
+      !confirm(
+        `Delete role "${roleName}"? This will remove it from all players.`
+      )
+    )
+      return;
+    deleteRoleInlineFromPlayers(roleName, currentPlayerName);
+  }
+
+  async function deleteRoleInlineFromPlayers(roleName, currentPlayerName) {
+    try {
+      const res = await fetch("/api/moderator-actions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
+        body: JSON.stringify({ action: "deleteRole", roleName })
+      });
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(data.error || data.message || "Failed to delete role");
+      alert(data.message || "Role deleted");
+      await loadRoles();
+      populateInlineRolesList(currentPlayerName);
+      openPlayerInlineEditor(currentPlayerName);
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  }
+
+  // Inline preview helpers
+  function updateInlineRolePreview() {
+    const name = (
+      document.getElementById("inline-new-role-name") || { value: "" }
+    ).value.trim();
+    const color =
+      (document.getElementById("inline-new-role-color") || { value: "#ff0000" })
+        .value || "#ff0000";
+    const preview = document.getElementById("inline-role-preview");
+    if (!preview) return;
+    if (!name) {
+      preview.textContent = "Start typing to see preview...";
+      preview.style.color = "";
+      preview.style.borderColor = "";
+      preview.innerHTML = "Start typing to see preview...";
+      return;
+    }
+    preview.style.color = color;
+    preview.style.borderColor = color + "40";
+    preview.innerHTML = `<span style=\"display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border-radius:9999px;font-size:0.9rem;font-weight:700;background:${color}22;color:${color};border:1px solid ${color};\"><span style=\"display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0\"></span><span style=\"color:inherit;\">${escapeHtml(name)}</span></span>`;
+  }
+
+  function attachInlineRolePreviewListeners() {
+    const name = document.getElementById("inline-new-role-name");
+    const color = document.getElementById("inline-new-role-color");
+    if (name) {
+      name.removeEventListener("input", updateInlineRolePreview);
+      name.addEventListener("input", updateInlineRolePreview);
+    }
+    if (color) {
+      color.removeEventListener("input", updateInlineRolePreview);
+      color.addEventListener("input", updateInlineRolePreview);
+    }
+    updateInlineRolePreview();
+  }
+
+  function updateInlineAwardPreview() {
+    const name = (
+      document.getElementById("inline-new-award-name") || { value: "" }
+    ).value.trim();
+    const icon = (
+      document.getElementById("inline-new-award-icon") || { value: "" }
+    ).value.trim();
+    const desc = (
+      document.getElementById("inline-new-award-desc") || { value: "" }
+    ).value.trim();
+    const iconEl = document.getElementById("inline-award-preview-icon");
+    const nameEl = document.getElementById("inline-award-preview-name");
+    const descEl = document.getElementById("inline-award-preview-desc");
+    if (!nameEl || !iconEl || !descEl) return;
+    nameEl.textContent = name || "Award Name";
+    descEl.textContent = desc || "Description will appear here";
+    if (icon && icon.startsWith && icon.startsWith("fa-")) {
+      iconEl.innerHTML = `<i class=\"fa-solid ${escapeHtml(icon)}\"></i>`;
+    } else {
+      iconEl.textContent = icon || "";
+    }
+  }
+
+  function attachInlineAwardPreviewListeners() {
+    const name = document.getElementById("inline-new-award-name");
+    const icon = document.getElementById("inline-new-award-icon");
+    const desc = document.getElementById("inline-new-award-desc");
+    if (name) {
+      name.removeEventListener("input", updateInlineAwardPreview);
+      name.addEventListener("input", updateInlineAwardPreview);
+    }
+    if (icon) {
+      icon.removeEventListener("input", updateInlineAwardPreview);
+      icon.addEventListener("input", updateInlineAwardPreview);
+    }
+    if (desc) {
+      desc.removeEventListener("input", updateInlineAwardPreview);
+      desc.addEventListener("input", updateInlineAwardPreview);
+    }
+    updateInlineAwardPreview();
+  }
+
+  // Simple escaping for inserted text
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
   // Close moderator modal
   function closeModeratorModal() {
     const modal = document.getElementById("moderator-modal");
@@ -1425,5 +1664,11 @@
     window.openModeratorModal = openModeratorModal;
     window.assignAwardToPlayer = assignAwardToPlayer;
     window.addNewAward = addNewAward;
+    // Expose inline role management helpers
+    window.addRoleInline = addRoleInline;
+    window.prefillInlineRoleForEdit = prefillInlineRoleForEdit;
+    window.promptDeleteRoleInline = promptDeleteRoleInline;
+    window.deleteRoleInlineFromPlayers = deleteRoleInlineFromPlayers;
+    window.populateInlineRolesList = populateInlineRolesList;
   } catch (e) {}
 })();

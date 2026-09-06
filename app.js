@@ -727,6 +727,13 @@
       console.log("Moderator status:", isModerator);
       console.log("Admin status:", isAdmin);
 
+      // Cache moderator status so other pages can render optimistically
+      try {
+        localStorage.setItem("isModerator", isModerator ? "true" : "false");
+      } catch (e) {
+        console.warn("Could not cache moderator status:", e);
+      }
+
       // Add moderator button to header if user is a moderator
       if (isModerator) {
         const navSection = $("nav-container");
