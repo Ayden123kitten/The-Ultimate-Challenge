@@ -12,7 +12,7 @@ const CONFIG = {
 // ==========================================
 let games = [];
 let players = []; // [{ name, pfp_link, has_password }]
-let availableRoles = []; // [{ name, color }]
+let pageAvailableRoles = []; // [{ name, color }]
 let availableAwards = []; // [{ name, icon, description }]
 let moderatorRoles = {}; // { playerName: 'admin' | 'moderator' }
 let currentPlayer = AUTH.getName();
@@ -35,7 +35,7 @@ async function loadRoles() {
   try {
     const res = await fetch(`/api/get-data?type=roles&t=${Date.now()}`);
     if (res.ok) {
-      availableRoles = await res.json();
+      pageAvailableRoles = await res.json();
     }
   } catch (err) {
     console.error("Failed to load roles:", err);
@@ -555,7 +555,7 @@ function showPlayerModal(stat) {
   const modalRoles = document.createElement("div");
   modalRoles.style.cssText = `display: flex; flex-wrap: wrap; gap: 6px;`;
   playerRoles.forEach((roleName) => {
-    const role = availableRoles.find((r) => r.name === roleName);
+    const role = pageAvailableRoles.find((r) => r.name === roleName);
     if (role) {
       const badge = document.createElement("span");
       badge.textContent = role.name;
@@ -1040,10 +1040,10 @@ async function openPlayerInlineEditor(playerName, event) {
 
   // Build roles HTML
   let rolesHtml = "";
-  if (availableRoles.length > 0) {
+  if (pageAvailableRoles.length > 0) {
     rolesHtml =
       '<div class="space-y-2"><label class="text-sm font-semibold text-slate-300">Assign Roles</label>';
-    availableRoles.forEach((role) => {
+    pageAvailableRoles.forEach((role) => {
       const isChecked =
         player.roles && player.roles.includes(role.name) ? "checked" : "";
       rolesHtml += `
@@ -1263,7 +1263,7 @@ function renderPlayerPreview(player, containerId) {
     rolesHtml =
       '<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 4px;">';
     playerRoles.forEach((roleName) => {
-      const role = availableRoles.find((r) => r.name === roleName);
+      const role = pageAvailableRoles.find((r) => r.name === roleName);
       if (role) {
         const roleColor = role.color;
         rolesHtml += `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; background-color: ${roleColor}33; color: ${roleColor}; border: 1px solid ${roleColor};"><span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${roleColor};"></span>${role.name}</span>`;

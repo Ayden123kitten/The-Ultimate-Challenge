@@ -48,7 +48,7 @@
   {
     "id": "adgac",
     "name": "A Difficult Game About Climbing",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/23c3aec1a19e1b66a0977f947b2ebc91.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/23c3aec1a19e1b66a0977f947b2ebc91.png",
     "apworld_version": "0.1.2",
     "mod_version": "0.1.2",
     "rules": "",
@@ -71,7 +71,7 @@
   {
     "id": "castlevaniahod",
     "name": "Castlevania: Harmony of Dissonance",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/81ed4d7130d22722194f33b1ab0f937c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/81ed4d7130d22722194f33b1ab0f937c.png",
     "apworld_version": "2.0-hotfix",
     "mod_version": "",
     "rules": "You must set your save name to HARDGAME.",
@@ -94,7 +94,7 @@
   {
     "id": "pdmm",
     "name": "Hatsune Miku: Project DIVA Mega Mix+",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/72b7d885d0da927fbe2636f5ef2d77bb.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/72b7d885d0da927fbe2636f5ef2d77bb.png",
     "apworld_version": "1.5.1B",
     "mod_version": "1.3.1",
     "rules": "",
@@ -117,7 +117,7 @@
   {
     "id": "mariokartdd",
     "name": "Mario Kart: Double Dash!!",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/69d658d0b2859e32cd4dc3b970c8496c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/69d658d0b2859e32cd4dc3b970c8496c.png",
     "apworld_version": "1.0.1",
     "mod_version": "",
     "rules": "",
@@ -140,7 +140,7 @@
   {
     "id": "terraria",
     "name": "Terraria",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/a7b8e43297034e90611ce98d9b6efcfe.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/a7b8e43297034e90611ce98d9b6efcfe.png",
     "apworld_version": "Core",
     "mod_version": "2.2",
     "rules": "You must play with Infernum installed, as it makes the game harder without breaking logic.",
@@ -163,7 +163,7 @@
   {
     "id": "riftofthenecrodancer",
     "name": "Rift of the NecroDancer",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/a22e4383849b4bb63896c5655ac51f4a.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/a22e4383849b4bb63896c5655ac51f4a.png",
     "apworld_version": "0.16.0",
     "mod_version": "0.16.0",
     "rules": "",
@@ -186,7 +186,7 @@
   {
     "id": "osu",
     "name": "osu!",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/c2ba1bc54b239208cb37b901c0d3b363.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/c2ba1bc54b239208cb37b901c0d3b363.png",
     "apworld_version": "1.3.2-beta",
     "mod_version": "",
     "rules": "",
@@ -209,7 +209,7 @@
   {
     "id": "twilightprincess",
     "name": "The Legend of Zelda: Twilight Princess",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/2d8b6c92b659a90e7ef716f811d8bba1.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/2d8b6c92b659a90e7ef716f811d8bba1.png",
     "apworld_version": "0.3.0",
     "mod_version": "",
     "rules": "",
@@ -232,7 +232,7 @@
   {
     "id": "twistycube",
     "name": "Twisty Cube",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/a10118110deab18a25a4a3cb5cae6bb5.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/a10118110deab18a25a4a3cb5cae6bb5.png",
     "apworld_version": "1.0.0",
     "mod_version": "",
     "rules": "",
@@ -255,7 +255,7 @@
   {
     "id": "vampiresurvivors",
     "name": "Vampire Survivors",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/f0e6bc914c24c98b02e956b53344d081.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/f0e6bc914c24c98b02e956b53344d081.png",
     "apworld_version": "0.3.5.1",
     "mod_version": "0.3.5.1",
     "rules": "",
@@ -278,7 +278,7 @@
   {
     "id": "mcdig",
     "name": "Minecraft Dig",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/06625c7ab300fe4fca126b8dd5970d2c.png",
     "apworld_version": "0.0.11",
     "mod_version": "0.0.11",
     "rules": "",
@@ -301,7 +301,7 @@
   {
     "id": "ktane",
     "name": "Keep Talking and Nobody Explodes",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/d47bf0af618a3523a226ed7cada85ce3.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/d47bf0af618a3523a226ed7cada85ce3.png",
     "apworld_version": "0.3.0c",
     "mod_version": "0.3.0",
     "rules": "",
@@ -324,7 +324,7 @@
   {
     "id": "buckshot",
     "name": "Buckshot Roulette",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/1eb0bb2592024cedf6b2cc140114a785.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/1eb0bb2592024cedf6b2cc140114a785.png",
     "apworld_version": "0.4.1",
     "mod_version": "0.4.1-hotfix.1",
     "rules": "You must use the SmarterDealer mod (https://github.com/ITR13/BuckshotRouletteMods/releases/download/v2.0.1/SmarterDealer-2.0.1.zip).",
@@ -370,7 +370,7 @@
   {
     "id": "unfairflips",
     "name": "Unfair Flips",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/9495a73d0c497ddc6c818c19672ad976.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/9495a73d0c497ddc6c818c19672ad976.png",
     "apworld_version": "1.2.1",
     "mod_version": "1.4.7",
     "rules": "",
@@ -393,7 +393,7 @@
   {
     "id": "roguelegacy",
     "name": "Rogue Legacy",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/ad51c2da96522b43ff838bca1f6cdc57.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/ad51c2da96522b43ff838bca1f6cdc57.png",
     "apworld_version": "",
     "mod_version": "1.1.0",
     "rules": "",
@@ -416,7 +416,7 @@
   {
     "id": "animalwell",
     "name": "ANIMAL WELL",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/e79bae5ded854800e149e947dc05d97f.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/e79bae5ded854800e149e947dc05d97f.png",
     "apworld_version": "0.5.4",
     "mod_version": "",
     "rules": "",
@@ -439,7 +439,7 @@
   {
     "id": "donutcounty",
     "name": "Donut County",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/04ffe297e862ba3e4a25b62b6a06105e.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/04ffe297e862ba3e4a25b62b6a06105e.png",
     "apworld_version": "0.1.1",
     "mod_version": "0.1.1",
     "rules": "",
@@ -485,7 +485,7 @@
   {
     "id": "deadcells",
     "name": "Dead Cells",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/abd1c782880cc59759f4112fda0b8f98.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/abd1c782880cc59759f4112fda0b8f98.png",
     "apworld_version": "0.1.8",
     "mod_version": "0.1.8",
     "rules": "",
@@ -508,7 +508,7 @@
   {
     "id": "crosscode",
     "name": "CrossCode",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/ce518001633ca4e1f2ae4b02f4dcb11f.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/ce518001633ca4e1f2ae4b02f4dcb11f.png",
     "apworld_version": "0.9.7",
     "mod_version": "0.9.7",
     "rules": "You must enable all of the following New Game Plus settings: Prepare to Hi!, Diet, No Mercy, First Belt, and Classic Porter.",
@@ -531,7 +531,7 @@
   {
     "id": "celeste",
     "name": "Celeste",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/2eace51d8f796d04991c831a07059758.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/2eace51d8f796d04991c831a07059758.png",
     "apworld_version": "1.1.3",
     "mod_version": "1.1.3",
     "rules": "",
@@ -554,7 +554,7 @@
   {
     "id": "pizzatower",
     "name": "Pizza Tower",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/23a6f2db69037bdf11a989b02b9c43e3.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/23a6f2db69037bdf11a989b02b9c43e3.png",
     "apworld_version": "1.3.3",
     "mod_version": "1.3.3",
     "rules": "",
@@ -577,7 +577,7 @@
   {
     "id": "riskofrain1",
     "name": "Risk of Rain",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/bb40a9b872c75a7090a06f97ca66e275.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/bb40a9b872c75a7090a06f97ca66e275.png",
     "apworld_version": "0.6.2",
     "mod_version": "0.6.2",
     "rules": "",
@@ -600,7 +600,7 @@
   {
     "id": "riskofrainreturns",
     "name": "Risk of Rain Returns",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/f571e1865bfa986776983c23b1525910.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/f571e1865bfa986776983c23b1525910.png",
     "apworld_version": "0.6.2",
     "mod_version": "0.2.2",
     "rules": "You must use the Eclipse mod for harder difficulty (https://thunderstore.io/c/risk-of-rain-returns/p/0n_x/Eclipse/).",
@@ -623,7 +623,7 @@
   {
     "id": "riskofrain2",
     "name": "Risk of Rain 2",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/2f10c1578a0706e06b6d7db6f0b4a6af.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/2f10c1578a0706e06b6d7db6f0b4a6af.png",
     "apworld_version": "Core",
     "mod_version": "1.5.4",
     "rules": "You must play on Eclipse 8 for the hardest diffculty.",
@@ -646,7 +646,7 @@
   {
     "id": "ultrakill",
     "name": "ULTRAKILL",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/ad5cd874127a962c3974bdab37630317.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/ad5cd874127a962c3974bdab37630317.png",
     "apworld_version": "3.5.6",
     "mod_version": "3.5.6",
     "rules": "You must play on brutal difficulty.",
@@ -669,7 +669,7 @@
   {
     "id": "cloverpit",
     "name": "CloverPit",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/a3ccc16bb1bee505c9b3746dcd734026.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/a3ccc16bb1bee505c9b3746dcd734026.png",
     "apworld_version": "1.2.2",
     "mod_version": "1.2.2",
     "rules": "Do not use CloverPitAPHints, as it is broken and makes the game easier. Any other mods are fine, as long as the game is not made easier from them.",
@@ -784,7 +784,7 @@
   {
     "id": "apquest",
     "name": "APQuest",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/06625c7ab300fe4fca126b8dd5970d2c.png",
     "yaml_slot_name": "APQuest",
     "apworld_link": "https://archipelago.gg/games/APQuest/info/en",
     "apworld_version": "Core",
@@ -807,7 +807,7 @@
   {
     "id": "btd6",
     "name": "Bloons TD 6",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/877638212861256c9cc89c428b96a29e.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/877638212861256c9cc89c428b96a29e.png",
     "yaml_slot_name": "BloonsTD6",
     "apworld_link": "https://github.com/Matt41321/Archipelago/releases/download/v0.7.1/bloonstd6.apworld",
     "apworld_version": "0.7.1",
@@ -830,7 +830,7 @@
   {
     "id": "soh",
     "name": "The Legend Of Zelda: Ocarina of Time - Ship of Harkinian",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/8f4deeb91f0d96208ad28e5f23029896.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/8f4deeb91f0d96208ad28e5f23029896.png",
     "yaml_slot_name": "ShipofHarkinian",
     "apworld_link": "https://github.com/HarbourMasters/Archipelago-SoH/releases/download/Soh_1.4.2/oot_soh.apworld",
     "apworld_version": "1.4.2",
@@ -853,7 +853,7 @@
   {
     "id": "tloz",
     "name": "The Legend of Zelda",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/16ec53071aa1007379276da20742504b.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/16ec53071aa1007379276da20742504b.png",
     "yaml_slot_name": "TheLegendOfZelda",
     "apworld_link": "https://cdn.discordapp.com/attachments/1090821869340467332/1454649243091341392/tloz.apworld?ex=6a977dad&is=6a962c2d&hm=2ad1f88358e1747d9fdf93d78067ddf98be12eac336b32373e2fff95abae93e3&",
     "apworld_version": "",
@@ -876,7 +876,7 @@
   {
     "id": "tloztaol",
     "name": "Zelda II: The Adventure of Link",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/a714b6bada5e4ad469abf003c9d2c3d8.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/a714b6bada5e4ad469abf003c9d2c3d8.png",
     "yaml_slot_name": "",
     "apworld_link": "https://github.com/PinkSwitch/Archipelago/releases/download/Zelda2ap1.1/zelda2.apworld",
     "apworld_version": "1.1",
@@ -968,7 +968,7 @@
   {
     "id": "tlozalltp",
     "name": "The Legend of Zelda: A Link to the Past",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/d94c59b53ea6a9eec0a47ae789867098.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/d94c59b53ea6a9eec0a47ae789867098.png",
     "yaml_slot_name": "TLoZALttP",
     "apworld_link": "https://archipelago.gg/games/A%20Link%20to%20the%20Past/info/en",
     "apworld_version": "Core",
@@ -991,7 +991,7 @@
   {
     "id": "tlozalbw",
     "name": "The Legend of Zelda: A Link Between Worlds",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/1ce5e897cda6aeb211dffe8d514f4365.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/1ce5e897cda6aeb211dffe8d514f4365.png",
     "yaml_slot_name": "TLoZALBW",
     "apworld_link": "https://github.com/randomsalience/albw-archipelago/releases/download/v0.3.4-hotfix/albw.apworld",
     "apworld_version": "0.3.4-hotfix",
@@ -1014,7 +1014,7 @@
   {
     "id": "kirbyshards",
     "name": "Kirby 64: The Crystal Shards",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/8d317bdcf4aafcfc22149d77babee96d.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/8d317bdcf4aafcfc22149d77babee96d.png",
     "yaml_slot_name": "Kirby64",
     "apworld_link": "https://github.com/Silvris/Archipelago/releases/download/k64_0.3.2/k64.apworld",
     "apworld_version": "0.3.2",
@@ -1037,7 +1037,7 @@
   {
     "id": "kirbymirror",
     "name": "Kirby & the Amazing Mirror",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/ca3a856a28df7d77d948949206ff9fdf.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/ca3a856a28df7d77d948949206ff9fdf.png",
     "yaml_slot_name": "KirbyMirror",
     "apworld_link": "https://github.com/hasherwi/Archipelago-kirbyam/releases/download/kirbyam-v0.3.0/kirbyam.apworld",
     "apworld_version": "0.3.0",
@@ -1060,7 +1060,7 @@
   {
     "id": "kirbyairride",
     "name": "Kirby Air Ride",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/b91c0e214d2c012f44bfab098fb99a1c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/b91c0e214d2c012f44bfab098fb99a1c.png",
     "yaml_slot_name": "KirbyAirRide",
     "apworld_link": "https://github.com/DeDeDeK/KARchipelago/releases/download/v1.1.1-TEST/kirby_air_ride.apworld",
     "apworld_version": "1.1.1-TEST",
@@ -1129,7 +1129,7 @@
   {
     "id": "jigsaw",
     "name": "Jigsaw",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/06625c7ab300fe4fca126b8dd5970d2c.png",
     "yaml_slot_name": "Jigsaw",
     "slot_count": 1,
     "apworld_link": "https://github.com/spineraks-org/ArchipelagoJigsaw/releases/download/v0.10.0/jigsaw.apworld",
@@ -1152,7 +1152,7 @@
   {
     "id": "librarian",
     "name": "Librarian: Tidy Up the Arcane Library!",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/60d462e6006ca3a50e85a6490aca1cfe.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/60d462e6006ca3a50e85a6490aca1cfe.png",
     "yaml_slot_name": "Librarian",
     "slot_count": 1,
     "apworld_link": "https://github.com/Str8UpWHITE64/Librarian-AP/releases/download/2.0.3/librarian.apworld",
@@ -1175,7 +1175,7 @@
   {
     "id": "adventure",
     "name": "Adventure",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/ace26ac24b643986e59f67ae2e323d0a.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/ace26ac24b643986e59f67ae2e323d0a.png",
     "yaml_slot_name": "Adventure",
     "slot_count": 1,
     "apworld_link": "https://archipelago.gg/games/Adventure/info/en",
@@ -1198,7 +1198,7 @@
   {
     "id": "againstthestorm",
     "name": "Against The Storm",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/e595b4a6f9d0cefe4fce92e5d561be45.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/e595b4a6f9d0cefe4fce92e5d561be45.png",
     "yaml_slot_name": "AgainstTheStorm",
     "slot_count": 1,
     "apworld_link": "https://github.com/Ryguy-9999/ArchipelagoATS/releases/download/v1.2.1/against_the_storm.apworld",
@@ -1221,7 +1221,7 @@
   {
     "id": "ageofmythology",
     "name": "Age of Mythology: Retold",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/92256b22c64d7619b1bc9138a1dfbbbf.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/92256b22c64d7619b1bc9138a1dfbbbf.png",
     "yaml_slot_name": "AgeOfMythology",
     "slot_count": 1,
     "apworld_link": "https://github.com/1-800-thewolf/AoM-Archipelago/releases/download/v1.3.6/aom.apworld",
@@ -1244,7 +1244,7 @@
   {
     "id": "airdelivery",
     "name": "Air Delivery",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/06625c7ab300fe4fca126b8dd5970d2c.png",
     "yaml_slot_name": "AirDelivery",
     "slot_count": 1,
     "apworld_link": "https://github.com/qwint/ap-air-delivery/releases/download/0.1.6/air_delivery.apworld",
@@ -1267,7 +1267,7 @@
   {
     "id": "anno1800",
     "name": "Anno 1800",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/45c8b0960d5d24aec0ae9a190725bc0a.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/45c8b0960d5d24aec0ae9a190725bc0a.png",
     "yaml_slot_name": "Anno1800",
     "slot_count": 1,
     "apworld_link": "https://github.com/Dark-Listener/ArchipelagoA1800/releases/download/release%2Fv1.3.1/a1800.apworld",
@@ -1290,7 +1290,7 @@
   {
     "id": "anodyne",
     "name": "Anodyne",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/b801759e5fe60c6715cdbb0a8a4574c1.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/b801759e5fe60c6715cdbb0a8a4574c1.png",
     "yaml_slot_name": "Anodyne",
     "slot_count": 1,
     "apworld_link": "https://github.com/PixieCatSupreme/ArchipelagoAno/releases/tag/v0.6.3",
@@ -1313,7 +1313,7 @@
   {
     "id": "apeescape",
     "name": "Ape Escape",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/0868dbe2d591f3c1beb2f6dd50bdb72e.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/0868dbe2d591f3c1beb2f6dd50bdb72e.png",
     "yaml_slot_name": "ApeEscape",
     "slot_count": 1,
     "apworld_link": "https://github.com/Thedragon005/Archipelago-Ape-Escape/releases/download/v0.9.10/apeescape.apworld",
@@ -1336,7 +1336,7 @@
   {
     "id": "ae3",
     "name": "Ape Escape 3",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/acbb8431ab8b5071fb0d96952101f951.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/acbb8431ab8b5071fb0d96952101f951.png",
     "yaml_slot_name": "ApeEscape3",
     "slot_count": 1,
     "apworld_link": "https://github.com/aidanii24/ae3-archipelago/releases/download/v2.0.6/ape_escape_3.apworld",
@@ -1359,7 +1359,7 @@
   {
     "id": "aquaria",
     "name": "Aquaria",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/883e881bb4d22a7add958f2d6b052c9f.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/883e881bb4d22a7add958f2d6b052c9f.png",
     "yaml_slot_name": "Aquaria",
     "slot_count": 1,
     "apworld_link": "https://archipelago.gg/games/Aquaria/info/en",
@@ -1382,7 +1382,7 @@
   {
     "id": "kirbydreamland3",
     "name": "Kirby's Dream Land 3",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/ec9b606d4c0673aa256696c06cc9e785.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/ec9b606d4c0673aa256696c06cc9e785.png",
     "yaml_slot_name": "KirbyDreamLand3",
     "slot_count": 1,
     "apworld_link": "https://archipelago.gg/games/Kirby's%20Dream%20Land%203/info/en",
@@ -1405,7 +1405,7 @@
   {
     "id": "kirbysuperstar",
     "name": "Kirby Super Star",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/580796a888df897b38097bd6c1fdaa96.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/580796a888df897b38097bd6c1fdaa96.png",
     "yaml_slot_name": "KirbySuperStar",
     "slot_count": 1,
     "apworld_link": "https://github.com/Silvris/Archipelago/releases/tag/kss_0.1.9",
@@ -1428,7 +1428,7 @@
   {
     "id": "kirbysqueaksquad",
     "name": "Kirby Squeak Squad",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/5b92e4945eb3a04990671a4da604ff17.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/5b92e4945eb3a04990671a4da604ff17.png",
     "yaml_slot_name": "KirbySqueakSquad",
     "slot_count": 1,
     "apworld_link": "https://github.com/WindChill404/Kirby-Squeak-Squad-APWORLD/releases/tag/0.0.9",
@@ -1451,7 +1451,7 @@
   {
     "id": "archipelaballs",
     "name": "Archipelaballs",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/06625c7ab300fe4fca126b8dd5970d2c.png",
     "yaml_slot_name": "Archipelaballs",
     "slot_count": 1,
     "apworld_link": "https://archipelago.shinten.moe/games/Archipelaballs/archipelaballs.apworld",
@@ -1474,7 +1474,7 @@
   {
     "id": "archipeladoku",
     "name": "Archipeladoku",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/06625c7ab300fe4fca126b8dd5970d2c.png",
     "yaml_slot_name": "Archipeladoku",
     "slot_count": 1,
     "apworld_link": "https://github.com/galdiuz/archipeladoku/releases/download/v2026.07.26/archipeladoku.apworld",
@@ -1497,7 +1497,7 @@
   {
     "id": "astalon",
     "name": "Astalon: Tears of the Earth",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/3cec71c1070fd792e73a5c9a6cedef17.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/3cec71c1070fd792e73a5c9a6cedef17.png",
     "yaml_slot_name": "AstalonTotE",
     "slot_count": 1,
     "apworld_link": "https://github.com/drtchops/Archipelago-Astalon/releases/download/v0.27.1/astalon.apworld",
@@ -1520,7 +1520,7 @@
   {
     "id": "autopelago",
     "name": "Autopelago",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/06625c7ab300fe4fca126b8dd5970d2c.png",
     "yaml_slot_name": "Autopelago",
     "slot_count": 1,
     "apworld_link": "https://github.com/airbreather/Archipelago/releases/download/v1.1.1/autopelago.apworld",
@@ -1543,7 +1543,7 @@
   {
     "id": "axiomverge",
     "name": "Axiom Verge",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/e197f2c0db6860022477e8300a8fd922.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/e197f2c0db6860022477e8300a8fd922.png",
     "yaml_slot_name": "AxiomVerge",
     "slot_count": 1,
     "apworld_link": "https://github.com/mail-liam/Archipelago/releases/download/beta3.3/axiomverge.apworld",
@@ -1566,7 +1566,7 @@
   {
     "id": "banjotooie",
     "name": "Banjo-Tooie",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/000c076c390a4c357313fca29e390ece.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/000c076c390a4c357313fca29e390ece.png",
     "yaml_slot_name": "BanjoTooie",
     "slot_count": 1,
     "apworld_link": "https://github.com/jjjj12212/Archipelago-BanjoTooie/releases/download/V4.13.1/banjo_tooie.apworld",
@@ -1589,7 +1589,7 @@
   {
     "id": "tboir",
     "name": "The Binding of Isaac: Repentance",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/795daa0834ca092ed52b5d0a5848387d.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/795daa0834ca092ed52b5d0a5848387d.png",
     "yaml_slot_name": "TBoIR",
     "slot_count": 1,
     "apworld_link": "https://github.com/NaveTK/Archipelago/releases/download/v0.4.3/tboir.apworld",
@@ -1612,7 +1612,7 @@
   {
     "id": "bksim",
     "name": "BK Simulator",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/06625c7ab300fe4fca126b8dd5970d2c.png",
     "yaml_slot_name": "BKSimulator",
     "slot_count": 1,
     "apworld_link": "https://github.com/BK-Simulator/BK-Simulator/releases/download/1.0.2/bksim.apworld",
@@ -1635,7 +1635,7 @@
   {
     "id": "touhou18.5",
     "name": "Bulletphilia-tachi no Yami-Ichiba ~ 100th Black Market",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/658554b5cdaf6ce721d68cf2a0be6734.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/658554b5cdaf6ce721d68cf2a0be6734.png",
     "yaml_slot_name": "TouhouBlackMarket",
     "slot_count": 1,
     "apworld_link": "https://github.com/furret78/ArchipelagoTouhou/releases/download/0.4.52/th185.apworld",
@@ -1658,7 +1658,7 @@
   {
     "id": "blasphemous",
     "name": "Blasphemous",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/f53a13851422263fb59329edb66f1dbc.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/f53a13851422263fb59329edb66f1dbc.png",
     "yaml_slot_name": "Blasphemous",
     "slot_count": 1,
     "apworld_link": "https://archipelago.gg/games/Blasphemous/info/en",
@@ -1681,7 +1681,7 @@
   {
     "id": "bombermanhero",
     "name": "Bomberman Hero",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/34e420f6e47d96669897a45586997a57.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/34e420f6e47d96669897a45586997a57.png",
     "yaml_slot_name": "BombermanHero",
     "slot_count": 1,
     "apworld_link": "https://github.com/Happyhappyism/Archipelago/releases/download/bombhero_v0.2.1/bomberman_hero.apworld",
@@ -1704,7 +1704,7 @@
   {
     "id": "bombrushcyberfunk",
     "name": "Bomb Rush Cyberfunk",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/f06f03a970353985cf4f02ccb07f1c38.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/f06f03a970353985cf4f02ccb07f1c38.png",
     "yaml_slot_name": "BRC",
     "slot_count": 1,
     "apworld_link": "https://archipelago.gg/games/Bomb%20Rush%20Cyberfunk/info/en",
@@ -1727,7 +1727,7 @@
   {
     "id": "bravefencermusashi",
     "name": "Brave Fencer Musashi",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/536eecee295b92db6b32194e269541f8.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/536eecee295b92db6b32194e269541f8.png",
     "yaml_slot_name": "BFM",
     "slot_count": 1,
     "apworld_link": "https://github.com/AegeusEvander/Brave-Fencer-Musashi-AP-World/releases/download/v0.8.0/bfm.apworld",
@@ -1761,7 +1761,7 @@
     "tracker_link": "",
     "game_info_link": "",
     "support_link": "https://discord.com/channels/731205301247803413/1154944430097313803",
-    "save_file_link": "https://cdn2.steamgriddb.com/logo_thumb/c4e0ca9de71cce2b40af66bff49c4b24.png",
+    "save_file_link": "https://cdn2.steamgriddb.com/logo/c4e0ca9de71cce2b40af66bff49c4b24.png",
     "rules": "",
     "extra_information": "",
     "current_player": null,
@@ -1773,7 +1773,7 @@
   {
     "id": "bumperstickers",
     "name": "Bumper Stickers",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/06625c7ab300fe4fca126b8dd5970d2c.png",
     "yaml_slot_name": "BumperStickers",
     "slot_count": 1,
     "apworld_link": "https://archipelago.gg/games/Bumper%20Stickers/info/en",
@@ -1796,7 +1796,7 @@
   {
     "id": "candybox2",
     "name": "Candy Box 2",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/06625c7ab300fe4fca126b8dd5970d2c.png",
     "yaml_slot_name": "CandyBox2",
     "slot_count": 1,
     "apworld_link": "https://github.com/vicr123/Archipelago/releases/download/20260822-1/candybox2.apworld",
@@ -1819,7 +1819,7 @@
   {
     "id": "cartograp",
     "name": "CartogrAP",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/06625c7ab300fe4fca126b8dd5970d2c.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/06625c7ab300fe4fca126b8dd5970d2c.png",
     "yaml_slot_name": "CartogrAP",
     "slot_count": 1,
     "apworld_link": "https://xmcacutt.itch.io/cartograp",
@@ -1842,7 +1842,7 @@
   {
     "id": "castlevania64",
     "name": "Castlevania 64",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/72a7dd9f91089b8fabd3edc4c9db7ed1.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/72a7dd9f91089b8fabd3edc4c9db7ed1.png",
     "yaml_slot_name": "Castlevania64",
     "slot_count": 1,
     "apworld_link": "https://archipelago.gg/games/Castlevania%2064/info/en",
@@ -1865,7 +1865,7 @@
   {
     "id": "newsupermariobrosds",
     "name": "New Super Mario Bros.",
-    "logo": "https://cdn2.steamgriddb.com/logo_thumb/02785fa8c305e5f22c101f65923d6de4.png",
+    "logo": "https://cdn2.steamgriddb.com/logo/02785fa8c305e5f22c101f65923d6de4.png",
     "yaml_slot_name": "NewSMarioBrosDS",
     "slot_count": 1,
     "apworld_link": "https://github.com/Lemix028/Archipelago-NewSuperMarioBrosDS/releases/download/nsmbds-v0.4.6-alpha/nsmbds.apworld",

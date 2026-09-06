@@ -12,7 +12,7 @@ const CONFIG = {
 // ==========================================
 let games = [];
 let players = [];
-let availableRoles = []; // [{ name, color }]
+let pageAvailableRoles = []; // [{ name, color }]
 let currentPlayer = AUTH.getName();
 let currentSortType = "games"; // 'games', 'time', 'claims', 'completion'
 
@@ -30,7 +30,7 @@ async function loadRoles() {
   try {
     const res = await fetch(`/api/get-data?type=roles&t=${Date.now()}`);
     if (res.ok) {
-      availableRoles = await res.json();
+      pageAvailableRoles = await res.json();
     }
   } catch (err) {
     console.error("Failed to load roles:", err);
@@ -429,7 +429,7 @@ function showPlayerModal(stat) {
   const modalRoles = document.createElement("div");
   modalRoles.style.cssText = `display: flex; flex-wrap: wrap; gap: 6px;`;
   playerRoles.forEach((roleName) => {
-    const role = availableRoles.find((r) => r.name === roleName);
+    const role = pageAvailableRoles.find((r) => r.name === roleName);
     if (role) {
       const badge = document.createElement("span");
       badge.textContent = role.name;
