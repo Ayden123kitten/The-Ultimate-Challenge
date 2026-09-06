@@ -1107,7 +1107,7 @@
                         <div class="mt-3">
                           <div id="roles-tab-content-create" class="mt-3"></div>
                           <div class="mt-3 pt-3 border-t border-slate-700">
-                            <h5 class="text-xs font-semibold text-slate-400 mb-2">Existing Roles</h5>
+                            <h5 class="text-xs font-semibold text-slate-400 mb-2">Manage Roles</h5>
                             <div id="roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
                           </div>
                         </div>
@@ -1168,7 +1168,7 @@
                             <div class="md:col-span-2 mt-3">
                                 <div id="awards-tab-content-create" class="mt-3"></div>
                                 <div class="mt-3 pt-3 border-t border-slate-700">
-                                  <h5 class="text-xs font-semibold text-slate-400 mb-2">Existing Awards</h5>
+                                  <h5 class="text-xs font-semibold text-slate-400 mb-2">Manage Awards</h5>
                                   <div id="awards-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
                                 </div>
                             </div>
