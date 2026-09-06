@@ -1090,7 +1090,7 @@
                             <button onclick="addNewRole()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Role</button>
                         </div>
                         <!-- Live Preview -->
-                        <div class="mt-3 pt-3 border-t border-slate-700">
+                        <div class="mt-3">
                             <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
                             <div id="add-role-preview" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700">
                                 <span class="text-sm text-slate-400">Start typing to see preview...</span>
@@ -1143,6 +1143,20 @@
                             <input type="text" id="award-name-input" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                             <input type="text" id="award-icon-input" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                             <textarea id="award-description-input" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
+                            <!-- Live Preview (moved to be directly under Create New Award inputs) -->
+                            <div class="md:col-span-2 mt-2">
+                              <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
+                              <div class="mt-1 p-4 glass rounded-lg">
+                                <div id="award-preview" class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                                  <span id="preview-icon" class="text-2xl w-8 text-center"></span>
+                                  <div>
+                                    <div id="preview-name" class="font-bold text-white">Award Name</div>
+                                    <div id="preview-description" class="text-xs text-slate-400">Description will appear here</div>
+                                  </div>
+                                </div>
+                                <button onclick="createAward()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg mt-4 w-full">Create Award</button>
+                              </div>
+                            </div>
                             <!-- Existing Awards list -->
                             <div class="md:col-span-2 mt-3">
                                 <div id="awards-tab-content-create" class="mt-3"></div>
@@ -1152,17 +1166,6 @@
                                 </div>
                             </div>
                         </div>
-                        <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
-                        <div class="mt-4 p-4 glass rounded-lg">
-                          <div id="award-preview" class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
-                            <span id="preview-icon" class="text-2xl w-8 text-center"></span>
-                            <div>
-                              <div id="preview-name" class="font-bold text-white">Award Name</div>
-                              <div id="preview-description" class="text-xs text-slate-400">Description will appear here</div>
-                            </div>
-                          </div>
-                        </div>
-                        <button onclick="createAward()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg mt-4 w-full">Create Award</button>
                     </div>
                     <div class="border-t border-slate-700 pt-4">
                         <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Award</h4>
@@ -3051,5 +3054,14 @@
     window.setAdmin = setAdmin;
     window.updateModeratorPermissions = updateModeratorPermissions;
     window.switchRolesTab = switchRolesTab;
+      // Expose role/award helper functions used by inline onclick attributes
+      window.prefillRoleForEdit = prefillRoleForEdit;
+      window.promptDeleteRole = promptDeleteRole;
+      window.deleteRoleInline = deleteRoleInline;
+      window.populateRolesEditList = populateRolesEditList;
+      window.prefillAwardForEdit = prefillAwardForEdit;
+      window.promptDeleteAward = promptDeleteAward;
+      window.deleteAwardInline = deleteAwardInline;
+      window.populateAwardsEditList = populateAwardsEditList;
   } catch (e) {}
 })();
