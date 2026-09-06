@@ -790,8 +790,11 @@
           const isLeaderboardPage =
             pagePath.endsWith("/leaderboard.html") ||
             pagePath.endsWith("leaderboard.html");
-          // Don't add the inline-edit toggle on the leaderboard page (user requested)
-          if (!isLeaderboardPage) {
+          const isSettingsPage =
+            pagePath.endsWith("/settings.html") ||
+            pagePath.endsWith("settings.html");
+          // Don't add the inline-edit toggle on the leaderboard or settings page
+          if (!isLeaderboardPage && !isSettingsPage) {
             const inlineEditBtn = document.createElement("button");
             inlineEditBtn.id = "inline-edit-toggle-btn";
             inlineEditBtn.className =
@@ -819,7 +822,7 @@
           modBtnMobile.onclick = openModeratorModal;
           mobileModContainer.appendChild(modBtnMobile);
 
-          if (!isLeaderboardPage) {
+          if (!isLeaderboardPage && !isSettingsPage) {
             const inlineEditBtnMobile = document.createElement("button");
             inlineEditBtnMobile.className =
               "mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
@@ -1142,7 +1145,7 @@
       htmlContent += `
             <!-- Player Roles Section -->
             <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-shield text-purple-400 mr-2"></i>Manage Player Roles</h3>
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-shield text-purple-400 mr-2"></i>Manage Roles</h3>
                 <div class="space-y-4">
                     <div>
                         <h4 class="text-sm font-semibold text-slate-300 mb-2">Create New Role</h4>
@@ -1205,6 +1208,7 @@
                             <input type="text" id="award-name-input" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                             <input type="text" id="award-icon-input" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                             <textarea id="award-description-input" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
+                            <button onclick="createAward()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg w-full md:col-span-2">Create Award</button>
                             <!-- Live Preview (moved to be directly under Create New Award inputs) -->
                             <div class="md:col-span-2 mt-2">
                               <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
@@ -1216,7 +1220,6 @@
                                     <div id="preview-description" class="text-xs text-slate-400">Description will appear here</div>
                                   </div>
                                 </div>
-                                <button onclick="createAward()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg mt-4 w-full">Create Award</button>
                               </div>
                             </div>
                             <!-- Existing Awards list -->
@@ -2350,20 +2353,35 @@
         const item = document.createElement("div");
         item.className =
           "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
-        item.innerHTML = `
-        <div class="flex items-center gap-3">
+
+        const badge = document.createElement("div");
+        badge.className = "flex items-center gap-3";
+        badge.innerHTML = `
           <span style="display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border-radius:9999px;font-size:0.8rem;font-weight:700;background:${r.color}33;color:${r.color};border:1px solid ${r.color};">
             <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.color};flex-shrink:0"></span>
             <span style="color:inherit;">${r.name}</span>
           </span>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillRoleForEdit(${JSON.stringify(r)})'>Edit</button>
-          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteRole(${JSON.stringify(
-            r.name
-          )})'>Delete</button>
-        </div>
-      `;
+        `;
+
+        const controls = document.createElement("div");
+        controls.style.display = "flex";
+        controls.style.gap = "8px";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm";
+        editBtn.textContent = "Edit";
+        editBtn.addEventListener("click", () => prefillRoleForEdit(r));
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", () => promptDeleteRole(r.name));
+
+        controls.appendChild(editBtn);
+        controls.appendChild(deleteBtn);
+
+        item.appendChild(badge);
+        item.appendChild(controls);
         list.appendChild(item);
       });
   }
@@ -2913,22 +2931,37 @@
         const item = document.createElement("div");
         item.className =
           "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
+
+        const info = document.createElement("div");
+        info.className = "flex items-center gap-3";
         const iconHtml =
           a.icon && a.icon.startsWith && a.icon.startsWith("fa-")
             ? `<i class="fa-solid ${a.icon}" style="color:${a.color};"></i>`
             : a.icon || "🏆";
-        item.innerHTML = `
-        <div class="flex items-center gap-3">
+        info.innerHTML = `
           ${iconHtml}
           <div style="min-width:0;"><div style="color:#e2e8f0;font-weight:700;">${a.name}</div><div style="color:#94a3b8;font-size:0.85rem;">${a.description || ""}</div></div>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillAwardForEdit(${JSON.stringify(a)})'>Edit</button>
-          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteAward(${JSON.stringify(
-            a.name
-          )})'>Delete</button>
-        </div>
-      `;
+        `;
+
+        const controls = document.createElement("div");
+        controls.style.display = "flex";
+        controls.style.gap = "8px";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm";
+        editBtn.textContent = "Edit";
+        editBtn.addEventListener("click", () => prefillAwardForEdit(a));
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", () => promptDeleteAward(a.name));
+
+        controls.appendChild(editBtn);
+        controls.appendChild(deleteBtn);
+
+        item.appendChild(info);
+        item.appendChild(controls);
         list.appendChild(item);
       });
   }
