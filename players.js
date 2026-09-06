@@ -1114,12 +1114,10 @@
       <div class="mt-3">
         <label class="text-sm font-semibold text-slate-300">Create New Role</label>
         <div class="mt-2 space-y-2">
-          <div>
-            <input type="text" id="inline-new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
-          </div>
           <div class="flex gap-2">
+            <input type="text" id="inline-new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
             <input type="color" id="inline-new-role-color" value="#ff0000" class="bg-slate-800/50 border border-slate-700 rounded-lg px-2 py-2 h-10 w-12">
-            <button onclick="addRoleInline(${JSON.stringify(player.name)})" id="inline-add-role-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Add Role</button>
+            <button onclick="addRoleInline(${JSON.stringify(player.name)})" id="inline-add-role-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap">Add Role</button>
           </div>
         </div>
         <div class="mt-3">
@@ -1169,8 +1167,8 @@
                     <input type="text" id="inline-edit-player-discord" placeholder="Discord Username" value="${player.discord || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
                 </div>
                 <div class="border-t border-slate-700 my-4"></div>
+                ${permissions.manageRoles || pageAvailableRoles.length > 0 ? `<div class="mt-4"><h4 class="text-sm font-semibold text-slate-300 mb-2">Manage Roles</h4></div>` : ""}
                 ${createRoleHtml ? `<div class="mt-4">${createRoleHtml}</div>` : ""}
-                ${permissions.manageRoles || pageAvailableRoles.length > 0 ? `<div class="mt-4"><label class="text-sm font-semibold text-slate-300">Manage Roles</label></div>` : ""}
                 ${rolesHtml ? `<div class="mt-4">${rolesHtml}</div>` : ""}
 
                 ${
@@ -1201,7 +1199,7 @@
                       </div>
                     </div>
 
-                    <label class="text-sm font-semibold text-slate-300 mt-4 block">Manage Awards</label>
+                    <h4 class="text-sm font-semibold text-slate-300 mb-2 mt-4">Manage Awards</h4>
                     <div id="inline-awards-list" class="mt-2 space-y-2">
                       ${
                         availableAwards.length > 0
@@ -1210,15 +1208,15 @@
                                 (a) => `
                         <div class="flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded">
                           <div class="flex items-center gap-3">
-                            ${a.icon && a.icon.startsWith && a.icon.startsWith("fa-") ? `<i class="fa-solid ${a.icon}" style="color: #38bdf8;"></i>` : `<span style="font-size:1.2rem;">${a.icon || "🏆"}</span>`}
+                            ${a.icon && a.icon.startsWith && a.icon.startsWith("fa-") ? `<i class="fa-solid ${a.icon}" style="color: ${a.color || "#38bdf8"};"></i>` : `<span style="font-size:1.2rem;">${a.icon || "🏆"}</span>`}
                             <div style="min-width:0;">
                               <div style="color:#e2e8f0; font-weight:700;">${a.name}</div>
                               <div style="color:#94a3b8; font-size:0.85rem;">${a.description || ""}</div>
                             </div>
                           </div>
                           <div style="display:flex; gap:8px;">
-                            <button onclick="assignAwardToPlayer('add', ${JSON.stringify(player.name)}, ${JSON.stringify(a.name)}, ${JSON.stringify(a.icon || "")}, ${JSON.stringify(a.description || "")})" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm">Assign</button>
-                            <button onclick="assignAwardToPlayer('remove', ${JSON.stringify(player.name)}, ${JSON.stringify(a.name)})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Remove</button>
+                            <button onclick="prefillAwardForEdit(${JSON.stringify(a)})" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">Edit</button>
+                            <button onclick="promptDeleteAward(${JSON.stringify(a.name)})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Delete</button>
                           </div>
                         </div>
                       `

@@ -1229,13 +1229,11 @@
                             <!-- Live Preview (moved to be directly under Create New Award inputs) -->
                             <div class="md:col-span-2 mt-2">
                               <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
-                              <div class="mt-1 p-4 glass rounded-lg">
-                                <div id="award-preview" class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
-                                  <span id="preview-icon" class="text-2xl w-8 text-center"></span>
-                                  <div>
-                                    <div id="preview-name" class="font-bold text-white">Award Name</div>
-                                    <div id="preview-description" class="text-xs text-slate-400">Description will appear here</div>
-                                  </div>
+                              <div id="award-preview" class="flex items-center gap-3 p-2 bg-slate-800/50 rounded-lg">
+                                <span id="preview-icon" class="text-2xl w-8 text-center"></span>
+                                <div>
+                                  <div id="preview-name" class="font-bold text-white">Award Name</div>
+                                  <div id="preview-description" class="text-xs text-slate-400">Description will appear here</div>
                                 </div>
                               </div>
                             </div>
@@ -1250,7 +1248,7 @@
                         </div>
                     </div>
                     <div class="border-t border-slate-700 pt-4">
-                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Award</h4>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Awards</h4>
                         <select id="award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
                             <option value="">Select an award...</option>
                         </select>
