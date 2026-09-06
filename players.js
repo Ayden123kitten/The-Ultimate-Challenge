@@ -1113,20 +1113,22 @@
       createRoleHtml = `
       <div class="mt-3">
         <label class="text-sm font-semibold text-slate-300">Create New Role</label>
-        <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 items-start">
+        <div class="mt-2 space-y-2">
           <div>
-            <input type="text" id="inline-new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full">
+            <input type="text" id="inline-new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
           </div>
           <div class="flex gap-2">
             <input type="color" id="inline-new-role-color" value="#ff0000" class="bg-slate-800/50 border border-slate-700 rounded-lg px-2 py-2 h-10 w-12">
             <button onclick="addRoleInline(${JSON.stringify(player.name)})" id="inline-add-role-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Add Role</button>
           </div>
-          <div class="md:col-span-2">
-            <label class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Live Preview</label>
-            <div id="inline-role-preview" class="mt-2 p-2 inline-flex items-center gap-2 rounded-lg bg-slate-800/50 border border-slate-700 text-sm text-slate-400" style="min-height: 2.5rem; resize: vertical; overflow: auto;">Start typing to see preview...</div>
-            <div id="inline-roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto mt-2"></div>
+        </div>
+        <div class="mt-3">
+          <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
+          <div id="inline-role-preview" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700">
+            <span class="text-sm text-slate-400">Start typing to see preview...</span>
           </div>
         </div>
+        <div id="inline-roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto mt-2"></div>
       </div>
     `;
     }
@@ -1166,9 +1168,9 @@
                     <input type="text" id="inline-edit-player-pronouns" placeholder="Pronouns" value="${player.pronouns || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
                     <input type="text" id="inline-edit-player-discord" placeholder="Discord Username" value="${player.discord || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
                 </div>
-                
-                ${permissions.manageRoles || pageAvailableRoles.length > 0 ? `<div class="mt-4"><label class="text-sm font-semibold text-slate-300">Manage Roles</label></div>` : ""}
+                <div class="border-t border-slate-700 my-4"></div>
                 ${createRoleHtml ? `<div class="mt-4">${createRoleHtml}</div>` : ""}
+                ${permissions.manageRoles || pageAvailableRoles.length > 0 ? `<div class="mt-4"><label class="text-sm font-semibold text-slate-300">Manage Roles</label></div>` : ""}
                 ${rolesHtml ? `<div class="mt-4">${rolesHtml}</div>` : ""}
 
                 ${
@@ -1177,20 +1179,24 @@
                   <div id="inline-awards-management" class="mt-4 border-t border-slate-700 pt-4">
                     <div class="mt-3">
                       <label class="text-sm font-semibold text-slate-300">Create New Award</label>
-                      <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <input id="inline-new-award-name" type="text" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                        <input id="inline-new-award-icon" type="text" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                        <textarea id="inline-new-award-desc" rows="2" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white md:col-span-2 resize-y min-h-[3rem]" style="resize: vertical; min-height: 3rem;"></textarea>
-                        <label class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Live Preview</label>
-                        <div id="inline-award-preview" class="mt-2 p-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400 flex items-center gap-3">
-                          <span id="inline-award-preview-icon" class="text-2xl w-8 text-center"></span>
-                          <div>
-                            <div id="inline-award-preview-name" class="font-bold text-white">Award Name</div>
-                            <div id="inline-award-preview-desc" class="text-xs text-slate-400">Start typing to see preview...</div>
+                      <div class="mt-2 space-y-2">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          <input id="inline-new-award-name" type="text" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                          <input id="inline-new-award-icon" type="text" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        </div>
+                        <textarea id="inline-new-award-desc" rows="2" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full resize-y min-h-[3rem]" style="resize: vertical; min-height: 3rem;"></textarea>
+                        <div class="mt-3">
+                          <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
+                          <div id="inline-award-preview" class="w-full p-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400 flex items-center gap-3">
+                            <span id="inline-award-preview-icon" class="text-2xl w-8 text-center"></span>
+                            <div>
+                              <div id="inline-award-preview-name" class="font-bold text-white">Award Name</div>
+                              <div id="inline-award-preview-desc" class="text-xs text-slate-400">Start typing to see preview...</div>
+                            </div>
                           </div>
                         </div>
                         <div class="mt-2 flex gap-2">
-                          <button onclick="addNewAward(${JSON.stringify(player.name)})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Create Award</button>
+                          <button onclick="addNewAward(${JSON.stringify(player.name)})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg w-full">Create Award</button>
                         </div>
                       </div>
                     </div>
@@ -1646,19 +1652,22 @@
         .value || "#ff0000";
     const preview = document.getElementById("inline-role-preview");
     if (!preview) return;
+
     if (!name) {
-      preview.textContent = "Start typing to see preview...";
       preview.style.color = "";
       preview.style.borderColor = "";
-      preview.style.backgroundColor = "";
-      preview.innerHTML = "Start typing to see preview...";
+      preview.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
       return;
     }
-    preview.style.color = "#e2e8f0";
-    preview.style.borderColor = "#475569";
-    preview.style.backgroundColor = "#0f172a";
-    preview.style.borderRadius = "8px";
-    preview.innerHTML = `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:0.8rem;font-weight:700;background:#0f172a;color:#e2e8f0;border:1px solid #475569;"><span style="display:inline-block;width:6px;height:6px;background:${color};border-radius:50%;flex-shrink:0"></span><span style="color:inherit;">${escapeHtml(name)}</span></span>`;
+
+    preview.style.color = "";
+    preview.style.borderColor = "";
+    preview.innerHTML = `
+      <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 0.875rem; font-weight:700; background-color: ${color}33; color: ${color}; border: 1px solid ${color};">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span>
+        <span style="color:inherit;">${escapeHtml(name)}</span>
+      </span>
+    `;
   }
 
   function attachInlineRolePreviewListeners() {
