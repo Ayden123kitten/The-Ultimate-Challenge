@@ -487,9 +487,9 @@
                 ${
                   inlineEditMode && effectiveModerator
                     ? `
-                    <button onclick="openPlayerInlineEditor('${stat.name}', event)" style="position: absolute; top: -5px; right: -5px; background: #1e293b; border: 2px solid #38bdf8; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Edit Player">
-                        <i class="fa-solid fa-gear" style="color: #38bdf8;"></i>
-                    </button>
+<button onclick="openPlayerInlineEditor(${JSON.stringify(stat.name)}, event)" style="position: absolute; top: -5px; right: -5px; background: #1e293b; border: 2px solid #38bdf8; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Edit Player">
+    <i class="fa-solid fa-gear" style="color: #38bdf8;"></i>
+</button>
                 `
                     : ""
                 }
@@ -1270,25 +1270,24 @@
                       ${availableAwards
                         .map(
                           (a) =>
-                            `<option value='${JSON.stringify({
+                            `<option value="${JSON.stringify({
                               name: a.name,
                               icon: a.icon || "",
                               description: a.description || ""
-                            })}'>${a.icon ? (a.icon.startsWith("fa-") ? "" : a.icon + " ") : ""}${a.name}</option>`
+                            })}">${a.icon ? (a.icon.startsWith("fa-") ? "" : a.icon + " ") : ""}${a.name}</option>`
                         )
                         .join("")}
                     </select>
                     <div class="flex gap-2">
-                      <button onclick="assignAwardInline('add', '${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Assign Award</button>
-                      <button onclick="assignAwardInline('remove', '${player.name}')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Award</button>
-                    </div>
+<button onclick="assignAwardInline('add', ${JSON.stringify(player.name)})" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Assign Award</button>
+<button onclick="assignAwardInline('remove', ${JSON.stringify(player.name)})" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Award</button>                    </div>
                   </div>
                 `
                     : ""
                 }
 
                 <div class="flex gap-2 mt-4">
-                  <button onclick="saveInlineEditedPlayer('${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
+<button onclick="saveInlineEditedPlayer(${JSON.stringify(player.name)})" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
                   <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
                 </div>
             </div>

@@ -838,6 +838,17 @@
             '<i class="fa-solid fa-shield-halved"></i><span class="text-sm">Moderation</span>';
           modBtnMobile.onclick = openModeratorModal;
           mobileModContainer.appendChild(modBtnMobile);
+      if (typeof renderPlayers === "function") {
+        renderPlayers();
+      }
+
+      // Kick off background prefetch for moderator data (non-blocking)
+      try {
+        prefetchModeratorData();
+      } catch (e) {
+        console.debug('prefetchModeratorData invocation failed', e);
+      }
+    }
 
           if (!isLeaderboardPage && !isSettingsPage) {
             const inlineEditBtnMobile = document.createElement("button");
