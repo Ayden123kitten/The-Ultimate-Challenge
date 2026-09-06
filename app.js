@@ -27,6 +27,35 @@
     const hours = Math.floor(ms / (1000 * 60 * 60));
     return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   }
+
+  // Background prefetch for moderator-related data to make controls load faster
+  async function prefetchModeratorData() {
+    try {
+      // Only run if user appears to be a moderator (optimistic check)
+      const isMod = localStorage.getItem('isModerator') === 'true';
+      if (!isMod) return;
+
+      // Fetch roles, awards and moderators in background and cache them
+      const endpoints = [
+        { url: '/api/get-data?type=roles', key: 'rolesCache' },
+        { url: '/api/get-data?type=awards', key: 'awardsCache' },
+        { url: '/api/get-moderators', key: 'moderatorsCache' }
+      ];
+
+      await Promise.all(endpoints.map(async (ep) => {
+        try {
+          const res = await fetch(ep.url + '&t=' + Date.now());
+          if (!res.ok) return;
+          const data = await res.json();
+          localStorage.setItem(ep.key, JSON.stringify(data));
+        } catch (e) {
+          console.debug('Prefetch failed for', ep.url, e);
+        }
+      }));
+    } catch (e) {
+      console.debug('PrefetchModeratorData error', e);
+    }
+  }
   let editingAwardOriginal = null;
 
   async function deleteAwardInline(awardName) {
@@ -795,6 +824,12 @@
             mobileModContainer.appendChild(inlineEditBtnMobile);
           }
         }
+        // Kick off background prefetch for moderator data (non-blocking)
+        try {
+          prefetchModeratorData();
+        } catch (e) {
+          console.debug('prefetchModeratorData invocation failed', e);
+        }
       }
     }
   })();
@@ -856,7 +891,18 @@
 
     if (!modal || !content) return;
 
-    // Fetch current user's permissions
+    // Show modal immediately with a loading placeholder while permissions/data load
+    content.innerHTML = `
+      <div class="p-6">
+        <div class="text-center py-8 text-slate-400">
+          <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-4"></i>
+          <div>Loading Moderation Panel...</div>
+        </div>
+      </div>`;
+    modal.classList.remove("hidden");
+    document.addEventListener("keydown", onModeratorKeydown);
+
+    // Fetch current user's permissions (do not block showing the modal)
     let permissions = {
       manageModerators: false,
       manageGames: false,

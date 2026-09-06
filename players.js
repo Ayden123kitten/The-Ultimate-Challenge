@@ -34,9 +34,28 @@
 
   async function loadRoles() {
     try {
+      // Use cached roles if available for faster UI population
+      const cached = localStorage.getItem("rolesCache");
+      if (cached) {
+        try {
+          pageAvailableRoles = JSON.parse(cached);
+        } catch (e) {
+          console.debug("Invalid rolesCache, ignoring", e);
+        }
+      }
+
+      // Always refresh from server in case of updates
       const res = await fetch(`/api/get-data?type=roles&t=${Date.now()}`);
       if (res.ok) {
         pageAvailableRoles = await res.json();
+        try {
+          localStorage.setItem(
+            "rolesCache",
+            JSON.stringify(pageAvailableRoles)
+          );
+        } catch (e) {
+          console.debug("Could not cache roles:", e);
+        }
       }
     } catch (err) {
       console.error("Failed to load roles:", err);
@@ -56,9 +75,25 @@
 
   async function loadAwards() {
     try {
+      // Use cached awards if available for faster UI population
+      const cached = localStorage.getItem("awardsCache");
+      if (cached) {
+        try {
+          availableAwards = JSON.parse(cached);
+        } catch (e) {
+          console.debug("Invalid awardsCache, ignoring", e);
+        }
+      }
+
+      // Always refresh from server in case of updates
       const res = await fetch(`/api/get-data?type=awards&t=${Date.now()}`);
       if (res.ok) {
         availableAwards = await res.json();
+        try {
+          localStorage.setItem("awardsCache", JSON.stringify(availableAwards));
+        } catch (e) {
+          console.debug("Could not cache awards:", e);
+        }
       }
     } catch (err) {
       console.error("Failed to load awards:", err);
