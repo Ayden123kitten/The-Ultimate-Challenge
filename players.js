@@ -979,7 +979,15 @@
 
   (async () => {
     if (AUTH.isLoggedIn()) {
-      isModerator = await AUTH.checkModerator();
+      // Reuse the moderator check already kicked off by app.js instead of
+      // firing a second, duplicate AUTH.checkModerator() network call.
+      // Falls back to a direct call only if app.js hasn't set this up
+      // (e.g. unexpected load order or a page missing app.js).
+      if (window.__moderatorStatusPromise) {
+        ({ isModerator } = await window.__moderatorStatusPromise);
+      } else {
+        isModerator = await AUTH.checkModerator();
+      }
       try {
         localStorage.setItem("isModerator", isModerator ? "true" : "false");
       } catch (e) {
@@ -1088,8 +1096,10 @@
         <div class="flex items-center gap-2">
           <input type="checkbox" id="inline-role-${role.name}" ${isChecked} class="inline-edit-role-checkbox w-4 h-4 rounded cursor-pointer">
           <label for="inline-role-${role.name}" class="cursor-pointer flex items-center gap-2">
-            <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: ${role.color};"></span>
-            <span style="color: #e2e8f0; font-size: 0.875rem;">${role.name}</span>
+            <span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:12px; font-size:0.8rem; font-weight:700; background-color:${role.color}33; color:${role.color}; border:1px solid ${role.color};">
+              <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background-color:${role.color};"></span>
+              <span style="color:inherit;">${role.name}</span>
+            </span>
           </label>
         </div>
       `;
@@ -1102,7 +1112,7 @@
     if (permissions.manageRoles) {
       createRoleHtml = `
       <div class="mt-3">
-        <label class="text-sm font-semibold text-white">Manage Roles</label>
+        <label class="text-sm font-semibold text-white">Create Roles</label>
         <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 items-start">
           <div>
             <input type="text" id="inline-new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full">
@@ -1123,8 +1133,7 @@
     // Build awards HTML
     let awardsHtml = "";
     if (availableAwards.length > 0) {
-      awardsHtml =
-        '<div class="space-y-2"><label class="text-sm font-semibold text-slate-300">Assign Awards</label>';
+      awardsHtml = '<div class="space-y-2">';
       availableAwards.forEach((award) => {
         const isChecked =
           player.awards && player.awards.includes(award.name) ? "checked" : "";
@@ -1157,14 +1166,34 @@
                     <input type="text" id="inline-edit-player-discord" placeholder="Discord Username" value="${player.discord || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
                 </div>
                 
-                ${awardsHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${awardsHtml}</div>` : ""}
-                ${rolesHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${rolesHtml}${createRoleHtml}</div>` : createRoleHtml}
+                ${createRoleHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${createRoleHtml}</div>` : ""}
+                ${rolesHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${rolesHtml}</div>` : ""}
+                ${awardsHtml ? `<div class="mt-4 border-t border-slate-700 pt-4"><div class="mb-2"><span class="text-sm font-semibold text-white">Assign Awards</span></div>${awardsHtml}</div>` : ""}
 
                 ${
                   permissions.manageAwards
                     ? `
                   <div id="inline-awards-management" class="mt-4 border-t border-slate-700 pt-4">
-                    <label class="text-sm font-semibold text-white">Manage Awards</label>
+                    <div class="mt-3">
+                      <label class="text-sm font-semibold text-slate-300">Add Award</label>
+                      <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <input id="inline-new-award-name" type="text" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <input id="inline-new-award-icon" type="text" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                        <input id="inline-new-award-desc" type="text" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white md:col-span-2">
+                        <div id="inline-award-preview" class="mt-2 p-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400 flex items-center gap-3">
+                          <span id="inline-award-preview-icon" class="text-2xl w-8 text-center"></span>
+                          <div>
+                            <div id="inline-award-preview-name" class="font-bold text-white">Award Name</div>
+                            <div id="inline-award-preview-desc" class="text-xs text-slate-400">Start typing to see preview...</div>
+                          </div>
+                        </div>
+                        <div class="flex gap-2">
+                          <button onclick="addNewAward(${JSON.stringify(player.name)})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Create Award</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <label class="text-sm font-semibold text-white mt-4 block">Manage Awards</label>
                     <div id="inline-awards-list" class="mt-2 space-y-2">
                       ${
                         availableAwards.length > 0
@@ -1189,25 +1218,6 @@
                               .join("")
                           : '<div class="text-slate-500">No awards defined.</div>'
                       }
-                    </div>
-
-                    <div class="mt-3">
-                      <label class="text-sm font-semibold text-slate-300">Add Award</label>
-                      <div class="mt-2 grid grid-cols-1 gap-2">
-                        <input id="inline-new-award-name" type="text" placeholder="Award name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                        <input id="inline-new-award-icon" type="text" placeholder="Icon (fa-class or emoji)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                        <input id="inline-new-award-desc" type="text" placeholder="Short description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                        <div id="inline-award-preview" class="mt-2 p-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400 flex items-center gap-3">
-                          <span id="inline-award-preview-icon" class="text-2xl w-8 text-center"></span>
-                          <div>
-                            <div id="inline-award-preview-name" class="font-bold text-white"></div>
-                            <div id="inline-award-preview-desc" class="text-xs text-slate-400"></div>
-                          </div>
-                        </div>
-                        <div class="flex gap-2">
-                          <button onclick="addNewAward(${JSON.stringify(player.name)})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Create Award</button>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 `
@@ -1533,8 +1543,10 @@
           "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
         item.innerHTML = `
           <div class="flex items-center gap-3">
-            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.color}"></span>
-            <div style="min-width:0;"><div style="color:#e2e8f0;font-weight:700;">${r.name}</div></div>
+            <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;font-size:0.8rem;font-weight:700;background:${r.color}33;color:${r.color};border:1px solid ${r.color};">
+              <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${r.color};"></span>
+              <span style="color:inherit;">${r.name}</span>
+            </span>
           </div>
           <div style="display:flex;gap:8px;">
             <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillInlineRoleForEdit(${JSON.stringify(
@@ -1643,7 +1655,7 @@
     const descEl = document.getElementById("inline-award-preview-desc");
     if (!nameEl || !iconEl || !descEl) return;
     nameEl.textContent = name || "Award Name";
-    descEl.textContent = desc || "Description will appear here";
+    descEl.textContent = desc || "Start typing to see preview...";
     if (icon && icon.startsWith && icon.startsWith("fa-")) {
       iconEl.innerHTML = `<i class=\"fa-solid ${escapeHtml(icon)}\"></i>`;
     } else {

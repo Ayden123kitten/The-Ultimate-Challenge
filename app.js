@@ -758,10 +758,27 @@
     console.warn("Could not load inline edit mode preference:", e);
   }
 
+  // Expose the in-flight moderator-status check on window so other
+  // page scripts (e.g. players.js) can await this same result instead
+  // of firing their own duplicate AUTH.checkModerator()/checkAdmin()
+  // network calls. This is set synchronously (before any await) so it
+  // is available to other scripts immediately, no matter load order.
+  window.__moderatorStatusPromise = (async () => {
+    if (!AUTH.isLoggedIn()) {
+      return { isModerator: false, isAdmin: false };
+    }
+    // Run both checks in parallel instead of sequentially - this alone
+    // roughly halves the time before isModerator is known.
+    const [modResult, adminResult] = await Promise.all([
+      AUTH.checkModerator(),
+      AUTH.checkAdmin()
+    ]);
+    return { isModerator: modResult, isAdmin: adminResult };
+  })();
+
   (async () => {
     if (AUTH.isLoggedIn()) {
-      isModerator = await AUTH.checkModerator();
-      isAdmin = await AUTH.checkAdmin();
+      ({ isModerator, isAdmin } = await window.__moderatorStatusPromise);
       console.log("Moderator status:", isModerator);
       console.log("Admin status:", isAdmin);
 
@@ -790,11 +807,8 @@
           const isLeaderboardPage =
             pagePath.endsWith("/leaderboard.html") ||
             pagePath.endsWith("leaderboard.html");
-          const isSettingsPage =
-            pagePath.endsWith("/settings.html") ||
-            pagePath.endsWith("settings.html");
-          // Don't add the inline-edit toggle on the leaderboard or settings page
-          if (!isLeaderboardPage && !isSettingsPage) {
+          // Don't add the inline-edit toggle on the leaderboard page (user requested)
+          if (!isLeaderboardPage) {
             const inlineEditBtn = document.createElement("button");
             inlineEditBtn.id = "inline-edit-toggle-btn";
             inlineEditBtn.className =
@@ -822,7 +836,7 @@
           modBtnMobile.onclick = openModeratorModal;
           mobileModContainer.appendChild(modBtnMobile);
 
-          if (!isLeaderboardPage && !isSettingsPage) {
+          if (!isLeaderboardPage) {
             const inlineEditBtnMobile = document.createElement("button");
             inlineEditBtnMobile.className =
               "mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
