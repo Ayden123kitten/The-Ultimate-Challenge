@@ -945,36 +945,23 @@
       isModerator = await AUTH.checkModerator();
       console.log("Moderator status:", isModerator);
 
+      // Re-render players after moderator status resolves so inline-edit icons appear if enabled
+      try {
+        renderPlayers();
+      } catch (e) {
+        // renderPlayers may not be defined yet in some load orders; ignore if so
+      }
+
       // Add moderation + inline edit buttons to nav if moderator
       if (isModerator) {
-        const nav = document.querySelector("header nav");
-        if (nav) {
-          const modBtn = document.createElement("button");
-          modBtn.id = "moderator-toggle-btn-players";
-          modBtn.className =
-            "text-slate-400 hover:text-white transition-colors flex items-center gap-2";
-          modBtn.innerHTML =
-            '<i class="fa-solid fa-shield-halved text-slate-400"></i><span class="hidden sm:inline">Moderation</span>';
-          modBtn.onclick = () => {
-            if (typeof openModeratorModal === "function") openModeratorModal();
-          };
-          nav.appendChild(modBtn);
-        }
+        // Moderation button is provided globally in `app.js`; avoid adding a duplicate here.
 
         // Also add a mobile moderation link if mobile container exists
         const mobileModContainer = $("mobile-moderation-container");
+        // Mobile moderation link is provided globally in `app.js`; avoid adding a duplicate here.
+        // Note: inline edit toggle is provided globally; do not add duplicate here.
         if (mobileModContainer) {
-          const modBtnMobile = document.createElement("button");
-          modBtnMobile.className =
-            "flex items-center gap-2 text-slate-400 hover:text-ap-accent transition-colors";
-          modBtnMobile.innerHTML =
-            '<i class="fa-solid fa-shield-halved"></i><span class="text-sm">Moderation</span>';
-          modBtnMobile.onclick = () => {
-            if (typeof openModeratorModal === "function") openModeratorModal();
-          };
-          mobileModContainer.appendChild(modBtnMobile);
-
-          // Note: inline edit toggle is provided globally; do not add duplicate here.
+          // leave mobile container untouched (global buttons will render there)
         }
       }
     }

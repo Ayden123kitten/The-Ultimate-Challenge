@@ -741,18 +741,25 @@
           navSection.appendChild(modBtn);
 
           // Add inline edit mode toggle button
-          const inlineEditBtn = document.createElement("button");
-          inlineEditBtn.id = "inline-edit-toggle-btn";
-          inlineEditBtn.className =
-            "group flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
-            (inlineEditMode
-              ? "text-ap-accent bg-ap-accent/20"
-              : "text-slate-400 hover:text-white hover:bg-slate-700/50");
-          inlineEditBtn.innerHTML =
-            '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm font-medium hidden xl:inline">Inline Edit</span>';
-          inlineEditBtn.onclick = toggleInlineEditMode;
-          inlineEditBtn.title = "Toggle inline editing mode";
-          navSection.appendChild(inlineEditBtn);
+          const pagePath = (window.location && window.location.pathname) || "";
+          const isLeaderboardPage =
+            pagePath.endsWith("/leaderboard.html") ||
+            pagePath.endsWith("leaderboard.html");
+          // Don't add the inline-edit toggle on the leaderboard page (user requested)
+          if (!isLeaderboardPage) {
+            const inlineEditBtn = document.createElement("button");
+            inlineEditBtn.id = "inline-edit-toggle-btn";
+            inlineEditBtn.className =
+              "group flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
+              (inlineEditMode
+                ? "text-ap-accent bg-ap-accent/20"
+                : "text-slate-400 hover:text-white hover:bg-slate-700/50");
+            inlineEditBtn.innerHTML =
+              '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm font-medium hidden xl:inline">Inline Edit</span>';
+            inlineEditBtn.onclick = toggleInlineEditMode;
+            inlineEditBtn.title = "Toggle inline editing mode";
+            navSection.appendChild(inlineEditBtn);
+          }
         }
 
         // Add to mobile menu as well
@@ -767,17 +774,19 @@
           modBtnMobile.onclick = openModeratorModal;
           mobileModContainer.appendChild(modBtnMobile);
 
-          const inlineEditBtnMobile = document.createElement("button");
-          inlineEditBtnMobile.className =
-            "mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
-            (inlineEditMode
-              ? "text-ap-accent bg-ap-accent/20"
-              : "text-slate-400 hover:text-white hover:bg-slate-700/50");
-          inlineEditBtnMobile.innerHTML =
-            '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm">Inline Edit</span>';
-          inlineEditBtnMobile.onclick = toggleInlineEditMode;
-          inlineEditBtnMobile.title = "Toggle inline editing mode";
-          mobileModContainer.appendChild(inlineEditBtnMobile);
+          if (!isLeaderboardPage) {
+            const inlineEditBtnMobile = document.createElement("button");
+            inlineEditBtnMobile.className =
+              "mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
+              (inlineEditMode
+                ? "text-ap-accent bg-ap-accent/20"
+                : "text-slate-400 hover:text-white hover:bg-slate-700/50");
+            inlineEditBtnMobile.innerHTML =
+              '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm">Inline Edit</span>';
+            inlineEditBtnMobile.onclick = toggleInlineEditMode;
+            inlineEditBtnMobile.title = "Toggle inline editing mode";
+            mobileModContainer.appendChild(inlineEditBtnMobile);
+          }
         }
       }
     }
@@ -2268,8 +2277,10 @@
           "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
         item.innerHTML = `
         <div class="flex items-center gap-3">
-          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.color}"></span>
-          <div style="min-width:0;"><div style="color:#e2e8f0;font-weight:700;">${r.name}</div></div>
+          <span style="display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border-radius:9999px;font-size:0.8rem;font-weight:700;background:${r.color}33;color:${r.color};border:1px solid ${r.color};">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${r.color};flex-shrink:0"></span>
+            <span style="color:inherit;">${r.name}</span>
+          </span>
         </div>
         <div style="display:flex;gap:8px;">
           <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillRoleForEdit(${JSON.stringify(r)})'>Edit</button>
