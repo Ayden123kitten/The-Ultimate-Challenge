@@ -637,7 +637,6 @@
               modBtn.onclick = () => {
                 if (typeof openModeratorModal === "function")
                   openModeratorModal();
-                else window.location = "/settings.html#moderation";
               };
               nav.appendChild(modBtn);
             }
@@ -651,7 +650,6 @@
               modBtnMobile.onclick = () => {
                 if (typeof openModeratorModal === "function")
                   openModeratorModal();
-                else window.location = "/settings.html#moderation";
               };
               mobileModContainer.appendChild(modBtnMobile);
             }

@@ -301,6 +301,7 @@
   let playersSortOption = "az";
 
   function renderPlayers() {
+    const inlineEditMode = localStorage.getItem("inlineEditMode") === "true";
     const container = $("players-container");
     container.innerHTML = "";
 
@@ -584,6 +585,49 @@
     info.appendChild(nameRow);
     if (modalRoles.children.length > 0) {
       info.appendChild(modalRoles);
+    }
+
+    // Compact Awards Badges (show under name for quick visibility)
+    const playerAwardsCompact =
+      playerObj && playerObj.awards ? playerObj.awards : [];
+    if (playerAwardsCompact.length > 0) {
+      const badgesRow = document.createElement("div");
+      badgesRow.style.cssText = `display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;`;
+      playerAwardsCompact.forEach((awardEntry) => {
+        let awardData = null;
+        if (typeof awardEntry === "string") {
+          awardData = availableAwards.find((a) => a.name === awardEntry) || {
+            name: awardEntry
+          };
+        } else if (awardEntry && typeof awardEntry === "object") {
+          awardData = awardEntry;
+        } else {
+          awardData = { name: String(awardEntry) };
+        }
+
+        const badge = document.createElement("span");
+        badge.title = awardData.description || awardData.name;
+        badge.style.cssText = `display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:9999px; background: rgba(255,255,255,0.03); color:#e2e8f0; font-size:0.85rem;`;
+        const iconSpan = document.createElement("span");
+        iconSpan.style.cssText = `min-width:18px; display:inline-flex; align-items:center; justify-content:center;`;
+        const icon = awardData.icon || "🏆";
+        if (
+          typeof icon === "string" &&
+          icon.startsWith &&
+          icon.startsWith("fa-")
+        ) {
+          iconSpan.innerHTML = `<i class=\"fa-solid ${icon}\" style=\"color:${awardData.color || "#38bdf8"};\"></i>`;
+        } else {
+          iconSpan.textContent = icon;
+        }
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = awardData.name;
+        nameSpan.style.cssText = `color:#94a3b8; font-weight:600;`;
+        badge.appendChild(iconSpan);
+        badge.appendChild(nameSpan);
+        badgesRow.appendChild(badge);
+      });
+      info.appendChild(badgesRow);
     }
 
     // Bio under name
@@ -894,16 +938,7 @@
     });
   }
 
-  // Moderator status check and inline edit mode
-  let inlineEditMode = false; // Track inline edit mode state
-
-  // Load inline edit mode preference from localStorage
-  try {
-    const savedMode = localStorage.getItem("inlineEditMode");
-    inlineEditMode = savedMode === "true";
-  } catch (e) {
-    console.warn("Could not load inline edit mode preference:", e);
-  }
+  // Moderator status check
 
   (async () => {
     if (AUTH.isLoggedIn()) {
@@ -922,28 +957,8 @@
             '<i class="fa-solid fa-shield-halved text-slate-400"></i><span class="hidden sm:inline">Moderation</span>';
           modBtn.onclick = () => {
             if (typeof openModeratorModal === "function") openModeratorModal();
-            else window.location = "/settings.html#moderation";
           };
           nav.appendChild(modBtn);
-
-          const inlineEditBtn = document.createElement("button");
-          inlineEditBtn.id = "inline-edit-toggle-btn-players";
-          inlineEditBtn.className =
-            "text-slate-400 hover:text-white transition-colors flex items-center gap-2 " +
-            (inlineEditMode ? "text-ap-accent" : "");
-          inlineEditBtn.innerHTML =
-            '<i class="fa-solid fa-pen-to-square"></i><span>Inline Edit</span>';
-          inlineEditBtn.onclick = () => {
-            inlineEditMode = !inlineEditMode;
-            try {
-              localStorage.setItem("inlineEditMode", inlineEditMode.toString());
-            } catch (e) {}
-            inlineEditBtn.className =
-              "text-slate-400 hover:text-white transition-colors flex items-center gap-2 " +
-              (inlineEditMode ? "text-ap-accent" : "");
-            renderPlayers();
-          };
-          nav.appendChild(inlineEditBtn);
         }
 
         // Also add a mobile moderation link if mobile container exists
@@ -956,26 +971,10 @@
             '<i class="fa-solid fa-shield-halved"></i><span class="text-sm">Moderation</span>';
           modBtnMobile.onclick = () => {
             if (typeof openModeratorModal === "function") openModeratorModal();
-            else window.location = "/settings.html#moderation";
           };
           mobileModContainer.appendChild(modBtnMobile);
 
-          const inlineEditBtnMobile = document.createElement("button");
-          inlineEditBtnMobile.className =
-            "flex items-center gap-2 transition-colors " +
-            (inlineEditMode
-              ? "text-ap-accent"
-              : "text-slate-400 hover:text-white");
-          inlineEditBtnMobile.innerHTML =
-            '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm">Inline Edit</span>';
-          inlineEditBtnMobile.onclick = () => {
-            inlineEditMode = !inlineEditMode;
-            try {
-              localStorage.setItem("inlineEditMode", inlineEditMode.toString());
-            } catch (e) {}
-            renderPlayers();
-          };
-          mobileModContainer.appendChild(inlineEditBtnMobile);
+          // Note: inline edit toggle is provided globally; do not add duplicate here.
         }
       }
     }

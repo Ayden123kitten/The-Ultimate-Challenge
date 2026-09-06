@@ -292,7 +292,7 @@
 
       const card = document.createElement("div");
       card.className =
-        "glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50";
+        "glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50 relative";
 
       // Slot display: show "No limit" when slot_count is 0; hide when slot_count is 1
       let slotHtml = "";
@@ -344,9 +344,9 @@
 
       ${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary)).join("")}</div>` : ""}
 
-      <div class="mt-4">
-        <div class="text-center text-xs text-slate-400 mt-2">Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span></div>
-        ${isMyClaim ? `<button onclick="unclaimGame('${game.id}', event)" class="w-full mt-3 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-upload"></i> Mark as Done</button>` : canClaim ? `<button onclick="claimGame('${game.id}', event)" class="w-full mt-3 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Claim Game</button>` : `<button disabled class="w-full mt-3 bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"><i class="fa-solid fa-lock"></i> ${eventNotStarted ? "Event hasn't started" : currentPlayer === "" ? "Log In on Players Page" : "Currently Unavailable"}</button>`}
+      <div class="mt-2">
+        <div class="text-center text-xs text-slate-400 mt-1">Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span></div>
+        ${isMyClaim ? `<button onclick="unclaimGame('${game.id}', event)" class="w-full mt-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-upload"></i> Mark as Done</button>` : canClaim ? `<button onclick="claimGame('${game.id}', event)" class="w-full mt-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Claim Game</button>` : `<button disabled class="w-full mt-1 bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"><i class="fa-solid fa-lock"></i> ${eventNotStarted ? "Event hasn't started" : currentPlayer === "" ? "Log In on Players Page" : "Currently Unavailable"}</button>`}
       </div>
 
       ${
@@ -579,6 +579,8 @@
     `;
 
     modal.classList.remove("hidden");
+    // Listen for Escape to close modal
+    document.addEventListener("keydown", onModeratorKeydown);
 
     // Update preview on input change
     const startInput = $("event-start-time-input");
@@ -781,6 +783,22 @@
     }
   })();
 
+  // Close modal when clicking the overlay (onclick in HTML calls this)
+  function closeModeratorModalOnClick(e) {
+    // Only close when clicking the backdrop itself, not inner content
+    if (!e) return;
+    const modal = $("moderator-modal");
+    if (!modal) return;
+    if (e.target === modal) {
+      closeModeratorModal();
+    }
+  }
+
+  // Keydown handler for Escape to close modal
+  function onModeratorKeydown(e) {
+    if (e.key === "Escape") closeModeratorModal();
+  }
+
   // Toggle inline edit mode
   function toggleInlineEditMode() {
     inlineEditMode = !inlineEditMode;
@@ -878,7 +896,63 @@
             </div>`;
     }
 
-    // Edit Game Section (requires manageGames permission)
+    // Reordered sections: Event Time & Cheesetracker first (after Add New Game)
+    // Event Time Settings Section (requires manageSettings permission)
+    if (permissions.manageSettings) {
+      htmlContent += `
+        <!-- Event Time Settings Section (with merged Live Preview) -->
+        <div class="glass rounded-lg p-4">
+          <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-cyan-400 mr-2"></i>Event Time Settings</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+            <div>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
+                  <input type="datetime-local" id="event-start-time-input" value="${settings.start_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                  <p class="text-xs text-slate-400 mt-2">Set when the event starts. Before this time, a countdown will be shown.</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-300 mb-2">Event End Time (optional)</label>
+                  <input type="datetime-local" id="event-end-time-input" value="${settings.end_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                  <p class="text-xs text-slate-400 mt-2">Set when the event ends. Leave empty for an ongoing event.</p>
+                </div>
+                <div class="flex gap-2">
+                  <button onclick="updateEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Event Time Settings</button>
+                  <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+              <div id="event-timer-preview" class="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                <div class="text-center w-full">
+                  <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent">${formatTime(Date.now() - (settings.start_time ? new Date(settings.start_time).getTime() : 0))}</div>
+                  <div id="preview-status" class="text-xs text-slate-400 uppercase">${settings.start_time ? "Event Live" : "Not Set"}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // Cheesetracker Settings Section (requires manageSettings permission)
+    if (permissions.manageSettings) {
+      htmlContent += `
+            <!-- Cheesetracker Settings Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-link text-orange-400 mr-2"></i>Cheesetracker Integration</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Cheesetracker URL</label>
+                        <input type="url" id="cheesetracker-url-input" value="${settings.cheesetracker_url || ""}" placeholder="https://cheesetrackers.theincrediblewheelofchee.se/..." class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                        <p class="text-xs text-slate-400 mt-2">Enter the URL to your Cheesetracker page to enable automatic check tracking and progress display.</p>
+                    </div>
+                    <button onclick="updateCheesetrackerSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Cheesetracker Settings</button>
+                </div>
+            </div>`;
+    }
+
+    // Game Management: Edit / Remove / Logs (requires manageGames)
     if (permissions.manageGames) {
       htmlContent += `
             <!-- Edit Game Section -->
@@ -919,7 +993,6 @@
             </div>`;
     }
 
-    // Remove Game Section (requires manageGames permission)
     if (permissions.manageGames) {
       htmlContent += `
             <!-- Remove Game Section -->
@@ -940,7 +1013,27 @@
             </div>`;
     }
 
-    // Edit Player Section (requires managePlayers permission)
+    if (permissions.manageGames) {
+      htmlContent += `
+            <!-- Edit Logs Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-list-check text-ap-accent mr-2"></i>Edit Game Logs</h3>
+                <select id="edit-log-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
+                    <option value="">Select a game...</option>
+                    ${games
+                      .slice()
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map(
+                        (g) =>
+                          `<option value="${g.id}">${g.name} (${g.logs?.length || 0} logs)</option>`
+                      )
+                      .join("")}
+                </select>
+                <div id="edit-logs-container" class="hidden space-y-2 max-h-64 overflow-y-auto"></div>
+            </div>`;
+    }
+
+    // Player management next
     if (permissions.managePlayers) {
       htmlContent += `
             <!-- Edit Player Section -->
@@ -973,27 +1066,6 @@
             </div>`;
     }
 
-    // Edit Logs Section (requires managePlayers permission)
-    if (permissions.managePlayers) {
-      htmlContent += `
-            <!-- Edit Logs Section -->
-            <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-list-check text-ap-accent mr-2"></i>Edit Game Logs</h3>
-                <select id="edit-log-game-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-4">
-                    <option value="">Select a game...</option>
-                    ${games
-                      .slice()
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .map(
-                        (g) =>
-                          `<option value="${g.id}">${g.name} (${g.logs?.length || 0} logs)</option>`
-                      )
-                      .join("")}
-                </select>
-                <div id="edit-logs-container" class="hidden space-y-2 max-h-64 overflow-y-auto"></div>
-            </div>`;
-    }
-
     // Player Roles Section (requires manageRoles permission)
     if (permissions.manageRoles) {
       htmlContent += `
@@ -1002,7 +1074,7 @@
                 <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-shield text-purple-400 mr-2"></i>Manage Player Roles</h3>
                 <div class="space-y-4">
                     <div>
-                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Add New Role</h4>
+                        <h4 class="text-sm font-semibold text-slate-300 mb-2">Create New Role</h4>
                         <div class="flex gap-2">
                             <input type="text" id="new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
                             <input type="color" id="new-role-color" value="#ff0000" class="bg-slate-800/50 border border-slate-700 rounded-lg px-2 py-2 h-10 w-12">
@@ -1015,14 +1087,11 @@
                                 <span class="text-sm text-slate-400">Start typing to see preview...</span>
                             </div>
                         </div>
-                        <!-- Tabs: Create / Edit Roles -->
+                        <!-- Create Role and Existing Roles list -->
                         <div class="mt-3">
-                          <div class="flex gap-2">
-                            <button id="roles-tab-create" class="px-3 py-1 rounded bg-ap-accent text-slate-900 text-sm" onclick="switchRolesTab('create')">Create Role</button>
-                            <button id="roles-tab-edit" class="px-3 py-1 rounded bg-slate-700 text-sm text-slate-300" onclick="switchRolesTab('edit')">Edit Roles</button>
-                          </div>
                           <div id="roles-tab-content-create" class="mt-3"></div>
-                          <div id="roles-tab-content-edit" class="mt-3 hidden">
+                          <div class="mt-3 pt-3 border-t border-slate-700">
+                            <h5 class="text-xs font-semibold text-slate-400 mb-2">Existing Roles</h5>
                             <div id="roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
                           </div>
                         </div>
@@ -1065,27 +1134,24 @@
                             <input type="text" id="award-name-input" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                             <input type="text" id="award-icon-input" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                             <textarea id="award-description-input" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
-                            <!-- Tabs: Create / Edit Awards -->
+                            <!-- Existing Awards list -->
                             <div class="md:col-span-2 mt-3">
-                              <div class="flex gap-2">
-                                <button id="awards-tab-create" class="px-3 py-1 rounded bg-ap-accent text-slate-900 text-sm" onclick="switchAwardsTab('create')">Create Award</button>
-                                <button id="awards-tab-edit" class="px-3 py-1 rounded bg-slate-700 text-sm text-slate-300" onclick="switchAwardsTab('edit')">Edit Awards</button>
-                              </div>
-                              <div id="awards-tab-content-create" class="mt-3"></div>
-                              <div id="awards-tab-content-edit" class="mt-3 hidden">
-                                <div id="awards-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
-                              </div>
-                            </div>
-                        </div>
-                        <div class="mt-4 p-4 glass rounded-lg">
-                            <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
-                            <div id="award-preview" class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
-                                <span id="preview-icon" class="text-2xl w-8 text-center"></span>
-                                <div>
-                                    <div id="preview-name" class="font-bold text-white">Award Name</div>
-                                    <div id="preview-description" class="text-xs text-slate-400">Description will appear here</div>
+                                <div id="awards-tab-content-create" class="mt-3"></div>
+                                <div class="mt-3 pt-3 border-t border-slate-700">
+                                  <h5 class="text-xs font-semibold text-slate-400 mb-2">Existing Awards</h5>
+                                  <div id="awards-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
                                 </div>
                             </div>
+                        </div>
+                        <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
+                        <div class="mt-4 p-4 glass rounded-lg">
+                          <div id="award-preview" class="flex items-center gap-3 p-3 bg-slate-800/50 rounded-lg">
+                            <span id="preview-icon" class="text-2xl w-8 text-center"></span>
+                            <div>
+                              <div id="preview-name" class="font-bold text-white">Award Name</div>
+                              <div id="preview-description" class="text-xs text-slate-400">Description will appear here</div>
+                            </div>
+                          </div>
                         </div>
                         <button onclick="createAward()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg mt-4 w-full">Create Award</button>
                     </div>
@@ -1178,62 +1244,11 @@
             </div>`;
     }
 
-    // Cheesetracker Settings Section (requires manageSettings permission)
-    if (permissions.manageSettings) {
-      htmlContent += `
-            <!-- Cheesetracker Settings Section -->
-            <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-link text-orange-400 mr-2"></i>Cheesetracker Integration</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-300 mb-2">Cheesetracker URL</label>
-                        <input type="url" id="cheesetracker-url-input" value="${settings.cheesetracker_url || ""}" placeholder="https://cheesetrackers.theincrediblewheelofchee.se/..." class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-                        <p class="text-xs text-slate-400 mt-2">Enter the URL to your Cheesetracker page to enable automatic check tracking and progress display.</p>
-                    </div>
-                    <button onclick="updateCheesetrackerSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Cheesetracker Settings</button>
-                </div>
-            </div>`;
-    }
-
-    // Event Time Settings Section (requires manageSettings permission)
-    if (permissions.manageSettings) {
-      htmlContent += `
-            <!-- Event Time Settings Section -->
-            <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-cyan-400 mr-2"></i>Event Time Settings</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
-                        <input type="datetime-local" id="event-start-time-input" value="${settings.start_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-                        <p class="text-xs text-slate-400 mt-2">Set when the event starts. Before this time, a countdown will be shown.</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-300 mb-2">Event End Time (optional)</label>
-                        <input type="datetime-local" id="event-end-time-input" value="${settings.end_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-                        <p class="text-xs text-slate-400 mt-2">Set when the event ends. Leave empty for an ongoing event.</p>
-                    </div>
-                    <button onclick="updateEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Event Time Settings</button>
-                </div>
-            </div>`;
-    }
-
-    // Event Timer Preview (always show)
-    htmlContent += `
-            <!-- Live Preview -->
-            <div class="glass rounded-lg p-4">
-                <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
-                <div id="event-timer-preview" class="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-                    <div class="text-center">
-                        <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent">${formatTime(Date.now() - (settings.start_time ? new Date(settings.start_time).getTime() : 0))}</div>
-                        <div id="preview-status" class="text-xs text-slate-400 uppercase">${settings.start_time ? "Event Live" : "Not Set"}</div>
-                    </div>
-                </div>
-            </div>
-        </div>`;
-
     content.innerHTML = htmlContent;
 
     modal.classList.remove("hidden");
+    // Listen for Escape to close modal
+    document.addEventListener("keydown", onModeratorKeydown);
 
     // Update preview on input change
     const startInput = $("event-start-time-input");
@@ -1737,7 +1752,14 @@
 
   function closeModeratorModal() {
     const modal = $("moderator-modal");
+    const content = $("moderator-panel-content");
     if (modal) modal.classList.add("hidden");
+    // Clear content to avoid stale event listeners and DOM nodes
+    if (content) content.innerHTML = "";
+    // Remove Escape key listener if present
+    try {
+      document.removeEventListener("keydown", onModeratorKeydown);
+    } catch (e) {}
   }
 
   async function saveEditedGame() {
@@ -1832,6 +1854,8 @@
     `;
 
     modal.classList.remove("hidden");
+    // Listen for Escape to close modal
+    document.addEventListener("keydown", onModeratorKeydown);
 
     // Setup live preview
     setupInlineGamePreview(game);
@@ -2226,6 +2250,59 @@
     }
   }
 
+  // Populate and manage roles edit list (global so inline onclick handlers work)
+  function populateRolesEditList() {
+    const list = $("roles-edit-list");
+    if (!list) return;
+    list.innerHTML = "";
+    if (!availableRoles || availableRoles.length === 0) {
+      list.innerHTML = '<div class="text-slate-500">No roles defined.</div>';
+      return;
+    }
+    availableRoles
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .forEach((r) => {
+        const item = document.createElement("div");
+        item.className =
+          "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
+        item.innerHTML = `
+        <div class="flex items-center gap-3">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.color}"></span>
+          <div style="min-width:0;"><div style="color:#e2e8f0;font-weight:700;">${r.name}</div></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillRoleForEdit(${JSON.stringify(r)})'>Edit</button>
+          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteRole(${JSON.stringify(
+            r.name
+          )})'>Delete</button>
+        </div>
+      `;
+        list.appendChild(item);
+      });
+  }
+
+  function prefillRoleForEdit(role) {
+    const nameInput = $("new-role-name");
+    const colorInput = $("new-role-color");
+    if (nameInput && colorInput) {
+      nameInput.value = role.name;
+      colorInput.value = role.color || "#ff0000";
+      nameInput.focus();
+      editingRoleOriginal = role.name;
+    }
+  }
+
+  function promptDeleteRole(roleName) {
+    if (
+      !confirm(
+        `Delete role "${roleName}"? This will remove it from all players.`
+      )
+    )
+      return;
+    deleteRoleInline(roleName);
+  }
+
   // Delete role from inline modal
   async function deleteRoleInline(roleName) {
     if (
@@ -2312,6 +2389,10 @@
     // Initialize award preview
     updateAwardPreview();
     attachAwardPreviewListeners();
+
+    // Populate Roles and Awards edit lists inline
+    populateRolesEditList();
+    populateAwardsEditList();
 
     // Populate moderator select if admin
     if (isAdmin) {
@@ -2466,49 +2547,25 @@
 
     // Tab helpers for roles/awards in moderator modal
     function switchRolesTab(tab) {
-      const createBtn = $("roles-tab-create");
-      const editBtn = $("roles-tab-edit");
       const createContent = $("roles-tab-content-create");
-      const editContent = $("roles-tab-content-edit");
-      if (!createBtn || !editBtn || !createContent || !editContent) return;
+      if (!createContent) return;
       if (tab === "create") {
-        createBtn.classList.add("bg-ap-accent");
-        createBtn.classList.remove("bg-slate-700", "text-slate-300");
-        editBtn.classList.remove("bg-ap-accent");
-        editBtn.classList.add("bg-slate-700", "text-slate-300");
         createContent.classList.remove("hidden");
-        editContent.classList.add("hidden");
+        const nameInput = $("new-role-name");
+        if (nameInput) nameInput.focus();
       } else {
-        createBtn.classList.remove("bg-ap-accent");
-        createBtn.classList.add("bg-slate-700", "text-slate-300");
-        editBtn.classList.add("bg-ap-accent");
-        editBtn.classList.remove("bg-slate-700", "text-slate-300");
-        createContent.classList.add("hidden");
-        editContent.classList.remove("hidden");
         populateRolesEditList();
       }
     }
 
     function switchAwardsTab(tab) {
-      const createBtn = $("awards-tab-create");
-      const editBtn = $("awards-tab-edit");
       const createContent = $("awards-tab-content-create");
-      const editContent = $("awards-tab-content-edit");
-      if (!createBtn || !editBtn || !createContent || !editContent) return;
+      if (!createContent) return;
       if (tab === "create") {
-        createBtn.classList.add("bg-ap-accent");
-        createBtn.classList.remove("bg-slate-700", "text-slate-300");
-        editBtn.classList.remove("bg-ap-accent");
-        editBtn.classList.add("bg-slate-700", "text-slate-300");
         createContent.classList.remove("hidden");
-        editContent.classList.add("hidden");
+        const nameInput = $("award-name-input");
+        if (nameInput) nameInput.focus();
       } else {
-        createBtn.classList.remove("bg-ap-accent");
-        createBtn.classList.add("bg-slate-700", "text-slate-300");
-        editBtn.classList.add("bg-ap-accent");
-        editBtn.classList.remove("bg-slate-700", "text-slate-300");
-        createContent.classList.add("hidden");
-        editContent.classList.remove("hidden");
         populateAwardsEditList();
       }
     }
@@ -2754,6 +2811,84 @@
     }
   }
 
+  // Populate and manage awards edit list (global so inline onclick handlers work)
+  function populateAwardsEditList() {
+    const list = $("awards-edit-list");
+    if (!list) return;
+    list.innerHTML = "";
+    if (!availableAwards || availableAwards.length === 0) {
+      list.innerHTML = '<div class="text-slate-500">No awards defined.</div>';
+      return;
+    }
+    availableAwards
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .forEach((a) => {
+        const item = document.createElement("div");
+        item.className =
+          "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
+        const iconHtml =
+          a.icon && a.icon.startsWith && a.icon.startsWith("fa-")
+            ? `<i class="fa-solid ${a.icon}" style="color:${a.color};"></i>`
+            : a.icon || "🏆";
+        item.innerHTML = `
+        <div class="flex items-center gap-3">
+          ${iconHtml}
+          <div style="min-width:0;"><div style="color:#e2e8f0;font-weight:700;">${a.name}</div><div style="color:#94a3b8;font-size:0.85rem;">${a.description || ""}</div></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillAwardForEdit(${JSON.stringify(a)})'>Edit</button>
+          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteAward(${JSON.stringify(
+            a.name
+          )})'>Delete</button>
+        </div>
+      `;
+        list.appendChild(item);
+      });
+  }
+
+  function prefillAwardForEdit(award) {
+    const nameInput = $("award-name-input");
+    const iconInput = $("award-icon-input");
+    const descInput = $("award-description-input");
+    if (nameInput && iconInput && descInput) {
+      nameInput.value = award.name;
+      iconInput.value = award.icon || "";
+      descInput.value = award.description || "";
+      nameInput.focus();
+      editingAwardOriginal = award.name;
+    }
+  }
+
+  function promptDeleteAward(awardName) {
+    if (
+      !confirm(
+        `Delete award "${awardName}"? This will remove it from all players.`
+      )
+    )
+      return;
+    (async () => {
+      try {
+        const res = await fetch("/api/manage-awards", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
+          body: JSON.stringify({ action: "deleteAward", awardName })
+        });
+        const data = await res.json();
+        if (!res.ok)
+          throw new Error(
+            data.error || data.message || "Failed to delete award"
+          );
+        alert(data.message || "Award deleted");
+        await loadAwards();
+        await loadData();
+        openModeratorModal();
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    })();
+  }
+
   function updateAwardPreview() {
     const name = $("award-name-input")?.value.trim() || "";
     const icon = $("award-icon-input")?.value.trim() || "";
@@ -2876,4 +3011,9 @@
     loadData();
     setInterval(loadData, 10000);
   });
+  // Expose modal helpers for inline HTML handlers
+  try {
+    window.closeModeratorModal = closeModeratorModal;
+    window.closeModeratorModalOnClick = closeModeratorModalOnClick;
+  } catch (e) {}
 })();
