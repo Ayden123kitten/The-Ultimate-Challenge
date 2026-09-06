@@ -1489,7 +1489,8 @@ async function openModeratorModal() {
             </div>
           </div>
           </div>
-              ${links.length > 0
+             ${
+              links.length > 0
                 ? `
                 <div class="grid grid-cols-2 gap-2 text-sm">
                     ${links
