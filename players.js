@@ -1112,17 +1112,17 @@
     if (permissions.manageRoles) {
       createRoleHtml = `
       <div class="mt-3">
-        <label class="text-sm font-semibold text-white">Create Roles</label>
+        <label class="text-sm font-semibold text-slate-300">Create New Role</label>
         <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 items-start">
           <div>
             <input type="text" id="inline-new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full">
           </div>
           <div class="flex gap-2">
             <input type="color" id="inline-new-role-color" value="#ff0000" class="bg-slate-800/50 border border-slate-700 rounded-lg px-2 py-2 h-10 w-12">
-            <button onclick="addRoleInline(${JSON.stringify(player.name)})" id="inline-add-role-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Role</button>
           </div>
           <div class="md:col-span-2">
-            <div id="inline-role-preview" class="mt-2 p-2 inline-flex items-center gap-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400">Start typing to see preview...</div>
+            <div id="inline-role-preview" class="mt-2 p-2 inline-flex items-center gap-2 rounded-lg bg-slate-800/50 border border-slate-700 text-sm text-slate-400" style="min-height: 2.5rem; resize: vertical; overflow: auto;">Start typing to see preview...</div>
+            <button onclick="addRoleInline(${JSON.stringify(player.name)})" id="inline-add-role-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg mt-2 w-full">Add Role</button>
             <div id="inline-roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto mt-2"></div>
           </div>
         </div>
@@ -1166,16 +1166,16 @@
                     <input type="text" id="inline-edit-player-discord" placeholder="Discord Username" value="${player.discord || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
                 </div>
                 
-                ${createRoleHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${createRoleHtml}</div>` : ""}
-                ${rolesHtml ? `<div class="mt-4 border-t border-slate-700 pt-4">${rolesHtml}</div>` : ""}
-                ${awardsHtml ? `<div class="mt-4 border-t border-slate-700 pt-4"><div class="mb-2"><span class="text-sm font-semibold text-white">Assign Awards</span></div>${awardsHtml}</div>` : ""}
+                ${(permissions.manageRoles || pageAvailableRoles.length > 0) ? `<div class="mt-4"><label class="text-sm font-semibold text-slate-300">Manage Roles</label></div>` : ""}
+                ${createRoleHtml ? `<div class="mt-4">${createRoleHtml}</div>` : ""}
+                ${rolesHtml ? `<div class="mt-4">${rolesHtml}</div>` : ""}
 
                 ${
                   permissions.manageAwards
                     ? `
                   <div id="inline-awards-management" class="mt-4 border-t border-slate-700 pt-4">
                     <div class="mt-3">
-                      <label class="text-sm font-semibold text-slate-300">Add Award</label>
+                      <label class="text-sm font-semibold text-slate-300">Create New Award</label>
                       <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
                         <input id="inline-new-award-name" type="text" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
                         <input id="inline-new-award-icon" type="text" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
@@ -1193,7 +1193,7 @@
                       </div>
                     </div>
 
-                    <label class="text-sm font-semibold text-white mt-4 block">Manage Awards</label>
+                    <label class="text-sm font-semibold text-slate-300 mt-4 block">Manage Awards</label>
                     <div id="inline-awards-list" class="mt-2 space-y-2">
                       ${
                         availableAwards.length > 0
@@ -1219,6 +1219,26 @@
                           : '<div class="text-slate-500">No awards defined.</div>'
                       }
                     </div>
+
+                    ${availableAwards.length > 0 ? `
+                    <div class="mt-4">
+                      <label class="text-sm font-semibold text-slate-300 block">Assign Awards</label>
+                      <div class="mt-2 space-y-2">
+                        ${availableAwards.map((award) => {
+                          const isChecked = player.awards && player.awards.includes(award.name) ? "checked" : "";
+                          return `
+                          <div class="flex items-center gap-2">
+                            <input type="checkbox" id="inline-award-${award.name}" ${isChecked} class="inline-edit-award-checkbox w-4 h-4 rounded cursor-pointer">
+                            <label for="inline-award-${award.name}" class="cursor-pointer flex items-center gap-2">
+                              ${award.icon && award.icon.startsWith("fa-") ? `<i class="fa-solid ${award.icon}" style="color: ${award.color || '#38bdf8'};"></i>` : `<span style="font-size:1.2rem;">${award.icon || "🏆"}</span>`}
+                              <span style="color: #e2e8f0; font-size: 0.875rem;">${award.name}</span>
+                            </label>
+                          </div>
+                          `;
+                        }).join("")}
+                      </div>
+                    </div>
+                    ` : ""}
                   </div>
                 `
                     : ""
@@ -1623,7 +1643,9 @@
     }
     preview.style.color = color;
     preview.style.borderColor = color + "40";
-    preview.innerHTML = `<span style=\"display:inline-flex;align-items:center;gap:8px;padding:4px 10px;border-radius:9999px;font-size:0.9rem;font-weight:700;background:${color}22;color:${color};border:1px solid ${color};\"><span style=\"display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0\"></span><span style=\"color:inherit;\">${escapeHtml(name)}</span></span>`;
+    preview.style.backgroundColor = color + "22";
+    preview.style.borderRadius = "8px";
+    preview.innerHTML = `<span style=\"display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:0.8rem;font-weight:700;background:${color}22;color:${color};border:1px solid ${color};\"><span style=\"display:inline-block;width:6px;height:6px;background:${color};flex-shrink:0\"></span><span style=\"color:inherit;\">${escapeHtml(name)}</span></span>`;
   }
 
   function attachInlineRolePreviewListeners() {
