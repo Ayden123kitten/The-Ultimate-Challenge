@@ -157,7 +157,7 @@
                         <i class="fa-solid fa-eye"></i>
                     </button>
                 </div>
-                <button type="submit" class="w-full bg-ap-accent/80 hover:bg-ap-accent text-slate-900 font-bold py-2 rounded-lg transition-colors">
+                <button type="submit" class="w-full bg-ap-accent/80 hover:bg-ap-accent text-white font-bold py-2 rounded-lg transition-colors">
                     Log In
                 </button>
                 <p id="login-error" class="text-red-400 text-sm hidden"></p>
@@ -1064,7 +1064,7 @@
         <div class="mt-2">
           <button onclick="(function(){ openModeratorModal(); setTimeout(function(){ const sel = document.getElementById('role-player-select'); if (sel) sel.value = ${JSON.stringify(
             player.name
-          )}; switchRolesTab('edit'); }, 250); })()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg">Open Roles Manager</button>
+          )}; switchRolesTab('edit'); }, 250); })()" class="bg-ap-accent hover:bg-ap-accent/80 text-white font-bold py-2 px-4 rounded-lg">Open Roles Manager</button>
         </div>
       </div>
     `;
@@ -1148,7 +1148,7 @@
                         <input id="inline-new-award-icon" type="text" placeholder="Icon (fa-class or emoji)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
                         <input id="inline-new-award-desc" type="text" placeholder="Short description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
                         <div class="flex gap-2">
-                          <button onclick="addNewAward(${JSON.stringify(player.name)})" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Create Award</button>
+                          <button onclick="addNewAward(${JSON.stringify(player.name)})" class="bg-ap-accent hover:bg-ap-accent/80 text-white font-bold py-2 px-4 rounded-lg flex-1">Create Award</button>
                         </div>
                       </div>
                     </div>
@@ -1158,7 +1158,7 @@
                 }
 
                 <div class="flex gap-2 mt-4">
-                  <button onclick="saveInlineEditedPlayer('${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
+                  <button onclick="saveInlineEditedPlayer('${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-white font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
                   <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
                 </div>
             </div>
@@ -1411,4 +1411,19 @@
     const modal = document.getElementById("moderator-modal");
     if (modal) modal.classList.add("hidden");
   }
+
+  // Initialize the players page
+  document.addEventListener("DOMContentLoaded", () => {
+    loadData();
+  });
+
+  // Expose functions for inline HTML handlers
+  try {
+    window.openPlayerInlineEditor = openPlayerInlineEditor;
+    window.saveInlineEditedPlayer = saveInlineEditedPlayer;
+    window.closeModeratorModal = closeModeratorModal;
+    window.openModeratorModal = openModeratorModal;
+    window.assignAwardToPlayer = assignAwardToPlayer;
+    window.addNewAward = addNewAward;
+  } catch (e) {}
 })();

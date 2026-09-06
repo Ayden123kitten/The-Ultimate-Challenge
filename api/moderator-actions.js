@@ -225,6 +225,12 @@ export default async function handler(req, res) {
       if (playerData.discord !== undefined) {
         players[playerIndex].discord = playerData.discord;
       }
+      if (playerData.roles !== undefined) {
+        players[playerIndex].roles = playerData.roles || [];
+      }
+      if (playerData.awards !== undefined) {
+        players[playerIndex].awards = playerData.awards || [];
+      }
 
       const newPlayersContent = Buffer.from(
         JSON.stringify(players, null, 2)

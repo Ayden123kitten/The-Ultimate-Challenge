@@ -1819,10 +1819,14 @@
     const game = games.find((g) => g.id === gameId);
     if (!game) return;
 
-    const modal = $("moderator-modal");
-    const content = $("moderator-panel-content");
+    let modal = $("moderator-modal");
+    let content = $("moderator-panel-content");
 
-    if (!modal || !content) return;
+    // If modal or content doesn't exist, return early (shouldn't happen in normal usage)
+    if (!modal || !content) {
+      console.error("Moderator modal not found. Cannot open inline editor.");
+      return;
+    }
 
     content.innerHTML = `
         <div class="space-y-6">
@@ -3022,9 +3026,30 @@
     loadData();
     setInterval(loadData, 10000);
   });
-  // Expose modal helpers for inline HTML handlers
+  // Expose modal helpers and inline edit functions for inline HTML handlers
   try {
     window.closeModeratorModal = closeModeratorModal;
     window.closeModeratorModalOnClick = closeModeratorModalOnClick;
+    window.openGameInlineEditor = openGameInlineEditor;
+    window.saveInlineEditedGame = saveInlineEditedGame;
+    window.deleteInlineGame = deleteInlineGame;
+    window.toggleInlineEditMode = toggleInlineEditMode;
+    window.openModeratorModal = openModeratorModal;
+    window.claimGame = claimGame;
+    window.unclaimGame = unclaimGame;
+    window.saveEventTimeSettings = saveEventTimeSettings;
+    window.updateEventTimeSettings = updateEventTimeSettings;
+    window.updateCheesetrackerSettings = updateCheesetrackerSettings;
+    window.saveEditedGame = saveEditedGame;
+    window.saveEditedPlayer = saveEditedPlayer;
+    window.deletePlayer = deletePlayer;
+    window.addNewRole = addNewRole;
+    window.assignRole = assignRole;
+    window.createAward = createAward;
+    window.assignAward = assignAward;
+    window.manageModerator = manageModerator;
+    window.setAdmin = setAdmin;
+    window.updateModeratorPermissions = updateModeratorPermissions;
+    window.switchRolesTab = switchRolesTab;
   } catch (e) {}
 })();

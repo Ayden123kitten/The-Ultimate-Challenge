@@ -105,7 +105,7 @@
 
         // Add current session time if player is currently playing this game
         if (game.current_player === playerName && game.claimed_at) {
-          const currentSessionMs = Date.now() - game.claimed_at;
+          const currentSessionMs = Date.now() - new Date(game.claimed_at).getTime();
           gameTotalMs += currentSessionMs;
           totalTimeMs += currentSessionMs;
           claimCount++;
