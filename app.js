@@ -132,7 +132,9 @@
       updateGlobalTimer();
     } catch (err) {
       console.error("Failed to load data:", err);
-      $("games-container").innerHTML = `
+      const gamesContainer = $("games-container");
+      if (gamesContainer) {
+        gamesContainer.innerHTML = `
             <div class="col-span-full text-center text-red-400 p-8">
                 <i class="fa-solid fa-circle-exclamation text-4xl mb-4"></i>
                 <p class="text-lg font-bold">Error loading games</p>
@@ -141,6 +143,7 @@
                     Check that CONFIG in app.js has your correct GitHub username and repo name.
                 </p>
             </div>`;
+      }
     }
   }
 
@@ -186,6 +189,8 @@
 
   function renderGames() {
     const container = $("games-container");
+    if (!container) return;
+
     container.innerHTML = "";
 
     let filteredGames = [...games];
@@ -506,6 +511,8 @@
     const timerEl = $("global-timer");
     const statusEl = $("timer-status");
 
+    if (!timerEl || !statusEl) return;
+
     if (!settings.start_time || settings.start_time.trim() === "") {
       timerEl.textContent = "0:00:00";
       statusEl.textContent = "";
@@ -541,8 +548,10 @@
 
   // Add inline edit button to the global timer
   function addInlineEditButtonToTimer() {
-    const timerContainer =
-      document.querySelector("#global-timer").parentElement;
+    const timerEl = document.querySelector("#global-timer");
+    if (!timerEl) return;
+
+    const timerContainer = timerEl.parentElement;
     if (!timerContainer) return;
 
     // Remove existing edit button
@@ -1153,7 +1162,7 @@
                         <div class="mt-3">
                           <div id="roles-tab-content-create" class="mt-3"></div>
                           <div class="mt-3 pt-3 border-t border-slate-700">
-                            <h5 class="text-xs font-semibold text-slate-400 mb-2">Manage Roles</h5>
+                            <h5 class="text-sm font-semibold text-white mb-2">Manage Roles</h5>
                             <div id="roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
                           </div>
                         </div>
@@ -1214,7 +1223,7 @@
                             <div class="md:col-span-2 mt-3">
                                 <div id="awards-tab-content-create" class="mt-3"></div>
                                 <div class="mt-3 pt-3 border-t border-slate-700">
-                                  <h5 class="text-xs font-semibold text-slate-400 mb-2">Manage Awards</h5>
+                                  <h5 class="text-sm font-semibold text-white mb-2">Manage Awards</h5>
                                   <div id="awards-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
                                 </div>
                             </div>

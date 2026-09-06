@@ -1102,7 +1102,7 @@
     if (permissions.manageRoles) {
       createRoleHtml = `
       <div class="mt-3">
-        <label class="text-sm font-semibold text-slate-300">Manage Roles</label>
+        <label class="text-sm font-semibold text-white">Manage Roles</label>
         <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 items-start">
           <div>
             <input type="text" id="inline-new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full">
@@ -1164,7 +1164,7 @@
                   permissions.manageAwards
                     ? `
                   <div id="inline-awards-management" class="mt-4 border-t border-slate-700 pt-4">
-                    <label class="text-sm font-semibold text-slate-300">Manage Awards</label>
+                    <label class="text-sm font-semibold text-white">Manage Awards</label>
                     <div id="inline-awards-list" class="mt-2 space-y-2">
                       ${
                         availableAwards.length > 0
