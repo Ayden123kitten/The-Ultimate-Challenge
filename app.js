@@ -807,8 +807,11 @@
           const isLeaderboardPage =
             pagePath.endsWith("/leaderboard.html") ||
             pagePath.endsWith("leaderboard.html");
-          // Don't add the inline-edit toggle on the leaderboard page (user requested)
-          if (!isLeaderboardPage) {
+          const isSettingsPage =
+            pagePath.endsWith("/settings.html") ||
+            pagePath.endsWith("settings.html");
+          // Don't add the inline-edit toggle on the leaderboard or settings pages (user requested)
+          if (!isLeaderboardPage && !isSettingsPage) {
             const inlineEditBtn = document.createElement("button");
             inlineEditBtn.id = "inline-edit-toggle-btn";
             inlineEditBtn.className =
@@ -836,7 +839,7 @@
           modBtnMobile.onclick = openModeratorModal;
           mobileModContainer.appendChild(modBtnMobile);
 
-          if (!isLeaderboardPage) {
+          if (!isLeaderboardPage && !isSettingsPage) {
             const inlineEditBtnMobile = document.createElement("button");
             inlineEditBtnMobile.className =
               "mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
