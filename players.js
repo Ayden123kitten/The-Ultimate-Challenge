@@ -1270,11 +1270,11 @@
                       ${availableAwards
                         .map(
                           (a) =>
-                            `<option value="${JSON.stringify({
+                            `<option value='${JSON.stringify({
                               name: a.name,
                               icon: a.icon || "",
                               description: a.description || ""
-                            })}">${a.icon ? (a.icon.startsWith("fa-") ? "" : a.icon + " ") : ""}${a.name}</option>`
+                            })}'>${a.icon ? (a.icon.startsWith("fa-") ? "" : a.icon + " ") : ""}${a.name}</option>`
                         )
                         .join("")}
                     </select>
