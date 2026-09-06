@@ -1763,9 +1763,15 @@
         return;
       }
 
-      previewEl.style.color = roleColor;
-      previewEl.style.borderColor = roleColor + "40";
-      previewEl.innerHTML = `<span class="text-sm">${roleName}</span>`;
+      // Render role pill like in player pop-out preview
+      previewEl.style.color = "";
+      previewEl.style.borderColor = "";
+      previewEl.innerHTML = `
+        <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 0.875rem; font-weight:700; background-color: ${roleColor}33; color: ${roleColor}; border: 1px solid ${roleColor};">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${roleColor};flex-shrink:0"></span>
+          <span style="color:inherit;">${roleName}</span>
+        </span>
+      `;
     }
   }
 
