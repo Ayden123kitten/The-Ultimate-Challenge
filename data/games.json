@@ -1884,5 +1884,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "castlevaniacotm",
+    "name": "Castlevania: Circle of the Moon",
+    "logo": "https://cdn2.steamgriddb.com/logo/61180d33250addaa3b07e23e110c04f4.png",
+    "yaml_slot_name": "CastlevaniaCotM",
+    "slot_count": 1,
+    "apworld_link": "https://archipelago.gg/games/Castlevania%20-%20Circle%20of%20the%20Moon/info/en",
+    "apworld_version": "Core",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://archipelago.gg/tutorial/Castlevania%20-%20Circle%20of%20the%20Moon/setup_en",
+    "tracker_link": "https://github.com/BowserCrusher/Circle-of-the-Moon-AP-Tracker/releases/download/2.3/Circle-of-the-Moon-AP-Tracker.zip",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1356647822803603536",
+    "save_file_link": "https://drive.google.com/drive/folders/1V9h02T-ZwgPpPwI-_L2jqc9LaAtswI1m?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
