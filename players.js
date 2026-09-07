@@ -579,14 +579,13 @@
                   availableAwards || []
                 )
                   .map((award) => {
-                    const hasA =
+                    const hasAward =
                       player.awards &&
-                      player.awards.some((a) =>
-                        typeof a === "string"
-                          ? a === award.name
-                          : a.name === award.name
+                      player.awards.some(
+                        (a) =>
+                          (typeof a === "string" ? a : a.name) === award.name
                       );
-                    const isC = hasA ? "checked" : "";
+                    const isChecked = hasAward ? "checked" : "";
                     return `<div class="flex items-center gap-2"><input type="checkbox" id="inline-award-${award.name}" ${isC} class="inline-edit-award-checkbox w-4 h-4 rounded cursor-pointer"><label for="inline-award-${award.name}" class="cursor-pointer flex items-center gap-2">${award.icon && award.icon.startsWith("fa-") ? `<i class="fa-solid ${award.icon}" style="color: ${award.color || "#38bdf8"};"></i>` : `<span style="font-size:1.2rem;">${award.icon || "🏆"}</span>`}<span style="color: #e2e8f0; font-size: 0.875rem;">${award.name}</span></label></div>`;
                   })
                   .join("")}</div></div>`
@@ -821,7 +820,9 @@
         data.message ||
           (editingAwardOriginalInline ? "Award updated" : "Award added")
       );
-      editingAwardOriginalInline = null; // Reset editing state
+
+      // Reset editing state
+      editingAwardOriginalInline = null;
 
       await loadData();
       openPlayerInlineEditor(playerName);
@@ -849,7 +850,10 @@
       btn.classList.add("bg-yellow-600", "hover:bg-yellow-700");
     }
 
-    updateInlineAwardPreview();
+    // Trigger preview update if the function exists
+    if (typeof updateInlineAwardPreview === "function") {
+      updateInlineAwardPreview();
+    }
   }
 
   function promptDeleteAward(awardName, currentPlayerName) {
