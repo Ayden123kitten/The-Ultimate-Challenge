@@ -1300,7 +1300,7 @@ ${
       (availableAwards || []).length > 0
         ? `
     <div class="mt-4">
-      <label class="text-sm font-semibold text-slate-300 block">Assign Awards (Checkboxes)</label>
+      <label class="text-sm font-semibold text-slate-300 block">Assign Awards</label>
       <div class="mt-2 space-y-2">
         ${(availableAwards || [])
           .map((award) => {
@@ -1335,8 +1335,6 @@ ${
 ${
   permissions.manageAwards
     ? `
-  <div class="mt-4 border-t border-slate-700 pt-4">
-    <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Awards (Dropdown)</h4>
 <select id="inline-award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
   <option value="">Select an award...</option>
   ${(availableAwards || [])
