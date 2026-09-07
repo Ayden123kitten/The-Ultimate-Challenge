@@ -34,12 +34,11 @@
 
   async function loadRoles() {
     try {
-      // Use cached roles if available for faster UI population
       const cached = localStorage.getItem("rolesCache");
       if (cached) {
         try {
           const parsed = JSON.parse(cached);
-          // Fix: Extract the array whether it's stored as a direct array or nested object
+          // FIX: Extract array if it's nested inside an object
           pageAvailableRoles = Array.isArray(parsed)
             ? parsed
             : parsed.roles || [];
@@ -48,11 +47,10 @@
         }
       }
 
-      // Always refresh from server in case of updates
       const res = await fetch(`/api/get-data?type=roles&t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
-        // Fix: Extract the array from the { roles: [...] } response structure
+        // FIX: Extract array from { roles: [...] } response
         pageAvailableRoles = Array.isArray(data) ? data : data.roles || [];
         try {
           localStorage.setItem(
@@ -68,25 +66,13 @@
     }
   }
 
-  async function loadModeratorRoles() {
-    try {
-      const res = await fetch(`/api/get-data?type=moderators`);
-      if (res.ok) {
-        moderatorRoles = await res.json();
-      }
-    } catch (err) {
-      console.error("Failed to load moderator roles:", err);
-    }
-  }
-
   async function loadAwards() {
     try {
-      // Use cached awards if available for faster UI population
       const cached = localStorage.getItem("awardsCache");
       if (cached) {
         try {
           const parsed = JSON.parse(cached);
-          // Fix: Extract the array whether it's stored as a direct array or nested object
+          // FIX: Extract array if it's nested inside an object
           availableAwards = Array.isArray(parsed)
             ? parsed
             : parsed.awards || [];
@@ -95,11 +81,10 @@
         }
       }
 
-      // Always refresh from server in case of updates
       const res = await fetch(`/api/get-data?type=awards&t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
-        // Fix: Extract the array from the { awards: [...] } response structure
+        // FIX: Extract array from { awards: [...] } response
         availableAwards = Array.isArray(data) ? data : data.awards || [];
         try {
           localStorage.setItem("awardsCache", JSON.stringify(availableAwards));
@@ -1259,15 +1244,13 @@ ${
                         <textarea id="inline-new-award-desc" rows="2" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full resize-y min-h-[3rem] focus:border-ap-accent focus:outline-none transition-colors" style="resize: vertical; min-height: 3rem;"></textarea>
                         
                         <!-- Boxed Live Preview -->
-                        <div class="mt-3 p-4 glass rounded-lg border border-slate-700/50">
-                          <h5 class="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2">
-                            <i class="fa-solid fa-eye"></i> Live Preview
-                          </h5>
-                          <div id="inline-award-preview" class="w-full p-3 rounded-md bg-slate-900/60 border border-slate-700 flex items-center gap-3 min-h-[60px] transition-all">
-                            <span id="inline-award-preview-icon" class="text-2xl w-8 h-8 flex items-center justify-center flex-shrink-0 text-slate-500">🏆</span>
-                            <div class="min-w-0 flex-1">
-                              <div id="inline-award-preview-name" class="font-bold text-white text-sm">Award Name</div>
-                              <div id="inline-award-preview-desc" class="text-xs text-slate-400 break-words">Start typing to see preview...</div>
+                        <div class="mt-3 glass rounded-lg p-3">
+                          <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
+                          <div id="inline-award-preview" class="w-full p-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400 flex items-center gap-3">
+                            <span id="inline-award-preview-icon" class="text-2xl w-8 text-center"></span>
+                            <div>
+                              <div id="inline-award-preview-name" class="font-bold text-white">Award Name</div>
+                              <div id="inline-award-preview-desc" class="text-xs text-slate-400">Start typing to see preview...</div>
                             </div>
                           </div>
                         </div>
@@ -1451,6 +1434,7 @@ ${
   }
 
   // Render player preview
+  // Render player preview to match the pop-up profile layout
   function renderPlayerPreview(player, containerId) {
     const container = $(containerId);
     if (!container) return;
@@ -1462,47 +1446,101 @@ ${
       !(player && player.bio && player.bio.trim()) &&
       !(player && player.pronouns && player.pronouns.trim()) &&
       !(player && player.discord && player.discord.trim());
+
     if (allEmpty) {
       container.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
       return;
     }
 
+    // Avatar (Fixed a small syntax typo in the original fallback SVG)
     const avatar =
       player.pfp_link && player.pfp_link.trim() !== ""
-        ? `<img src="${player.pfp_link}" alt="${player.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>\'">`
-        : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
+        ? `<img src="${player.pfp_link}" alt="${player.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
+        : `<div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(56, 189, 248, 0.2); display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
 
-    // Get player roles
-    const playerRoles = player && player.roles ? player.roles : [];
+    // Name and Pronouns Row
+    let nameRowHtml = `<h2 style="margin: 0; font-size: 1.25rem; color: #e2e8f0;">${player.name || "Player Name"}</h2>`;
+    if (player.pronouns && player.pronouns.trim()) {
+      nameRowHtml += `<span style="display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #38bdf822; color: #38bdf8; border: 1px solid #38bdf8; white-space: nowrap;">${player.pronouns}</span>`;
+    }
 
-    // Build roles HTML
+    // Roles
     let rolesHtml = "";
+    const playerRoles = player.roles || [];
     if (playerRoles.length > 0) {
       rolesHtml =
-        '<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 4px;">';
+        '<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;">';
       playerRoles.forEach((roleName) => {
         const role = pageAvailableRoles.find((r) => r.name === roleName);
         if (role) {
-          const roleColor = role.color;
-          rolesHtml += `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; background-color: ${roleColor}33; color: ${roleColor}; border: 1px solid ${roleColor};"><span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${roleColor};"></span>${role.name}</span>`;
+          rolesHtml += `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; background-color: ${role.color}33; color: ${role.color}; border: 1px solid ${role.color};"><span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${role.color};"></span>${role.name}</span>`;
         }
       });
       rolesHtml += "</div>";
     }
 
+    // Awards (Handles both string names and full objects)
+    let awardsHtml = "";
+    const playerAwards = player.awards || [];
+    if (playerAwards.length > 0) {
+      awardsHtml =
+        '<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">';
+      playerAwards.forEach((awardEntry) => {
+        let awardData = null;
+        if (typeof awardEntry === "string") {
+          awardData = availableAwards.find((a) => a.name === awardEntry) || {
+            name: awardEntry
+          };
+        } else if (awardEntry && typeof awardEntry === "object") {
+          awardData = awardEntry;
+        } else {
+          awardData = { name: String(awardEntry) };
+        }
+
+        const icon = awardData.icon || "🏆";
+        let iconHtml = "";
+        if (typeof icon === "string" && icon.startsWith("fa-")) {
+          iconHtml = `<i class="fa-solid ${icon}" style="color:${awardData.color || "#38bdf8"};"></i>`;
+        } else {
+          iconHtml = icon;
+        }
+
+        awardsHtml += `<span title="${awardData.description || awardData.name}" style="display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:9999px; background: rgba(255,255,255,0.03); color:#e2e8f0; font-size:0.85rem;">
+          <span style="min-width:18px; display:inline-flex; align-items:center; justify-content:center;">${iconHtml}</span>
+          <span style="color:#94a3b8; font-weight:600;">${awardData.name}</span>
+        </span>`;
+      });
+      awardsHtml += "</div>";
+    }
+
+    // Bio
+    let bioHtml = "";
+    if (player.bio && player.bio.trim()) {
+      bioHtml = `<div style="margin-top: 4px; overflow-wrap: anywhere; word-break: break-word;"><span style="color: #94a3b8; font-size: 0.9rem;">${player.bio}</span></div>`;
+    }
+
+    // Discord
+    let discordHtml = "";
+    if (player.discord && player.discord.trim()) {
+      discordHtml = `<div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;"><i class="fa-brands fa-discord" style="color: #5865F2;"></i><span style="color: #5865F2; font-size: 0.9rem;">${player.discord}</span></div>`;
+    }
+
+    // Render the horizontal layout matching the pop-up profile header
     container.innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%;">
-            <div style="position: relative;">
-                ${avatar}
-            </div>
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
-                <h3 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${player.name}</h3>
-                ${rolesHtml}
-                ${player.pronouns ? `<p style="margin: 0; font-size: 0.8rem; padding: 2px 10px; border-radius: 9999px; color: #38bdf8; border: 1px solid #38bdf838; background-color: #38bdf822;">${player.pronouns}</p>` : ""}
-                ${player.bio ? `<p style="margin: 0; font-size: 0.75rem; color: #94a3b8; text-align: center; max-width: 100%; overflow-wrap: anywhere; word-break: break-word; max-height: 40px; overflow-y: auto;">${player.bio}</p>` : ""}
-                ${player.discord ? `<p style="margin: 0; font-size: 0.7rem; color: #5865F2;"><i class="fa-brands fa-discord" style="margin-right: 4px;"></i>${player.discord}</p>` : ""}
-            </div>
+      <div style="display: flex; align-items: center; gap: 20px; width: 100%;">
+        <div style="flex-shrink: 0;">
+          ${avatar}
         </div>
+        <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1;">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            ${nameRowHtml}
+          </div>
+          ${rolesHtml}
+          ${awardsHtml}
+          ${bioHtml}
+          ${discordHtml}
+        </div>
+      </div>
     `;
   }
 
@@ -1826,41 +1864,26 @@ ${
     const desc = (
       document.getElementById("inline-new-award-desc") || { value: "" }
     ).value.trim();
-
     const iconEl = document.getElementById("inline-award-preview-icon");
     const nameEl = document.getElementById("inline-award-preview-name");
     const descEl = document.getElementById("inline-award-preview-desc");
-
     if (!nameEl || !iconEl || !descEl) return;
 
-    // Empty state
     if (!name && !icon && !desc) {
-      iconEl.style.display = "flex";
-      iconEl.innerHTML = "🏆";
-      iconEl.style.color = "#64748b"; // slate-500
-      iconEl.style.fontSize = "1.5rem";
+      iconEl.style.display = "none";
       nameEl.style.display = "none";
       descEl.textContent = "Start typing to see preview...";
-      descEl.className = "text-xs text-slate-500 italic";
       return;
     }
 
-    // Active state
-    iconEl.style.display = "flex";
-    nameEl.style.display = "block";
+    iconEl.style.display = "";
+    nameEl.style.display = "";
     nameEl.textContent = name || "Award Name";
-    nameEl.className = "font-bold text-white text-sm";
-
-    descEl.textContent = desc || "No description provided";
-    descEl.className = "text-xs text-slate-400 break-words";
-
-    // Handle FontAwesome vs Emoji icons
+    descEl.textContent = desc || "Start typing to see preview...";
     if (icon && icon.startsWith && icon.startsWith("fa-")) {
-      iconEl.innerHTML = `<i class="fa-solid ${escapeHtml(icon)}" style="color: #38bdf8; font-size: 1.25rem;"></i>`;
+      iconEl.innerHTML = `<i class="fa-solid ${escapeHtml(icon)}"></i>`;
     } else {
-      iconEl.textContent = icon || "🏆";
-      iconEl.style.color = "#e2e8f0";
-      iconEl.style.fontSize = "1.5rem";
+      iconEl.textContent = icon || "";
     }
   }
 
