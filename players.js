@@ -1120,14 +1120,6 @@
     } catch (err) {
       console.warn("Could not fetch permissions for inline editor:", err);
     }
-    // ... (the rest of your existing code continues here)
-    // Fetch permissions to determine whether to show Manage Awards button
-    let permissions = { manageAwards: false, manageRoles: false };
-    try {
-      permissions = await AUTH.getPermissions();
-    } catch (err) {
-      console.warn("Could not fetch permissions for inline editor:", err);
-    }
 
     // Ensure roles are loaded so we can render role creation UI
     try {
