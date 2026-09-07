@@ -18,7 +18,14 @@
     "roles": [
       "Choo-Choo Charles Fan Club"
     ],
-    "awards": []
+    "awards": [
+      {
+        "name": "Veteran",
+        "icon": "fa-medal",
+        "description": "Made an account before the async started.",
+        "awardedAt": "2026-09-07T01:43:29.842Z"
+      }
+    ]
   },
   {
     "name": "LORD X",
