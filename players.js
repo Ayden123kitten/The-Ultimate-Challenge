@@ -378,7 +378,7 @@
     } else {
       nameRow.appendChild(h2);
     }
-
+    info.appendChild(nameRow);
     // Bio under name
     const playerBio = playerObj && playerObj.bio ? playerObj.bio.trim() : "";
     if (playerBio) {
