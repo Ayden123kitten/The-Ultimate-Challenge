@@ -38,10 +38,7 @@
       if (cached) {
         try {
           const parsed = JSON.parse(cached);
-          // FIX: Extract array if it's nested inside an object
-          pageAvailableRoles = Array.isArray(parsed)
-            ? parsed
-            : parsed.roles || [];
+          pageAvailableRoles = Array.isArray(parsed) ? parsed : (parsed.roles || []);
         } catch (e) {
           console.debug("Invalid rolesCache, ignoring", e);
         }
@@ -50,13 +47,9 @@
       const res = await fetch(`/api/get-data?type=roles&t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
-        // FIX: Extract array from { roles: [...] } response
-        pageAvailableRoles = Array.isArray(data) ? data : data.roles || [];
+        pageAvailableRoles = Array.isArray(data) ? data : (data.roles || []);
         try {
-          localStorage.setItem(
-            "rolesCache",
-            JSON.stringify(pageAvailableRoles)
-          );
+          localStorage.setItem("rolesCache", JSON.stringify(pageAvailableRoles));
         } catch (e) {
           console.debug("Could not cache roles:", e);
         }
@@ -66,36 +59,31 @@
     }
   }
 
+  // 👇 MAKE SURE THIS FUNCTION IS HERE 👇
+  async function loadModeratorRoles() {
+    try {
+      const res = await fetch(`/api/get-data?type=moderators`);
+      if (res.ok) {
+        moderatorRoles = await res.json();
+      }
+    } catch (err) {
+      console.error("Failed to load moderator roles:", err);
+    }
+  }
+
   async function loadAwards() {
     try {
       const cached = localStorage.getItem("awardsCache");
       if (cached) {
         try {
           const parsed = JSON.parse(cached);
-          // FIX: Extract array if it's nested inside an object
-          availableAwards = Array.isArray(parsed)
-            ? parsed
-            : parsed.awards || [];
+          availableAwards = Array.isArray(parsed) ? parsed : (parsed.awards || []);
         } catch (e) {
           console.debug("Invalid awardsCache, ignoring", e);
         }
       }
 
-      const res = await fetch(`/api/get-data?type=awards&t=${Date.now()}`);
-      if (res.ok) {
-        const data = await res.json();
-        // FIX: Extract array from { awards: [...] } response
-        availableAwards = Array.isArray(data) ? data : data.awards || [];
-        try {
-          localStorage.setItem("awardsCache", JSON.stringify(availableAwards));
-        } catch (e) {
-          console.debug("Could not cache awards:", e);
-        }
-      }
-    } catch (err) {
-      console.error("Failed to load awards:", err);
-    }
-  }
+      const res = await fetch(`/api/get-data?type=awards&t=${Date.now
 
   function getModeratorIcon(playerName) {
     const role = moderatorRoles[playerName];
