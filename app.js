@@ -1097,7 +1097,7 @@
                      <h5 class="text-sm font-semibold text-slate-300 mb-2">Manage Roles</h5>
                      <div id="roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto"></div>
                  </div>
-                 <div>
+                 <div class="mt-3 pt-3 border-t border-slate-700">
                      <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Roles</h4>
                      <select id="role-player-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
                          <option value="">Select a player...</option>
