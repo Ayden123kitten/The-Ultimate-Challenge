@@ -1750,7 +1750,7 @@
   {
     "id": "brotato",
     "name": "Brotato",
-    "logo": "",
+    "logo": "https://cdn2.steamgriddb.com/logo/c4e0ca9de71cce2b40af66bff49c4b24.png",
     "yaml_slot_name": "Brotato",
     "slot_count": 1,
     "apworld_link": "https://github.com/SpenserHaddad/Brotato-ArchipelagoClient/releases/download/v0.15.2/brotato.apworld",
