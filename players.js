@@ -480,16 +480,15 @@
       const modIcon = getModeratorIcon(stat.name);
       const playerObj = players.find((p) => p.name === stat.name);
       const playerRank = leaderboardPositions[stat.name] || null;
-
       card.innerHTML = `
             <div style="position: relative;">
                 ${avatar}
                 ${
                   inlineEditMode && effectiveModerator
                     ? `
-<button onclick="openPlayerInlineEditor(${JSON.stringify(stat.name)}, event)" style="position: absolute; top: -5px; right: -5px; background: #1e293b; border: 2px solid #38bdf8; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer;" title="Edit Player">
-    <i class="fa-solid fa-gear" style="color: #38bdf8;"></i>
-</button>
+                    <button class="inline-edit-btn" style="position: absolute; top: -5px; right: -5px; background: #1e293b; border: 2px solid #38bdf8; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10;" title="Edit Player">
+                        <i class="fa-solid fa-gear" style="color: #38bdf8;"></i>
+                    </button>
                 `
                     : ""
                 }
@@ -500,6 +499,17 @@
                 <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ""}</h2>
             </div>
         `;
+
+      // ✅ FIX: Attach event listener directly to prevent bubbling to card.onclick
+      if (inlineEditMode && effectiveModerator) {
+        const editBtn = card.querySelector(".inline-edit-btn");
+        if (editBtn) {
+          editBtn.addEventListener("click", (e) => {
+            e.stopPropagation(); // Reliably prevents the card's onclick (showPlayerModal) from firing
+            openPlayerInlineEditor(stat.name, e);
+          });
+        }
+      }
 
       container.appendChild(card);
     });
