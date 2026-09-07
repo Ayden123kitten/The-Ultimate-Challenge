@@ -15,6 +15,7 @@ export default async function handler(req, res) {
   const branch = process.env.GITHUB_BRANCH || "main";
   const jwtSecret = process.env.JWT_SECRET || "dev_local_jwt_secret";
   const useGitHub = !!(token && owner && repo);
+
   if (!process.env.JWT_SECRET)
     console.warn("Warning: JWT_SECRET not set; using local dev secret");
 
@@ -25,7 +26,6 @@ export default async function handler(req, res) {
 
   const authToken = authHeader.split(" ")[1];
 
-  // Helper to read file from GitHub or local
   const getRepoFile = async (filePath) => {
     if (useGitHub) {
       const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=${branch}`;
@@ -46,7 +46,6 @@ export default async function handler(req, res) {
     }
   };
 
-  // Helper to write file to GitHub or local
   const putRepoFile = async (filePath, obj, sha, message) => {
     if (useGitHub) {
       const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}?ref=${branch}`;
@@ -80,7 +79,6 @@ export default async function handler(req, res) {
     const decoded = jwt.verify(authToken, jwtSecret);
     const playerName = decoded.name;
 
-    // Load moderators data (from GitHub or local)
     const modFilePath = "data/moderators.json";
     let moderators = [];
     let admin = null;
@@ -101,7 +99,6 @@ export default async function handler(req, res) {
 
     const isModerator =
       isAdmin || moderators.some((m) => m.name === playerName);
-
     if (!isModerator) {
       return res.status(403).json({ error: "Access denied. Moderators only." });
     }
@@ -184,16 +181,13 @@ export default async function handler(req, res) {
       }
       const playersFilePath = "data/players.json";
       const playersApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${playersFilePath}?ref=${branch}`;
-
       const playersGetRes = await fetch(playersApiUrl, {
         headers: {
           Authorization: `token ${token}`,
           Accept: "application/vnd.github.v3+json"
         }
       });
-
       if (!playersGetRes.ok) throw new Error("Failed to fetch players data");
-
       const playersFileData = await playersGetRes.json();
       const playersContent = Buffer.from(
         playersFileData.content,
@@ -204,38 +198,27 @@ export default async function handler(req, res) {
           ? { name: p, password_hash: null, pfp_link: "" }
           : p
       );
-
       const playerIndex = players.findIndex((p) => p.name === playerData.name);
       if (playerIndex === -1) {
         return res.status(404).json({ error: "Player not found" });
       }
-
-      if (playerData.newName) {
-        players[playerIndex].name = playerData.newName;
-      }
-      if (playerData.pfp_link !== undefined) {
+      if (playerData.newName) players[playerIndex].name = playerData.newName;
+      if (playerData.pfp_link !== undefined)
         players[playerIndex].pfp_link = playerData.pfp_link;
-      }
-      if (playerData.bio !== undefined) {
+      if (playerData.bio !== undefined)
         players[playerIndex].bio = playerData.bio;
-      }
-      if (playerData.pronouns !== undefined) {
+      if (playerData.pronouns !== undefined)
         players[playerIndex].pronouns = playerData.pronouns;
-      }
-      if (playerData.discord !== undefined) {
+      if (playerData.discord !== undefined)
         players[playerIndex].discord = playerData.discord;
-      }
-      if (playerData.roles !== undefined) {
+      if (playerData.roles !== undefined)
         players[playerIndex].roles = playerData.roles || [];
-      }
-      if (playerData.awards !== undefined) {
+      if (playerData.awards !== undefined)
         players[playerIndex].awards = playerData.awards || [];
-      }
 
       const newPlayersContent = Buffer.from(
         JSON.stringify(players, null, 2)
       ).toString("base64");
-
       const putRes = await fetch(playersApiUrl, {
         method: "PUT",
         headers: {
@@ -250,12 +233,10 @@ export default async function handler(req, res) {
           branch: branch
         })
       });
-
       if (!putRes.ok) {
         const errData = await putRes.json();
         throw new Error(errData.message || "Failed to update player");
       }
-
       return res.status(200).json({ message: "Player updated successfully!" });
     }
 
@@ -266,15 +247,13 @@ export default async function handler(req, res) {
           .json({ error: "Access denied. Missing manageGames permission." });
       }
       const gamesFilePath = "data/games.json";
-      const gamesApiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${gamesFilePath}?ref=${branch}`;
-
-      // Update logs for a game
-      const gamesFilePath = "data/games.json";
+      // ✅ FIX: Removed the duplicate 'const gamesFilePath' declaration that was here
       const { data: games, sha: gamesSha } = await getRepoFile(gamesFilePath);
       const gameIndex = games.findIndex((g) => g.id === logData.gameId);
       if (gameIndex === -1)
         return res.status(404).json({ error: "Game not found" });
       if (!games[gameIndex].logs) games[gameIndex].logs = [];
+
       if (logData.action === "add") games[gameIndex].logs.push(logData.entry);
       else if (logData.action === "remove")
         games[gameIndex].logs = games[gameIndex].logs.filter(
@@ -282,6 +261,7 @@ export default async function handler(req, res) {
         );
       else if (logData.action === "update")
         games[gameIndex].logs[logData.index] = logData.entry;
+
       await putRepoFile(
         gamesFilePath,
         games,
@@ -346,10 +326,8 @@ export default async function handler(req, res) {
           .status(403)
           .json({ error: "Access denied. Missing manageRoles permission." });
       }
-
       const { roleName } = req.body;
       if (!roleName) return res.status(400).json({ error: "Missing roleName" });
-
       const rolesFilePath = "data/roles.json";
       const { data: roles, sha: rolesSha } = await getRepoFile(rolesFilePath);
       roles.roles = (roles.roles || []).filter((r) => r.name !== roleName);
@@ -360,7 +338,6 @@ export default async function handler(req, res) {
         `Delete role: ${roleName}`
       );
 
-      // Also remove role references from players
       const playersFilePath = "data/players.json";
       const { data: players, sha: playersSha } =
         await getRepoFile(playersFilePath);
@@ -419,7 +396,8 @@ export default async function handler(req, res) {
       const settingsFilePath = "data/settings.json";
       const { data: settings, sha: settingsSha } =
         await getRepoFile(settingsFilePath);
-      const merged = { ...settings, ...settingsData };
+      // ✅ FIX: Changed 'settingsData' to 'req.body.settingsData'
+      const merged = { ...settings, ...req.body.settingsData };
       await putRepoFile(
         settingsFilePath,
         merged,
@@ -432,11 +410,9 @@ export default async function handler(req, res) {
     }
 
     if (action === "manageModerators") {
-      // Only admin can manage moderators
       if (!isAdmin) {
         return res.status(403).json({ error: "Access denied. Admin only." });
       }
-
       const { moderatorData } = req.body;
       const modFilePath = "data/moderators.json";
       const { data: modData, sha: modSha } = await getRepoFile(modFilePath);
