@@ -1524,13 +1524,14 @@
          </div>
        </div>
      </div>
-     ${hasRules ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Rules:</span> <span class="break-words overflow-wrap-anywhere">${game.rules}</span></div>` : ""}
-     ${hasExtraInfo ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Information:</span> <span class="break-words overflow-wrap-anywhere">${game.extra_information}</span></div>` : ""}
-     ${
-       links.length > 0
-         ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary)).join("")}</div>`
-         : '<p class="text-sm text-slate-500 italic">No links added yet</p>'
-     }
+${hasRules ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Rules:</span> <span class="break-words overflow-wrap-anywhere">${game.rules}</span></div>` : ""}
+${hasExtraInfo ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Information:</span> <span class="break-words overflow-wrap-anywhere">${game.extra_information}</span></div>` : ""}
+${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary)).join("")}</div>` : ""}
+${hasCheesetracker ? `<div class="bg-slate-800/50 rounded-lg p-3 border border-slate-700 mt-2"><div class="flex justify-between items-center mb-2"><span class="text-xs font-bold text-slate-400 uppercase">Cheesetracker Progress</span><span class="text-sm font-mono text-ap-accent">${completedChecks}/${totalChecks} (${checkPercentage}%)</span></div><div class="w-full bg-slate-700 rounded-full h-3 overflow-hidden"><div class="bg-gradient-to-r from-green-500 to-green-400 h-full transition-all duration-500" style="width: ${checkPercentage}%"></div></div></div>` : ""}
+<div class="mt-2">
+  <div class="text-center text-xs text-slate-400 mt-1">Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span></div>
+  ${isMyClaim ? `<button onclick="unclaimGame('${game.id}', event)" class="w-full mt-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-upload"></i> Mark as Done</button>` : canClaim ? `<button onclick="claimGame('${game.id}', event)" class="w-full mt-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Claim Game</button>` : `<button disabled class="w-full mt-1 bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"><i class="fa-solid fa-lock"></i> ${eventNotStarted ? "Event hasn't started" : currentPlayer === "" ? "Log In on Players Page" : "Currently Unavailable"}</button>`}
+</div>
    `;
     }
     // Add Game Live Preview
