@@ -31,6 +31,12 @@
         "icon": "fa-medal",
         "description": "Made an account before the async started.",
         "awardedAt": "2026-09-07T01:43:29.842Z"
+      },
+      {
+        "name": "Contributor",
+        "icon": "fa-hands-helping",
+        "description": "Contributed in some way to The Ultimate Challenge.",
+        "awardedAt": "2026-09-07T17:57:45.853Z"
       }
     ]
   },
