@@ -1907,5 +1907,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "castlevaniados",
+    "name": "Castlevania: Dawn of Sorrow",
+    "logo": "https://cdn2.steamgriddb.com/logo/09dbe99a5fa7d9840cd4ecca1e450c2b.png",
+    "yaml_slot_name": "CastlevaniaDoS",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/PinkSwitch/Archipelago/releases/download/cvdos3.0.1/cv_dos.apworld",
+    "apworld_version": "3.0.1",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "https://github.com/PinkSwitch/Archipelago/blob/dawn-of-sorrow/worlds/cv_dos/docs/setup_en.md",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1441671319690412052",
+    "save_file_link": "https://drive.google.com/drive/folders/1mbFBDHCadNnjdSAEkSjfqtbktBIOtNmg?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
