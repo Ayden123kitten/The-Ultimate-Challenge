@@ -573,7 +573,7 @@
 
     content.innerHTML = `<div class="space-y-6"><div class="glass rounded-lg p-4"><h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-user text-ap-accent mr-2"></i>Edit Player: ${player.name}</h3><div id="inline-edit-player-form-container" class="space-y-4"><input type="text" id="inline-edit-player-name" placeholder="Player Name" value="${player.name}" disabled class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full opacity-50"><input type="url" id="inline-edit-player-pfp" placeholder="Profile Picture URL" value="${player.pfp_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full"><textarea id="inline-edit-player-bio" placeholder="Bio" rows="3" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">${player.bio || ""}</textarea><input type="text" id="inline-edit-player-pronouns" placeholder="Pronouns" value="${player.pronouns || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full"><input type="text" id="inline-edit-player-discord" placeholder="Discord Username" value="${player.discord || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full"></div><div class="border-t border-slate-700 my-4"></div>${permissions.manageRoles || pageAvailableRoles.length > 0 ? `<div class="mt-4"><h4 class="text-sm font-semibold text-slate-300 mb-2">Manage Roles</h4></div>` : ""}${createRoleHtml ? `<div class="mt-4">${createRoleHtml}</div>` : ""}${rolesHtml ? `<div class="mt-4">${rolesHtml}</div>` : ""}${
       permissions.manageAwards
-        ? `<div id="inline-awards-management" class="mt-4 border-t border-slate-700 pt-4"><div class="mt-4"><label class="text-sm font-semibold text-slate-300">Create New Award</label><div class="mt-2 space-y-3"><div class="grid grid-cols-1 md:grid-cols-2 gap-2"><input id="inline-new-award-name" type="text" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white"><input id="inline-new-award-icon" type="text" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white"></div><textarea id="inline-new-award-desc" rows="2" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full resize-y min-h-[3rem]"></textarea><div class="mt-3 glass rounded-lg p-3"><h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5><div id="inline-award-preview" class="w-full p-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400 flex items-center gap-3"><span id="inline-award-preview-icon" class="text-2xl w-8 text-center"></span><div><div id="inline-award-preview-name" class="font-bold text-white">Award Name</div><div id="inline-award-preview-desc" class="text-xs text-slate-400">Start typing to see preview...</div></div></div></div><div class="mt-2 flex gap-2"><button onclick="addNewAward(${JSON.stringify(player.name).replace(/'/g, "\\'")})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg w-full">Create Award</button></div></div></div><h4 class="text-sm font-semibold text-slate-300 mb-2 mt-4">Manage Awards</h4><div id="inline-awards-list" class="mt-2 space-y-2">${(availableAwards || []).length > 0 ? (availableAwards || []).map((a) => `<div class="flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded"><div class="flex items-center gap-3">${a.icon && a.icon.startsWith("fa-") ? `<i class="fa-solid ${a.icon}" style="color: ${a.color || "#38bdf8"};"></i>` : `<span style="font-size:1.2rem;">${a.icon || "🏆"}</span>`}<div style="min-width:0;"><div style="color:#e2e8f0; font-weight:700;">${a.name}</div><div style="color:#94a3b8; font-size:0.85rem;">${a.description || ""}</div></div></div><div style="display:flex; gap:8px;"><button onclick="prefillAwardForEdit(${JSON.stringify(a).replace(/'/g, "\\'")})" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">Edit</button><button onclick="promptDeleteAward(${JSON.stringify(a.name).replace(/'/g, "\\'")})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Delete</button></div></div>`).join("") : '<div class="text-slate-500">No awards defined.</div>'}</div>${
+        ? `<div id="inline-awards-management" class="mt-4 border-t border-slate-700 pt-4"><div class="mt-4"><label class="text-sm font-semibold text-slate-300">Create New Award</label><div class="mt-2 space-y-3"><div class="grid grid-cols-1 md:grid-cols-2 gap-2"><input id="inline-new-award-name" type="text" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white"><input id="inline-new-award-icon" type="text" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white"></div><textarea id="inline-new-award-desc" rows="2" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full resize-y min-h-[3rem]"></textarea><div class="mt-3 glass rounded-lg p-3"><h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5><div id="inline-award-preview" class="w-full p-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400 flex items-center gap-3"><span id="inline-award-preview-icon" class="text-2xl w-8 text-center"></span><div><div id="inline-award-preview-name" class="font-bold text-white">Award Name</div><div id="inline-award-preview-desc" class="text-xs text-slate-400">Start typing to see preview...</div></div></div></div><div class="mt-2 flex gap-2"><button id="inline-add-award-btn" onclick="addNewAward(${JSON.stringify(player.name)})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg w-full">Create Award</button></div></div></div><h4 class="text-sm font-semibold text-slate-300 mb-2 mt-4">Manage Awards</h4><div id="inline-awards-list" class="mt-2 space-y-2">${(availableAwards || []).length > 0 ? (availableAwards || []).map((a) => `<div class="flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded"><div class="flex items-center gap-3">${a.icon && a.icon.startsWith("fa-") ? `<i class="fa-solid ${a.icon}" style="color: ${a.color || "#38bdf8"};"></i>` : `<span style="font-size:1.2rem;">${a.icon || "🏆"}</span>`}<div style="min-width:0;"><div style="color:#e2e8f0; font-weight:700;">${a.name}</div><div style="color:#94a3b8; font-size:0.85rem;">${a.description || ""}</div></div></div><div style="display:flex; gap:8px;"><button onclick="prefillAwardForEdit(${JSON.stringify(a)}, ${JSON.stringify(player.name)})" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">Edit</button><button onclick="promptDeleteAward(${JSON.stringify(a.name)}, ${JSON.stringify(player.name)})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Delete</button></div></div>`).join("") : '<div class="text-slate-500">No awards defined.</div>'}</div>${
             (availableAwards || []).length > 0
               ? `<div class="mt-4"><label class="text-sm font-semibold text-slate-300 block">Assign Awards (Checkboxes)</label><div class="mt-2 space-y-2">${(
                   availableAwards || []
@@ -781,27 +781,48 @@
 
   async function addNewAward(playerName) {
     const name = (
-        document.getElementById("inline-new-award-name") || { value: "" }
-      ).value.trim(),
-      icon = (
-        document.getElementById("inline-new-award-icon") || { value: "" }
-      ).value.trim(),
-      description = (
-        document.getElementById("inline-new-award-desc") || { value: "" }
-      ).value.trim();
-    if (!name) return alert("Award name is required");
+      document.getElementById("inline-new-award-name") || { value: "" }
+    ).value.trim();
+    const icon = (
+      document.getElementById("inline-new-award-icon") || { value: "" }
+    ).value.trim();
+    const description = (
+      document.getElementById("inline-new-award-desc") || { value: "" }
+    ).value.trim();
+
+    if (!name) {
+      alert("Award name is required");
+      return;
+    }
+
     try {
+      const body = editingAwardOriginalInline
+        ? {
+            action: "updateAward",
+            originalName: editingAwardOriginalInline,
+            awardData: { name, icon, description }
+          }
+        : {
+            action: "addAward",
+            awardData: { name, icon, description }
+          };
+
       const res = await fetch("/api/manage-awards", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
-        body: JSON.stringify({
-          action: "addAward",
-          awardData: { name, icon, description }
-        })
+        body: JSON.stringify(body)
       });
-      const d = await res.json();
-      if (!res.ok) throw new Error(d.error || d.message);
-      alert(d.message || "Award added");
+
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(data.error || data.message || "Failed to save award");
+
+      alert(
+        data.message ||
+          (editingAwardOriginalInline ? "Award updated" : "Award added")
+      );
+      editingAwardOriginalInline = null; // Reset editing state
+
       await loadData();
       openPlayerInlineEditor(playerName);
     } catch (err) {
@@ -809,7 +830,59 @@
     }
   }
 
+  function prefillAwardForEdit(award, currentPlayerName) {
+    editingAwardOriginalInline = award.name;
+
+    const nameEl = document.getElementById("inline-new-award-name");
+    const iconEl = document.getElementById("inline-new-award-icon");
+    const descEl = document.getElementById("inline-new-award-desc");
+
+    if (nameEl) nameEl.value = award.name || "";
+    if (iconEl) iconEl.value = award.icon || "";
+    if (descEl) descEl.value = award.description || "";
+
+    // Change button to indicate update mode
+    const btn = document.getElementById("inline-add-award-btn");
+    if (btn) {
+      btn.textContent = "Update Award";
+      btn.classList.remove("bg-green-600", "hover:bg-green-700");
+      btn.classList.add("bg-yellow-600", "hover:bg-yellow-700");
+    }
+
+    updateInlineAwardPreview();
+  }
+
+  function promptDeleteAward(awardName, currentPlayerName) {
+    if (
+      !confirm(
+        `Delete award "${awardName}"? This will remove it from all players.`
+      )
+    )
+      return;
+    deleteAwardInline(awardName, currentPlayerName);
+  }
+
+  async function deleteAwardInline(awardName, currentPlayerName) {
+    try {
+      const res = await fetch("/api/manage-awards", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
+        body: JSON.stringify({ action: "deleteAward", awardName })
+      });
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(data.error || data.message || "Failed to delete award");
+
+      alert(data.message || "Award deleted");
+      await loadData();
+      openPlayerInlineEditor(currentPlayerName);
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  }
+
   let editingRoleOriginalInline = null;
+  let editingAwardOriginalInline = null;
   async function addRoleInline(currentPlayerName) {
     const rNEl = document.getElementById("inline-new-role-name") || {
         value: ""
