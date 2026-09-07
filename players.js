@@ -1046,6 +1046,7 @@
 
   // Open inline editor for a specific player
   // Open inline editor for a specific player
+  // Open inline editor for a specific player
   async function openPlayerInlineEditor(playerName, event) {
     console.log(
       "🔍 openPlayerInlineEditor called with playerName:",
@@ -1070,7 +1071,23 @@
 
     console.log("✅ Player found, attempting to open modal...");
 
-    // ✅ CRITICAL: These two lines MUST be present to define 'modal' and 'content'
+    // ✅ SAFEGUARD: Ensure these are always arrays to prevent .map() crashes
+    if (!Array.isArray(availableAwards)) {
+      console.warn(
+        "⚠️ availableAwards is not an array! Defaulting to []. Raw value:",
+        availableAwards
+      );
+      availableAwards = [];
+    }
+    if (!Array.isArray(pageAvailableRoles)) {
+      console.warn(
+        "⚠️ pageAvailableRoles is not an array! Defaulting to []. Raw value:",
+        pageAvailableRoles
+      );
+      pageAvailableRoles = [];
+    }
+
+    // Create modal dynamically since it doesn't exist in players.html
     let modal = document.getElementById("moderator-modal");
     let content = document.getElementById("moderator-panel-content");
 
@@ -1120,6 +1137,7 @@
     } catch (err) {
       console.warn("Could not fetch permissions for inline editor:", err);
     }
+    // ... (the rest of your existing code continues here)
 
     // Ensure roles are loaded so we can render role creation UI
     try {
