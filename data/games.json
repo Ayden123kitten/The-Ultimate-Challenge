@@ -2068,28 +2068,5 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
-  },
-  {
-    "id": "cavestory",
-    "name": "Cave Story",
-    "logo": "https://cdn2.steamgriddb.com/logo/b7371399a967f6b427d632478f47306f.png",
-    "yaml_slot_name": "CaveStory",
-    "slot_count": 1,
-    "apworld_link": "https://github.com/kl3cks7r/CaveStoryArchipelago/releases/download/0.6.7/cave_story.apworld",
-    "apworld_version": "0.6.7",
-    "mod_link": "",
-    "mod_version": "",
-    "mod_setup_guide_link": "https://github.com/kl3cks7r/CaveStoryArchipelago#installation-instructions",
-    "tracker_link": "",
-    "game_info_link": "",
-    "support_link": "https://discord.com/channels/731205301247803413/1083474864150695956",
-    "save_file_link": "https://drive.google.com/drive/folders/11UFxievwM_aVCXMlacYtc6vfoPx6Qhpd?usp=drive_link",
-    "rules": "",
-    "extra_information": "",
-    "current_player": null,
-    "claimed_at": null,
-    "total_time_ms": 0,
-    "completed": false,
-    "logs": []
   }
 ]
