@@ -1131,7 +1131,7 @@
     "name": "Jigsaw",
     "logo": "https://cdn2.steamgriddb.com/logo/06625c7ab300fe4fca126b8dd5970d2c.png",
     "yaml_slot_name": "Jigsaw",
-    "slot_count": 1,
+    "slot_count": 0,
     "apworld_link": "https://github.com/spineraks-org/ArchipelagoJigsaw/releases/download/v0.10.0/jigsaw.apworld",
     "apworld_version": "0.10.0",
     "mod_link": "https://jigsaw-ap.netlify.app/",
