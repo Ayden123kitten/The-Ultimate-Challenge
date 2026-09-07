@@ -4,6 +4,11 @@
       "name": "Veteran",
       "icon": "fa-medal",
       "description": "Made an account before the async started."
+    },
+    {
+      "name": "Contributor",
+      "icon": "fa-hands-helping",
+      "description": "Contributed in some way to The Ultimate Challenge."
     }
   ]
 }
