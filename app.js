@@ -1790,21 +1790,39 @@
     setupInlineGamePreview(game);
   }
   // Delete a game from inline editor
+  // Delete a game from inline editor
   async function deleteInlineGame(gameId) {
     if (
       !confirm(
         "Are you sure you want to permanently remove this game? This cannot be undone."
       )
-    )
+    ) {
       return;
+    }
+
     try {
       const res = await fetch("/api/moderator-actions", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
         body: JSON.stringify({ action: "removeGame", gameId })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to remove game");
+
+      // ✅ SAFE JSON PARSING
+      const contentType = res.headers.get("content-type");
+      let data;
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(
+          `Server returned non-JSON response (${res.status}): ${text.substring(0, 150)}`
+        );
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to remove game");
+      }
+
       alert("Game removed successfully!");
       closeModeratorModal();
       loadData();
@@ -1988,6 +2006,7 @@
 `;
   }
   // Save inline edited game
+  // Save inline edited game
   async function saveInlineEditedGame(gameId) {
     const gameData = {
       name: $("inline-edit-game-name").value.trim(),
@@ -2011,14 +2030,30 @@
       rules: $("inline-edit-game-rules").value.trim(),
       extra_information: $("inline-edit-game-extra-information").value.trim()
     };
+
     try {
       const res = await fetch("/api/moderator-actions", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
         body: JSON.stringify({ action: "updateGame", gameId, gameData })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+
+      // ✅ SAFE JSON PARSING: Prevents crashes if the server returns an HTML error page
+      const contentType = res.headers.get("content-type");
+      let data;
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(
+          `Server returned non-JSON response (${res.status}): ${text.substring(0, 150)}`
+        );
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to update game");
+      }
+
       alert("Game updated successfully!");
       closeModeratorModal();
       loadData();
@@ -2544,7 +2579,7 @@
         info.className = "flex items-center gap-3";
         const iconHtml =
           a.icon && a.icon.startsWith && a.icon.startsWith("fa-")
-            ? `<i class="fa-solid ${a.icon}" style="color:${a.color};"></i>`
+            ? `<i class="fa-solid ${a.icon}" style="color:${a.color || "#38bdf8"};"></i>`
             : a.icon || "🏆";
         info.innerHTML = `
        ${iconHtml}
@@ -2639,8 +2674,8 @@
     // Render icon - check if it's a FontAwesome icon (starts with "fa-")
     if (previewIcon) {
       if (icon && icon.startsWith("fa-")) {
-        // FontAwesome icon
-        previewIcon.innerHTML = `<i class="fa-solid ${icon}"></i>`;
+        // FontAwesome icon (matches profile fallback color)
+        previewIcon.innerHTML = `<i class="fa-solid ${icon}" style="color: #38bdf8;"></i>`;
       } else {
         // Emoji or plain text
         previewIcon.textContent = icon || "";
