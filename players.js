@@ -1,35 +1,27 @@
 (function () {
-  // ==========================================
-  // CONFIGURATION
-  // ==========================================
   const CONFIG = {
     GITHUB_OWNER: "Ayden123kitten",
     GITHUB_REPO: "The-Ultimate-Challenge",
     BRANCH: "main"
   };
-
-  // ==========================================
-  // STATE & UTILS
-  // ==========================================
-  let games = [];
-  let players = []; // [{ name, pfp_link, has_password }]
-  let pageAvailableRoles = []; // [{ name, color }]
-  let availableAwards = []; // [{ name, icon, description }]
-  let moderatorRoles = {}; // { playerName: 'admin' | 'moderator' }
-  let currentPlayer = AUTH.getName();
-  let leaderboardPositions = {}; // { playerName: rank }
-  let currentAuthTab = "login"; // Track which auth tab is active: 'login' or 'signup'
-  let authPanelRendered = false; // Track if auth panel has been rendered
-  let isModerator = false; // Track moderator status
-
+  let games = [],
+    players = [],
+    pageAvailableRoles = [],
+    availableAwards = [],
+    moderatorRoles = {};
+  let currentPlayer = AUTH.getName(),
+    leaderboardPositions = {},
+    currentAuthTab = "login",
+    authPanelRendered = false,
+    isModerator = false;
   const $ = (id) => document.getElementById(id);
 
   function formatTime(ms) {
     if (!ms || ms < 0) return "0:00:00";
-    const seconds = Math.floor((ms / 1000) % 60);
-    const minutes = Math.floor((ms / (1000 * 60)) % 60);
-    const hours = Math.floor(ms / (1000 * 60 * 60));
-    return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    const s = Math.floor((ms / 1000) % 60),
+      m = Math.floor((ms / 60000) % 60),
+      h = Math.floor(ms / 3600000);
+    return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   }
 
   async function loadRoles() {
@@ -37,42 +29,27 @@
       const cached = localStorage.getItem("rolesCache");
       if (cached) {
         try {
-          const parsed = JSON.parse(cached);
-          pageAvailableRoles = Array.isArray(parsed)
-            ? parsed
-            : parsed.roles || [];
-        } catch (e) {
-          console.debug("Invalid rolesCache, ignoring", e);
-        }
+          const p = JSON.parse(cached);
+          pageAvailableRoles = Array.isArray(p) ? p : p.roles || [];
+        } catch (e) {}
       }
-
       const res = await fetch(`/api/get-data?type=roles&t=${Date.now()}`);
       if (res.ok) {
-        const data = await res.json();
-        pageAvailableRoles = Array.isArray(data) ? data : data.roles || [];
-        try {
-          localStorage.setItem(
-            "rolesCache",
-            JSON.stringify(pageAvailableRoles)
-          );
-        } catch (e) {
-          console.debug("Could not cache roles:", e);
-        }
+        const d = await res.json();
+        pageAvailableRoles = Array.isArray(d) ? d : d.roles || [];
+        localStorage.setItem("rolesCache", JSON.stringify(pageAvailableRoles));
       }
     } catch (err) {
       console.error("Failed to load roles:", err);
     }
   }
 
-  // 👇 MAKE SURE THIS FUNCTION IS HERE 👇
   async function loadModeratorRoles() {
     try {
       const res = await fetch(`/api/get-data?type=moderators`);
-      if (res.ok) {
-        moderatorRoles = await res.json();
-      }
+      if (res.ok) moderatorRoles = await res.json();
     } catch (err) {
-      console.error("Failed to load moderator roles:", err);
+      console.error("Failed to load mods:", err);
     }
   }
 
@@ -81,221 +58,88 @@
       const cached = localStorage.getItem("awardsCache");
       if (cached) {
         try {
-          const parsed = JSON.parse(cached);
-          availableAwards = Array.isArray(parsed)
-            ? parsed
-            : parsed.awards || [];
-        } catch (e) {
-          console.debug("Invalid awardsCache, ignoring", e);
-        }
+          const p = JSON.parse(cached);
+          availableAwards = Array.isArray(p) ? p : p.awards || [];
+        } catch (e) {}
       }
-
       const res = await fetch(`/api/get-data?type=awards&t=${Date.now()}`);
       if (res.ok) {
-        const data = await res.json();
-        availableAwards = Array.isArray(data) ? data : data.awards || [];
-        try {
-          localStorage.setItem("awardsCache", JSON.stringify(availableAwards));
-        } catch (e) {
-          console.debug("Could not cache awards:", e);
-        }
+        const d = await res.json();
+        availableAwards = Array.isArray(d) ? d : d.awards || [];
+        localStorage.setItem("awardsCache", JSON.stringify(availableAwards));
       }
     } catch (err) {
       console.error("Failed to load awards:", err);
     }
   }
 
-  function getModeratorIcon(playerName) {
-    const role = moderatorRoles[playerName];
-    if (role === "admin") {
+  function getModeratorIcon(n) {
+    const r = moderatorRoles[n];
+    if (r === "admin")
       return '<i class="fa-solid fa-crown text-yellow-400" title="Admin"></i>';
-    } else if (role === "moderator") {
+    if (r === "moderator")
       return '<i class="fa-solid fa-shield-halved text-blue-400" title="Moderator"></i>';
-    }
     return "";
   }
 
-  // ==========================================
-  // DATA FETCHING
-  // ==========================================
   async function loadData() {
     try {
-      const [gamesRes, playersRes] = await Promise.all([
+      const [gRes, pRes] = await Promise.all([
         fetch(`/api/get-data?type=games&t=${Date.now()}`),
         fetch(`/api/get-data?type=players&t=${Date.now()}`)
       ]);
-
-      if (!gamesRes.ok) throw new Error(`Games API: ${gamesRes.status}`);
-      if (!playersRes.ok) throw new Error(`Players API: ${playersRes.status}`);
-
-      games = await gamesRes.json();
-      players = await playersRes.json();
-
+      if (!gRes.ok || !pRes.ok) throw new Error("API Error");
+      games = await gRes.json();
+      players = await pRes.json();
       await Promise.all([loadRoles(), loadModeratorRoles(), loadAwards()]);
-
       renderAuthPanel();
       renderPlayers();
     } catch (err) {
       console.error("Failed to load data:", err);
-      $("players-container").innerHTML = `
-            <div class="col-span-full text-center text-red-400 p-8">
-                <i class="fa-solid fa-circle-exclamation text-4xl mb-4"></i>
-                <p class="text-lg font-bold">Error loading player stats</p>
-                <p class="text-sm mt-2">${err.message}</p>
-            </div>
-        `;
+      $("players-container").innerHTML =
+        `<div class="col-span-full text-center text-red-400 p-8"><p class="text-lg font-bold">Error loading player stats</p><p class="text-sm mt-2">${err.message}</p></div>`;
     }
   }
 
-  // ==========================================
-  // RENDER AUTH PANEL
-  // ==========================================
   function renderAuthPanel() {
     const panel = $("auth-panel");
     if (!panel) return;
-
-    const currentNameEl = $("current-player-name");
-    if (currentNameEl)
-      currentNameEl.textContent = currentPlayer || "Not logged in";
-
-    // Don't re-render if already rendered and not logged in (preserves input values)
+    const cName = $("current-player-name");
+    if (cName) cName.textContent = currentPlayer || "Not logged in";
     if (authPanelRendered && !AUTH.isLoggedIn()) return;
-
     authPanelRendered = true;
-
     if (AUTH.isLoggedIn()) {
-      panel.innerHTML = `
-            <div class="glass rounded-xl p-6 flex items-center justify-between">
-                <div>
-                    <div class="text-sm text-slate-400">Logged in as</div>
-                    <div class="text-xl font-bold text-ap-accent">${currentPlayer}</div>
-                </div>
-                <button id="auth-logout-btn" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
-                    Log Out
-                </button>
-            </div>
-        `;
+      panel.innerHTML = `<div class="glass rounded-xl p-6 flex items-center justify-between"><div><div class="text-sm text-slate-400">Logged in as</div><div class="text-xl font-bold text-ap-accent">${currentPlayer}</div></div><button id="auth-logout-btn" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg">Log Out</button></div>`;
       $("auth-logout-btn").addEventListener("click", () => AUTH.logout());
-
       return;
     }
-
-    panel.innerHTML = `
-        <div class="glass rounded-xl p-6">
-            <div class="flex gap-2 mb-4">
-                <button id="tab-login" class="flex-1 py-2 rounded-lg font-semibold bg-ap-accent/20 text-ap-accent">Log In</button>
-                <button id="tab-signup" class="flex-1 py-2 rounded-lg font-semibold bg-slate-800 text-slate-400">Sign Up</button>
-            </div>
-
-            <form id="login-form" class="space-y-3">
-                <input id="login-name" type="text" placeholder="Player name" autocomplete="username"
-                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent">
-                <div class="relative">
-                    <input id="login-password" type="password" placeholder="Password" autocomplete="current-password"
-                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent">
-                    <button type="button" id="login-toggle-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
-                </div>
-                <button type="submit" class="w-full bg-ap-accent/80 hover:bg-ap-accent text-white font-bold py-2 rounded-lg transition-colors">
-                    Log In
-                </button>
-                <p id="login-error" class="text-red-400 text-sm hidden"></p>
-            </form>
-
-            <form id="signup-form" class="space-y-3 hidden">
-                <input id="signup-name" type="text" placeholder="Choose a player name" autocomplete="username"
-                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent">
-                <div class="relative">
-                    <input id="signup-password" type="password" placeholder="Choose a password (6+ characters)" autocomplete="new-password"
-                        class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent">
-                    <button type="button" id="signup-toggle-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
-                </div>
-                <input id="signup-pfp" type="url" placeholder="Profile picture link (optional)"
-                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-ap-accent">
-                <p class="text-xs text-slate-500">
-                    Already see your name in the list below with no password? Sign up with that exact name to claim it.
-                </p>
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg transition-colors">
-                    Sign Up
-                </button>
-                <p id="signup-error" class="text-red-400 text-sm hidden"></p>
-            </form>
-        </div>
-    `;
-
-    const loginTab = $("tab-login");
-    const signupTab = $("tab-signup");
-    const loginForm = $("login-form");
-    const signupForm = $("signup-form");
-
-    // Set initial tab state based on currentAuthTab
-    if (currentAuthTab === "signup") {
-      signupTab.className =
-        "flex-1 py-2 rounded-lg font-semibold bg-ap-accent/20 text-ap-accent";
-      loginTab.className =
-        "flex-1 py-2 rounded-lg font-semibold bg-slate-800 text-slate-400";
-      signupForm.classList.remove("hidden");
-      loginForm.classList.add("hidden");
-    } else {
-      loginTab.className =
-        "flex-1 py-2 rounded-lg font-semibold bg-ap-accent/20 text-ap-accent";
-      signupTab.className =
-        "flex-1 py-2 rounded-lg font-semibold bg-slate-800 text-slate-400";
-      loginForm.classList.remove("hidden");
-      signupForm.classList.add("hidden");
-    }
-
-    loginTab.addEventListener("click", () => {
-      currentAuthTab = "login";
-      loginTab.className =
-        "flex-1 py-2 rounded-lg font-semibold bg-ap-accent/20 text-ap-accent";
-      signupTab.className =
-        "flex-1 py-2 rounded-lg font-semibold bg-slate-800 text-slate-400";
-      loginForm.classList.remove("hidden");
-      signupForm.classList.add("hidden");
-    });
-
-    signupTab.addEventListener("click", () => {
-      currentAuthTab = "signup";
-      signupTab.className =
-        "flex-1 py-2 rounded-lg font-semibold bg-ap-accent/20 text-ap-accent";
-      loginTab.className =
-        "flex-1 py-2 rounded-lg font-semibold bg-slate-800 text-slate-400";
-      signupForm.classList.remove("hidden");
-      loginForm.classList.add("hidden");
-    });
-
-    // Toggle password visibility for login form
-    const loginToggleBtn = $("login-toggle-password");
-    const loginPasswordInput = $("login-password");
-    loginToggleBtn.addEventListener("click", () => {
-      const isPassword = loginPasswordInput.type === "password";
-      loginPasswordInput.type = isPassword ? "text" : "password";
-      loginToggleBtn.querySelector("i").className = isPassword
-        ? "fa-solid fa-eye-slash"
-        : "fa-solid fa-eye";
-    });
-
-    // Toggle password visibility for signup form
-    const signupToggleBtn = $("signup-toggle-password");
-    const signupPasswordInput = $("signup-password");
-    signupToggleBtn.addEventListener("click", () => {
-      const isPassword = signupPasswordInput.type === "password";
-      signupPasswordInput.type = isPassword ? "text" : "password";
-      signupToggleBtn.querySelector("i").className = isPassword
-        ? "fa-solid fa-eye-slash"
-        : "fa-solid fa-eye";
-    });
-
-    loginForm.addEventListener("submit", async (e) => {
+    panel.innerHTML = `<div class="glass rounded-xl p-6"><div class="flex gap-2 mb-4"><button id="tab-login" class="flex-1 py-2 rounded-lg font-semibold bg-ap-accent/20 text-ap-accent">Log In</button><button id="tab-signup" class="flex-1 py-2 rounded-lg font-semibold bg-slate-800 text-slate-400">Sign Up</button></div><form id="login-form" class="space-y-3"><input id="login-name" type="text" placeholder="Player name" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white"><div class="relative"><input id="login-password" type="password" placeholder="Password" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white"><button type="button" id="login-toggle-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white"><i class="fa-solid fa-eye"></i></button></div><button type="submit" class="w-full bg-ap-accent/80 hover:bg-ap-accent text-white font-bold py-2 rounded-lg">Log In</button><p id="login-error" class="text-red-400 text-sm hidden"></p></form><form id="signup-form" class="space-y-3 hidden"><input id="signup-name" type="text" placeholder="Choose a player name" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white"><div class="relative"><input id="signup-password" type="password" placeholder="Password (6+ chars)" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white"><button type="button" id="signup-toggle-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white"><i class="fa-solid fa-eye"></i></button></div><input id="signup-pfp" type="url" placeholder="Profile picture link (optional)" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white"><button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg">Sign Up</button><p id="signup-error" class="text-red-400 text-sm hidden"></p></form></div>`;
+    const lTab = $("tab-login"),
+      sTab = $("tab-signup"),
+      lForm = $("login-form"),
+      sForm = $("signup-form");
+    const setTab = (t) => {
+      currentAuthTab = t;
+      lTab.className = `flex-1 py-2 rounded-lg font-semibold ${t === "login" ? "bg-ap-accent/20 text-ap-accent" : "bg-slate-800 text-slate-400"}`;
+      sTab.className = `flex-1 py-2 rounded-lg font-semibold ${t === "signup" ? "bg-ap-accent/20 text-ap-accent" : "bg-slate-800 text-slate-400"}`;
+      lForm.classList.toggle("hidden", t !== "login");
+      sForm.classList.toggle("hidden", t !== "signup");
+    };
+    lTab.onclick = () => setTab("login");
+    sTab.onclick = () => setTab("signup");
+    const togglePw = (btnId, inputId) => {
+      const b = $(btnId),
+        i = $(inputId);
+      b.onclick = () => {
+        i.type = i.type === "password" ? "text" : "password";
+        b.querySelector("i").className =
+          i.type === "password" ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
+      };
+    };
+    togglePw("login-toggle-password", "login-password");
+    togglePw("signup-toggle-password", "signup-password");
+    lForm.onsubmit = async (e) => {
       e.preventDefault();
-      const errorEl = $("login-error");
-      errorEl.classList.add("hidden");
-      const submitBtn = loginForm.querySelector('button[type="submit"]');
-      submitBtn.disabled = true;
       try {
         await AUTH.login(
           $("login-name").value.trim(),
@@ -304,19 +148,12 @@
         currentPlayer = AUTH.getName();
         await loadData();
       } catch (err) {
-        errorEl.textContent = err.message;
-        errorEl.classList.remove("hidden");
-      } finally {
-        submitBtn.disabled = false;
+        $("login-error").textContent = err.message;
+        $("login-error").classList.remove("hidden");
       }
-    });
-
-    signupForm.addEventListener("submit", async (e) => {
+    };
+    sForm.onsubmit = async (e) => {
       e.preventDefault();
-      const errorEl = $("signup-error");
-      errorEl.classList.add("hidden");
-      const submitBtn = signupForm.querySelector('button[type="submit"]');
-      submitBtn.disabled = true;
       try {
         await AUTH.signup(
           $("signup-name").value.trim(),
@@ -326,147 +163,104 @@
         currentPlayer = AUTH.getName();
         await loadData();
       } catch (err) {
-        errorEl.textContent = err.message;
-        errorEl.classList.remove("hidden");
-      } finally {
-        submitBtn.disabled = false;
+        $("signup-error").textContent = err.message;
+        $("signup-error").classList.remove("hidden");
       }
-    });
+    };
   }
 
-  // ==========================================
-  // RENDERING PLAYER STATS
-  // ==========================================
-  let searchQuery = "";
-  let playersSortOption = "az";
-
+  let searchQuery = "",
+    playersSortOption = "az";
   function renderPlayers() {
-    const inlineEditMode = localStorage.getItem("inlineEditMode") === "true";
-    const cachedModerator = localStorage.getItem("isModerator") === "true";
-    const effectiveModerator = isModerator || cachedModerator;
+    const inlineEditMode = localStorage.getItem("inlineEditMode") === "true",
+      cachedMod = localStorage.getItem("isModerator") === "true",
+      effMod = isModerator || cachedMod;
     const container = $("players-container");
     container.innerHTML = "";
-
-    const playerStats = players.map((p) => {
-      const playerName = p.name;
-      const playerGames = games.filter(
-        (g) => g.logs && g.logs.some((log) => log.player === playerName)
-      );
-      const currentGame = games.find((g) => g.current_player === playerName);
-
-      let totalTimeMs = 0;
-      const gameHistory = [];
-      let totalClaims = 0;
-
-      games.forEach((game) => {
-        let gameTotalMs = 0;
-        let claimCount = 0;
-
-        if (game.logs) {
-          game.logs.forEach((log) => {
-            if (log.player === playerName) {
-              gameTotalMs += log.duration_ms;
-              totalTimeMs += log.duration_ms;
-              claimCount++;
+    const pStats = players.map((p) => {
+      const pGames = games.filter(
+          (g) => g.logs && g.logs.some((l) => l.player === p.name)
+        ),
+        cGame = games.find((g) => g.current_player === p.name);
+      let tMs = 0,
+        gHist = [],
+        tCl = 0;
+      games.forEach((g) => {
+        let gMs = 0,
+          cC = 0;
+        if (g.logs)
+          g.logs.forEach((l) => {
+            if (l.player === p.name) {
+              gMs += l.duration_ms;
+              tMs += l.duration_ms;
+              cC++;
             }
           });
+        if (cGame && cGame.id === g.id && g.claimed_at) {
+          const sMs = Date.now() - g.claimed_at;
+          gMs += sMs;
+          tMs += sMs;
+          cC++;
         }
-
-        if (currentGame && currentGame.id === game.id && game.claimed_at) {
-          const currentSessionMs = Date.now() - game.claimed_at;
-          gameTotalMs += currentSessionMs;
-          totalTimeMs += currentSessionMs;
-          claimCount++;
-        }
-
-        totalClaims += claimCount;
-
-        if (gameTotalMs > 0) {
-          gameHistory.push({ gameName: game.name, timeMs: gameTotalMs });
-        }
+        tCl += cC;
+        if (gMs > 0) gHist.push({ gameName: g.name, timeMs: gMs });
       });
-
-      gameHistory.sort((a, b) => b.timeMs - a.timeMs);
-
+      gHist.sort((a, b) => b.timeMs - a.timeMs);
       return {
-        name: playerName,
+        name: p.name,
         pfpLink: p.pfp_link,
-        totalTimeMs,
-        gamesPlayed: playerGames.length,
-        currentGame: currentGame ? currentGame.name : null,
-        gameHistory,
-        totalClaims
+        totalTimeMs: tMs,
+        gamesPlayed: pGames.length,
+        currentGame: cGame ? cGame.name : null,
+        gameHistory: gHist,
+        totalClaims: tCl
       };
     });
-
-    // Compute combined score and leaderboard positions (weights match leaderboard.js)
-    (function computePositions() {
-      const statsForRanking = playerStats.map((s) => ({ ...s }));
-      const weights = { games: 0.3, time: 0.3, claims: 0.25, completion: 0.15 };
-      // Compute completion rates
-      statsForRanking.forEach((s) => {
+    (function computePos() {
+      const sR = pStats.map((s) => ({ ...s }));
+      const w = { games: 0.3, time: 0.3, claims: 0.25, completion: 0.15 };
+      sR.forEach((s) => {
         s.completionRate =
           games.length > 0 ? (s.gamesPlayed / games.length) * 100 : 0;
       });
-      const maxGames = Math.max(
-        ...statsForRanking.map((s) => s.gamesPlayed),
-        1
-      );
-      const maxTime = Math.max(...statsForRanking.map((s) => s.totalTimeMs), 1);
-      const maxClaims = Math.max(
-        ...statsForRanking.map((s) => s.totalClaims),
-        1
-      );
-      const maxCompletion = Math.max(
-        ...statsForRanking.map((s) => s.completionRate),
-        0.0001
-      );
-      statsForRanking.forEach((s) => {
-        const ng = s.gamesPlayed / maxGames;
-        const nt = s.totalTimeMs / maxTime;
-        const nc = s.totalClaims / maxClaims;
-        const ncomp = s.completionRate / (maxCompletion || 100);
+      const mG = Math.max(...sR.map((s) => s.gamesPlayed), 1),
+        mT = Math.max(...sR.map((s) => s.totalTimeMs), 1),
+        mC = Math.max(...sR.map((s) => s.totalClaims), 1),
+        mCo = Math.max(...sR.map((s) => s.completionRate), 0.0001);
+      sR.forEach((s) => {
         s.combinedScore =
-          ng * weights.games +
-          nt * weights.time +
-          nc * weights.claims +
-          ncomp * weights.completion;
+          (s.gamesPlayed / mG) * w.games +
+          (s.totalTimeMs / mT) * w.time +
+          (s.totalClaims / mC) * w.claims +
+          (s.completionRate / mCo) * w.completion;
       });
-      statsForRanking.sort((a, b) => b.combinedScore - a.combinedScore);
+      sR.sort((a, b) => b.combinedScore - a.combinedScore);
       leaderboardPositions = {};
-      statsForRanking.forEach((s, i) => {
+      sR.forEach((s, i) => {
         leaderboardPositions[s.name] = i + 1;
       });
     })();
-
-    // Apply sorting
-    if (playersSortOption === "az") {
-      playerStats.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (playersSortOption === "za") {
-      playerStats.sort((a, b) => b.name.localeCompare(a.name));
-    } else if (playersSortOption === "games-played") {
-      playerStats.sort((a, b) => b.gamesPlayed - a.gamesPlayed);
-    } else if (playersSortOption === "total-time") {
-      playerStats.sort((a, b) => b.totalTimeMs - a.totalTimeMs);
-    } else if (playersSortOption === "most-claims") {
-      playerStats.sort((a, b) => b.totalClaims - a.totalClaims);
-    }
-
-    let filteredStats = playerStats;
+    if (playersSortOption === "az")
+      pStats.sort((a, b) => a.name.localeCompare(b.name));
+    else if (playersSortOption === "za")
+      pStats.sort((a, b) => b.name.localeCompare(a.name));
+    else if (playersSortOption === "games-played")
+      pStats.sort((a, b) => b.gamesPlayed - a.gamesPlayed);
+    else if (playersSortOption === "total-time")
+      pStats.sort((a, b) => b.totalTimeMs - a.totalTimeMs);
+    else if (playersSortOption === "most-claims")
+      pStats.sort((a, b) => b.totalClaims - a.totalClaims);
+    let fStats = pStats;
     if (searchQuery.trim() !== "") {
-      const query = searchQuery.toLowerCase();
-      filteredStats = playerStats.filter((stat) =>
-        stat.name.toLowerCase().includes(query)
-      );
+      const q = searchQuery.toLowerCase();
+      fStats = pStats.filter((s) => s.name.toLowerCase().includes(q));
     }
-
-    filteredStats.forEach((stat, index) => {
-      const card = document.createElement("div");
-      const isSelected = stat.name === currentPlayer;
-      card.className = `glass rounded-xl p-4 transition-all cursor-pointer hover:shadow-lg ${isSelected ? "border-2 border-ap-accent" : ""}`;
+    fStats.forEach((stat) => {
+      const card = document.createElement("div"),
+        isSel = stat.name === currentPlayer;
+      card.className = `glass rounded-xl p-4 transition-all cursor-pointer hover:shadow-lg ${isSel ? "border-2 border-ap-accent" : ""}`;
       card.style.cssText =
         "position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; aspect-ratio: 1; justify-content: center;";
-
       card.onmouseover = function () {
         this.style.transform = "translateY(-4px)";
         this.style.boxShadow = "0 8px 16px rgba(0,0,0,0.2)";
@@ -475,912 +269,323 @@
         this.style.transform = "translateY(0)";
         this.style.boxShadow = "none";
       };
-
-      // ✅ FIX: Ignore clicks on the card if the edit button was clicked
       card.onclick = (e) => {
-        if (e.target.closest(".inline-edit-btn")) {
-          return; // Let the button's own listener handle it
-        }
-        showPlayerModal(stat);
+        if (!e.target.closest(".inline-edit-btn")) showPlayerModal(stat);
       };
-
-      const avatar = stat.pfpLink
-        ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
-        : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
-
-      const modIcon = getModeratorIcon(stat.name);
-      const playerRank = leaderboardPositions[stat.name] || null;
-
-      card.innerHTML = `
-            <div style="position: relative;">
-                ${avatar}
-                ${
-                  inlineEditMode && effectiveModerator
-                    ? `
-                    <button class="inline-edit-btn" style="position: absolute; top: -5px; right: -5px; background: #1e293b; border: 2px solid #38bdf8; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20;" title="Edit Player">
-                        <i class="fa-solid fa-gear" style="color: #38bdf8;"></i>
-                    </button>
-                `
-                    : ""
-                }
-                ${playerRank ? `<div title="Leaderboard Position" style="position: absolute; bottom: -8px; right: -8px; background: rgba(17,24,39,0.95); border: 2px solid #0ea5e9; color: #0ea5e9; padding: 4px 6px; border-radius: 9999px; font-weight: 700; font-size: 0.75rem; z-index: 10;">#${playerRank}</div>` : ""}
-            </div>
-            ${modIcon ? `<div style="position: absolute; top: -5px; left: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; z-index: 10;">${modIcon}</div>` : ""}
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
-                <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ""}</h2>
-            </div>
-        `;
-
-      // ✅ FIX: Robustly attach the event listener
-      if (inlineEditMode && effectiveModerator) {
-        const editBtn = card.querySelector(".inline-edit-btn");
-        if (editBtn) {
-          editBtn.addEventListener("click", (e) => {
-            console.log("⚙️ Edit button clicked for:", stat.name);
+      const av = stat.pfpLink
+        ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;">`
+        : `<div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(56,189,248,0.2); display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
+      const mIcon = getModeratorIcon(stat.name),
+        pRank = leaderboardPositions[stat.name] || null;
+      card.innerHTML = `<div style="position: relative;">${av}${inlineEditMode && effMod ? `<button class="inline-edit-btn" style="position: absolute; top: -5px; right: -5px; background: #1e293b; border: 2px solid #38bdf8; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20;" title="Edit Player"><i class="fa-solid fa-gear" style="color: #38bdf8;"></i></button>` : ""}${pRank ? `<div title="Leaderboard Position" style="position: absolute; bottom: -8px; right: -8px; background: rgba(17,24,39,0.95); border: 2px solid #0ea5e9; color: #0ea5e9; padding: 4px 6px; border-radius: 9999px; font-weight: 700; font-size: 0.75rem; z-index: 10;">#${pRank}</div>` : ""}</div>${mIcon ? `<div style="position: absolute; top: -5px; left: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; z-index: 10;">${mIcon}</div>` : ""}<div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;"><h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSel ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ""}</h2></div>`;
+      if (inlineEditMode && effMod) {
+        const eBtn = card.querySelector(".inline-edit-btn");
+        if (eBtn)
+          eBtn.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
             openPlayerInlineEditor(stat.name, e);
           });
-        } else {
-          console.warn(
-            "⚠️ Edit button element not found in DOM for",
-            stat.name
-          );
-        }
       }
-
       container.appendChild(card);
     });
-
-    if (filteredStats.length === 0) {
-      container.innerHTML = `
-            <div class="col-span-full text-center text-slate-500 py-20">
-                <i class="fa-solid fa-users-slash text-4xl mb-4"></i>
-                <p>No players found</p>
-            </div>
-        `;
-    }
+    if (fStats.length === 0)
+      container.innerHTML = `<div class="col-span-full text-center text-slate-500 py-20"><p>No players found</p></div>`;
   }
 
-  // Modal Logic
   function showPlayerModal(stat) {
-    // Remove existing modal if any
-    const existing = document.getElementById("player-detail-modal");
-    if (existing) existing.remove();
-
+    const ex = document.getElementById("player-detail-modal");
+    if (ex) ex.remove();
     const modal = document.createElement("div");
     modal.id = "player-detail-modal";
-    modal.style.cssText = `
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(15, 23, 42, 0.4);
-        z-index: 1000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        backdrop-filter: blur(4px);
-    `;
-
+    modal.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 1000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px);`;
     const content = document.createElement("div");
-    content.style.cssText = `
-        background: rgba(30, 41, 59, 0.98);
-        backdrop-filter: blur(10px);
-        padding: 30px;
-        border-radius: 16px;
-        max-width: 600px;
-        width: 90%;
-        max-height: 80vh;
-        overflow-y: auto;
-        position: relative;
-        border: 1px solid rgba(255,255,255,0.1);
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    `;
-
-    // Close Button
-    const closeBtn = document.createElement("button");
-    closeBtn.innerHTML = "&times;";
-    closeBtn.style.cssText = `
-        position: absolute;
-        top: 15px; right: 20px;
-        background: none;
-        border: none;
-        color: #94a3b8;
-        font-size: 1.5rem;
-        cursor: pointer;
-        line-height: 1;
-    `;
-    closeBtn.onclick = () => modal.remove();
-
-    // Header
+    content.style.cssText = `background: rgba(30, 41, 59, 0.98); backdrop-filter: blur(10px); padding: 30px; border-radius: 16px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5);`;
+    const cBtn = document.createElement("button");
+    cBtn.innerHTML = "&times;";
+    cBtn.style.cssText = `position: absolute; top: 15px; right: 20px; background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;`;
+    cBtn.onclick = () => modal.remove();
     const header = document.createElement("div");
     header.style.cssText = `display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;`;
-
-    const avatar = stat.pfpLink
-      ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>\'">`
-      : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
-
+    const av = stat.pfpLink
+      ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;">`
+      : `<div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(56,189,248,0.2); display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
     const info = document.createElement("div");
     info.style.cssText = `display: flex; flex-direction: column; gap: 4px;`;
-
-    // Name row with pronouns badge
-    const nameRow = document.createElement("div");
-    nameRow.style.cssText = `display: flex; align-items: center; gap: 8px; flex-wrap: wrap;`;
-
+    const nRow = document.createElement("div");
+    nRow.style.cssText = `display: flex; align-items: center; gap: 8px; flex-wrap: wrap;`;
     const h2 = document.createElement("h2");
     h2.textContent = stat.name;
-    h2.style.margin = "0";
-    h2.style.fontSize = "1.25rem";
-    h2.style.color = "#e2e8f0";
-
-    // Pronouns badge
-    const playerObj = players.find((p) => p.name === stat.name);
-    const playerPronouns =
-      playerObj && playerObj.pronouns ? playerObj.pronouns.trim() : "";
-    if (playerPronouns) {
-      const pronounsBadge = document.createElement("span");
-      pronounsBadge.textContent = playerPronouns;
-      pronounsBadge.style.cssText = `display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #38bdf822; color: #38bdf8; border: 1px solid #38bdf8; white-space: nowrap;`;
-      nameRow.appendChild(h2);
-      nameRow.appendChild(pronounsBadge);
+    h2.style.cssText = `margin: 0; font-size: 1.25rem; color: #e2e8f0;`;
+    const pObj = players.find((p) => p.name === stat.name),
+      pPronouns = pObj && pObj.pronouns ? pObj.pronouns.trim() : "";
+    if (pPronouns) {
+      const b = document.createElement("span");
+      b.textContent = pPronouns;
+      b.style.cssText = `display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #38bdf822; color: #38bdf8; border: 1px solid #38bdf8;`;
+      nRow.appendChild(h2);
+      nRow.appendChild(b);
     } else {
-      nameRow.appendChild(h2);
+      nRow.appendChild(h2);
     }
-
-    // Roles in modal
-    const playerRoles = playerObj && playerObj.roles ? playerObj.roles : [];
-    const modalRoles = document.createElement("div");
-    modalRoles.style.cssText = `display: flex; flex-wrap: wrap; gap: 6px;`;
-    playerRoles.forEach((roleName) => {
-      const role = pageAvailableRoles.find((r) => r.name === roleName);
-      if (role) {
-        const badge = document.createElement("span");
-        badge.textContent = role.name;
-        badge.style.cssText = `
-                display: inline-flex; align-items: center; gap: 4px;
-                padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;
-                background-color: ${role.color}33; color: ${role.color}; border: 1px solid ${role.color};
-            `;
-        const dot = document.createElement("span");
-        dot.style.cssText = `display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${role.color};`;
-        badge.prepend(dot);
-        modalRoles.appendChild(badge);
+    const pRoles = pObj && pObj.roles ? pObj.roles : [],
+      mRoles = document.createElement("div");
+    mRoles.style.cssText = `display: flex; flex-wrap: wrap; gap: 6px;`;
+    pRoles.forEach((rN) => {
+      const r = pageAvailableRoles.find((r) => r.name === rN);
+      if (r) {
+        const b = document.createElement("span");
+        b.textContent = r.name;
+        b.style.cssText = `display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; background-color: ${r.color}33; color: ${r.color}; border: 1px solid ${r.color};`;
+        const d = document.createElement("span");
+        d.style.cssText = `display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${r.color};`;
+        b.prepend(d);
+        mRoles.appendChild(b);
       }
     });
+    info.appendChild(nRow);
+    if (mRoles.children.length > 0) info.appendChild(mRoles);
 
-    info.appendChild(nameRow);
-    if (modalRoles.children.length > 0) {
-      info.appendChild(modalRoles);
-    }
-
-    // Compact Awards Badges (show under name for quick visibility)
-    const playerAwardsCompact =
-      playerObj && playerObj.awards ? playerObj.awards : [];
-    if (playerAwardsCompact.length > 0) {
-      const badgesRow = document.createElement("div");
-      badgesRow.style.cssText = `display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;`;
-      playerAwardsCompact.forEach((awardEntry) => {
-        let awardData = null;
-        if (typeof awardEntry === "string") {
-          awardData = availableAwards.find((a) => a.name === awardEntry) || {
-            name: awardEntry
-          };
-        } else if (awardEntry && typeof awardEntry === "object") {
-          awardData = awardEntry;
-        } else {
-          awardData = { name: String(awardEntry) };
-        }
-
+    // AWARDS RENDERING LOGIC
+    const pAwardsC = pObj && pObj.awards ? pObj.awards : [];
+    if (pAwardsC.length > 0) {
+      const bRow = document.createElement("div");
+      bRow.style.cssText = `display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;`;
+      pAwardsC.forEach((aE) => {
+        let aD = null;
+        if (typeof aE === "string")
+          aD = availableAwards.find((a) => a.name === aE) || { name: aE };
+        else if (aE && typeof aE === "object") aD = aE;
+        else aD = { name: String(aE) };
         const badge = document.createElement("span");
-        badge.title = awardData.description || awardData.name;
+        badge.title = aD.description || aD.name;
         badge.style.cssText = `display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:9999px; background: rgba(255,255,255,0.03); color:#e2e8f0; font-size:0.85rem;`;
-        const iconSpan = document.createElement("span");
-        iconSpan.style.cssText = `min-width:18px; display:inline-flex; align-items:center; justify-content:center;`;
-        const icon = awardData.icon || "🏆";
-        if (
-          typeof icon === "string" &&
-          icon.startsWith &&
-          icon.startsWith("fa-")
-        ) {
-          iconSpan.innerHTML = `<i class=\"fa-solid ${icon}\" style=\"color:${awardData.color || "#38bdf8"};\"></i>`;
-        } else {
-          iconSpan.textContent = icon;
-        }
-        const nameSpan = document.createElement("span");
-        nameSpan.textContent = awardData.name;
-        nameSpan.style.cssText = `color:#94a3b8; font-weight:600;`;
-        badge.appendChild(iconSpan);
-        badge.appendChild(nameSpan);
-        badgesRow.appendChild(badge);
+        const iSpan = document.createElement("span");
+        iSpan.style.cssText = `min-width:18px; display:inline-flex; align-items:center; justify-content:center;`;
+        const icon = aD.icon || "🏆";
+        if (typeof icon === "string" && icon.startsWith("fa-"))
+          iSpan.innerHTML = `<i class="fa-solid ${icon}" style="color:${aD.color || "#38bdf8"};"></i>`;
+        else iSpan.textContent = icon;
+        const nSpan = document.createElement("span");
+        nSpan.textContent = aD.name;
+        nSpan.style.cssText = `color:#94a3b8; font-weight:600;`;
+        badge.appendChild(iSpan);
+        badge.appendChild(nSpan);
+        bRow.appendChild(badge);
       });
-      info.appendChild(badgesRow);
+      info.appendChild(bRow);
     }
 
-    // Bio under name
-    const playerBio = playerObj && playerObj.bio ? playerObj.bio.trim() : "";
-    if (playerBio) {
-      const bioDiv = document.createElement("div");
-      bioDiv.style.cssText = `margin-top: 4px; overflow-wrap: anywhere; word-break: break-word;`;
-      const bioText = document.createElement("span");
-      bioText.textContent = playerBio;
-      bioText.style.cssText = `color: #94a3b8; overflow-wrap: anywhere; word-break: break-word; font-size: 0.9rem;`;
-      bioDiv.appendChild(bioText);
-      info.appendChild(bioDiv);
+    const pBio = pObj && pObj.bio ? pObj.bio.trim() : "";
+    if (pBio) {
+      const bD = document.createElement("div");
+      bD.style.cssText = `margin-top: 4px; overflow-wrap: anywhere; word-break: break-word;`;
+      const bT = document.createElement("span");
+      bT.textContent = pBio;
+      bT.style.cssText = `color: #94a3b8; font-size: 0.9rem;`;
+      bD.appendChild(bT);
+      info.appendChild(bD);
     }
-
-    // Discord username under bio
-    const playerDiscord =
-      playerObj && playerObj.discord ? playerObj.discord.trim() : "";
-    if (playerDiscord) {
-      const discordDiv = document.createElement("div");
-      discordDiv.style.cssText = `display: flex; align-items: center; gap: 6px; margin-top: 4px;`;
-      const discordIcon = document.createElement("i");
-      discordIcon.className = "fa-brands fa-discord";
-      discordIcon.style.cssText = `color: #5865F2;`;
-      const discordText = document.createElement("span");
-      discordText.textContent = playerDiscord;
-      discordText.style.cssText = `color: #5865F2; overflow-wrap: anywhere; word-break: break-word; font-size: 0.9rem;`;
-      discordDiv.appendChild(discordIcon);
-      discordDiv.appendChild(discordText);
-      info.appendChild(discordDiv);
+    const pDisc = pObj && pObj.discord ? pObj.discord.trim() : "";
+    if (pDisc) {
+      const dD = document.createElement("div");
+      dD.style.cssText = `display: flex; align-items: center; gap: 6px; margin-top: 4px;`;
+      const dI = document.createElement("i");
+      dI.className = "fa-brands fa-discord";
+      dI.style.cssText = `color: #5865F2;`;
+      const dT = document.createElement("span");
+      dT.textContent = pDisc;
+      dT.style.cssText = `color: #5865F2; font-size: 0.9rem;`;
+      dD.appendChild(dI);
+      dD.appendChild(dT);
+      info.appendChild(dD);
     }
-
-    header.innerHTML = avatar;
+    header.innerHTML = av;
     header.appendChild(info);
-    // Show leaderboard rank in header (aligned right)
     const rank = leaderboardPositions[stat.name] || null;
     if (rank) {
-      const rankDiv = document.createElement("div");
-      rankDiv.style.cssText = `margin-left: auto; display: flex; flex-direction: column; align-items: center; gap: 4px;`;
-      const rankLabel = document.createElement("div");
-      rankLabel.textContent = "Rank";
-      rankLabel.style.cssText = `font-size: 0.75rem; color: #94a3b8;`;
-      const rankValue = document.createElement("div");
-      rankValue.textContent = `#${rank}`;
-      rankValue.style.cssText = `font-size: 1.1rem; font-weight: 700; color: #38bdf8;`;
-      rankDiv.appendChild(rankLabel);
-      rankDiv.appendChild(rankValue);
-      header.appendChild(rankDiv);
+      const rD = document.createElement("div");
+      rD.style.cssText = `margin-left: auto; display: flex; flex-direction: column; align-items: center; gap: 4px;`;
+      const rL = document.createElement("div");
+      rL.textContent = "Rank";
+      rL.style.cssText = `font-size: 0.75rem; color: #94a3b8;`;
+      const rV = document.createElement("div");
+      rV.textContent = `#${rank}`;
+      rV.style.cssText = `font-size: 1.1rem; font-weight: 700; color: #38bdf8;`;
+      rD.appendChild(rL);
+      rD.appendChild(rV);
+      header.appendChild(rD);
     }
 
-    // Player Settings Section (Bio, Pronouns, Discord, Website)
-    const settingsSection = document.createElement("div");
-    settingsSection.style.cssText = `margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
-
-    const hasSettings =
-      playerObj &&
-      ((playerObj.bio && playerObj.bio.trim() !== "") ||
-        (playerObj.pronouns && playerObj.pronouns.trim() !== "") ||
-        (playerObj.discord && playerObj.discord.trim() !== "") ||
-        (playerObj.website && playerObj.website.trim() !== ""));
-
-    if (hasSettings) {
-      if (playerObj.bio && playerObj.bio.trim() !== "") {
-        const bioDiv = document.createElement("div");
-        bioDiv.style.cssText = `margin-bottom: 10px; overflow-wrap: anywhere; word-break: break-word;`;
-        const bioLabel = document.createElement("span");
-        bioLabel.textContent = "Bio: ";
-        bioLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
-        const bioText = document.createElement("span");
-        bioText.textContent = playerObj.bio;
-        bioText.style.cssText = `color: #e2e8f0; overflow-wrap: anywhere; word-break: break-word;`;
-        bioDiv.appendChild(bioLabel);
-        bioDiv.appendChild(bioText);
-        settingsSection.appendChild(bioDiv);
-      }
-
-      if (playerObj.pronouns && playerObj.pronouns.trim() !== "") {
-        const pronounsDiv = document.createElement("div");
-        pronounsDiv.style.cssText = `margin-bottom: 10px;`;
-        const pronounsLabel = document.createElement("span");
-        pronounsLabel.textContent = "Pronouns: ";
-        pronounsLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
-        const pronounsText = document.createElement("span");
-        pronounsText.textContent = playerObj.pronouns;
-        pronounsText.style.cssText = `color: #38bdf8;`;
-        pronounsDiv.appendChild(pronounsLabel);
-        pronounsDiv.appendChild(pronounsText);
-        settingsSection.appendChild(pronounsDiv);
-      }
-
-      if (playerObj.discord && playerObj.discord.trim() !== "") {
-        const discordDiv = document.createElement("div");
-        discordDiv.style.cssText = `margin-bottom: 10px;`;
-        const discordLabel = document.createElement("span");
-        discordLabel.textContent = "Discord: ";
-        discordLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
-        const discordText = document.createElement("span");
-        discordText.textContent = playerObj.discord;
-        discordText.style.cssText = `color: #5865F2; overflow-wrap: anywhere; word-break: break-word;`;
-        discordDiv.appendChild(discordLabel);
-        discordDiv.appendChild(discordText);
-        settingsSection.appendChild(discordDiv);
-      }
-
-      if (playerObj.website && playerObj.website.trim() !== "") {
-        const websiteDiv = document.createElement("div");
-        websiteDiv.style.cssText = `margin-bottom: 10px;`;
-        const websiteLabel = document.createElement("span");
-        websiteLabel.textContent = "Website: ";
-        websiteLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
-        const websiteText = document.createElement("a");
-        websiteText.textContent = playerObj.website;
-        websiteText.href = playerObj.website.startsWith("http")
-          ? playerObj.website
-          : "#";
-        websiteText.target = "_blank";
-        websiteText.style.cssText = `color: #38bdf8; text-decoration: none; overflow-wrap: anywhere; word-break: break-word;`;
-        websiteText.onmouseover = function () {
-          this.style.textDecoration = "underline";
-        };
-        websiteText.onmouseout = function () {
-          this.style.textDecoration = "none";
-        };
-        websiteDiv.appendChild(websiteLabel);
-        websiteDiv.appendChild(websiteText);
-        settingsSection.appendChild(websiteDiv);
-      }
-    }
-
-    // Awards Section (build but append later between stats and history)
-    const playerAwards = playerObj && playerObj.awards ? playerObj.awards : [];
-    let awardsSection = null;
-    if (playerAwards.length > 0) {
-      awardsSection = document.createElement("div");
-      awardsSection.style.cssText = `margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
-      const awardsTitle = document.createElement("h3");
-      awardsTitle.textContent = "Awards";
-      awardsTitle.style.cssText = `border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px; font-size: 1.2rem; color: #e2e8f0;`;
-      awardsSection.appendChild(awardsTitle);
-
-      const awardsList = document.createElement("div");
-      awardsList.style.cssText = `display: flex; flex-direction: column; gap: 10px;`;
-
-      // Support both award objects stored on the player and award names (strings).
-      playerAwards.forEach((awardEntry) => {
-        // Resolve award data: if stored as string, look up in availableAwards
-        let awardData = null;
-        if (typeof awardEntry === "string") {
-          awardData = availableAwards.find((a) => a.name === awardEntry) || {
-            name: awardEntry
-          };
-        } else if (awardEntry && typeof awardEntry === "object") {
-          awardData = awardEntry;
-        } else {
-          awardData = { name: String(awardEntry) };
-        }
-
-        const awardItem = document.createElement("div");
-        awardItem.style.cssText = `
-                display: flex; align-items: center; gap: 12px;
-                background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px;
-            `;
-
-        // Render icon - check if it's a FontAwesome class or emoji
-        let iconHtml = "";
-        const icon = awardData.icon || "";
-        if (icon && icon.startsWith && icon.startsWith("fa-")) {
-          iconHtml = `<i class="fa-solid ${icon}" style="font-size: 1.5rem; color: #38bdf8; min-width: 24px;"></i>`;
-        } else {
-          iconHtml = `<span style="font-size: 1.5rem; min-width: 24px;">${icon || "🏆"}</span>`;
-        }
-
-        const awardInfo = document.createElement("div");
-        awardInfo.style.cssText = `flex: 1; min-width: 0;`;
-
-        const awardName = document.createElement("div");
-        awardName.innerHTML = `${iconHtml} <strong style="color: #38bdf8;">${awardData.name}</strong>`;
-        awardName.style.cssText = `display: flex; align-items: center; gap: 8px; margin-bottom: 4px;`;
-
-        const awardDesc = document.createElement("div");
-        awardDesc.textContent = awardData.description || "";
-        awardDesc.style.cssText = `font-size: 0.85rem; color: #94a3b8; overflow-wrap: anywhere; word-break: break-word;`;
-
-        awardInfo.appendChild(awardName);
-        awardInfo.appendChild(awardDesc);
-        awardItem.appendChild(awardInfo);
-        awardsList.appendChild(awardItem);
-      });
-
-      awardsSection.appendChild(awardsList);
-    }
-
-    // Stats Grid
-    const statsGrid = document.createElement("div");
-    statsGrid.style.cssText = `
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 25px;
-    `;
-
-    const statBoxes = [
-      { label: "Games Played", value: stat.gamesPlayed },
-      { label: "Total Time", value: formatTime(stat.totalTimeMs) },
-      { label: "Total Claims", value: stat.totalClaims }
-    ];
-
-    statBoxes.forEach((s) => {
-      const box = document.createElement("div");
-      box.style.cssText = `
-            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center;
-        `;
-      const val = document.createElement("div");
-      val.style.cssText = `font-size: 1.5rem; font-weight: bold; color: #38bdf8;`;
-      val.textContent = s.value;
-      const lbl = document.createElement("div");
-      lbl.style.cssText = `font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 5px;`;
-      lbl.textContent = s.label;
-      box.appendChild(val);
-      box.appendChild(lbl);
-      statsGrid.appendChild(box);
+    const sGrid = document.createElement("div");
+    sGrid.style.cssText = `display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 25px;`;
+    [
+      { l: "Games Played", v: stat.gamesPlayed },
+      { l: "Total Time", v: formatTime(stat.totalTimeMs) },
+      { l: "Total Claims", v: stat.totalClaims }
+    ].forEach((s) => {
+      const b = document.createElement("div");
+      b.style.cssText = `background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center;`;
+      const v = document.createElement("div");
+      v.style.cssText = `font-size: 1.5rem; font-weight: bold; color: #38bdf8;`;
+      v.textContent = s.v;
+      const l = document.createElement("div");
+      l.style.cssText = `font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 5px;`;
+      l.textContent = s.l;
+      b.appendChild(v);
+      b.appendChild(l);
+      sGrid.appendChild(b);
     });
 
-    // Game History Section
-    const historySection = document.createElement("div");
-    historySection.style.cssText = `margin-top: 20px;`;
-    const historyTitle = document.createElement("h3");
-    historyTitle.textContent = "Games Played";
-    historyTitle.style.cssText = `border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px;`;
-
-    const historyList = document.createElement("div");
-    historyList.style.cssText = `display: flex; flex-direction: column; gap: 10px;`;
-
+    const hSec = document.createElement("div");
+    hSec.style.cssText = `margin-top: 20px;`;
+    const hTit = document.createElement("h3");
+    hTit.textContent = "Games Played";
+    hTit.style.cssText = `border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px;`;
+    const hList = document.createElement("div");
+    hList.style.cssText = `display: flex; flex-direction: column; gap: 10px;`;
     if (stat.gameHistory.length > 0) {
-      stat.gameHistory.forEach((game) => {
-        const item = document.createElement("div");
-        item.style.cssText = `
-                background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; 
-                border-left: 3px solid #38bdf8; font-size: 0.9rem;
-                display: flex; justify-content: space-between; align-items: center;
-            `;
-        item.innerHTML = `
-                <strong style="color: #e2e8f0;">${game.gameName}</strong>
-                <span style="color: #38bdf8; font-weight: bold; font-family: monospace;">${formatTime(game.timeMs)}</span>
-            `;
-        historyList.appendChild(item);
+      stat.gameHistory.forEach((g) => {
+        const i = document.createElement("div");
+        i.style.cssText = `background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border-left: 3px solid #38bdf8; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;`;
+        i.innerHTML = `<strong style="color: #e2e8f0;">${g.gameName}</strong><span style="color: #38bdf8; font-weight: bold; font-family: monospace;">${formatTime(g.timeMs)}</span>`;
+        hList.appendChild(i);
       });
     } else {
-      historyList.innerHTML =
-        '<p style="color:#94a3b8; text-align:center;">No games played yet.</p>';
+      hList.innerHTML = `<p style="color:#94a3b8; text-align:center;">No games played yet.</p>`;
     }
-
-    historySection.appendChild(historyTitle);
-    historySection.appendChild(historyList);
-
-    content.appendChild(closeBtn);
+    hSec.appendChild(hTit);
+    hSec.appendChild(hList);
+    content.appendChild(cBtn);
     content.appendChild(header);
-    // Settings section is now redundant since bio, pronouns, and discord are shown in header
-    // Only show website if it exists
-    if (playerObj && playerObj.website && playerObj.website.trim() !== "") {
-      const websiteDiv = document.createElement("div");
-      websiteDiv.style.cssText = `margin-bottom: 25px;`;
-      const websiteLabel = document.createElement("span");
-      websiteLabel.textContent = "Icon";
-      websiteLabel.style.cssText = `font-weight: bold; color: #94a3b8;`;
-      const websiteText = document.createElement("a");
-      websiteText.textContent = playerObj.website;
-      websiteText.href = playerObj.website.startsWith("http")
-        ? playerObj.website
-        : "#";
-      websiteText.target = "_blank";
-      websiteText.style.cssText = `color: #38bdf8; text-decoration: none; overflow-wrap: anywhere; word-break: break-word;`;
-      websiteText.onmouseover = function () {
-        this.style.textDecoration = "underline";
-      };
-      websiteText.onmouseout = function () {
-        this.style.textDecoration = "none";
-      };
-      websiteDiv.appendChild(websiteLabel);
-      websiteDiv.appendChild(websiteText);
-      content.appendChild(websiteDiv);
-    }
-    content.appendChild(statsGrid);
-    // Insert awards between stats and games played if present
-    if (awardsSection) content.appendChild(awardsSection);
-    content.appendChild(historySection);
+    content.appendChild(sGrid);
+    content.appendChild(hSec);
     modal.appendChild(content);
-
-    // Close on outside click
     modal.onclick = (e) => {
       if (e.target === modal) modal.remove();
     };
-
     document.body.appendChild(modal);
   }
 
-  // Search functionality
-  const searchInput = $("players-search");
-  if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
+  const sInput = $("players-search");
+  if (sInput)
+    sInput.addEventListener("input", (e) => {
       searchQuery = e.target.value;
       renderPlayers();
     });
-  }
-
-  // Sort functionality
-  const sortSelect = $("players-sort");
-  if (sortSelect) {
-    sortSelect.addEventListener("change", (e) => {
+  const sSort = $("players-sort");
+  if (sSort)
+    sSort.addEventListener("change", (e) => {
       playersSortOption = e.target.value;
       renderPlayers();
     });
-  }
-
-  // Moderator status check
 
   (async () => {
     if (AUTH.isLoggedIn()) {
-      // Reuse the moderator check already kicked off by app.js instead of
-      // firing a second, duplicate AUTH.checkModerator() network call.
-      // Falls back to a direct call only if app.js hasn't set this up
-      // (e.g. unexpected load order or a page missing app.js).
-      if (window.__moderatorStatusPromise) {
+      if (window.__moderatorStatusPromise)
         ({ isModerator } = await window.__moderatorStatusPromise);
-      } else {
-        isModerator = await AUTH.checkModerator();
-      }
+      else isModerator = await AUTH.checkModerator();
       try {
         localStorage.setItem("isModerator", isModerator ? "true" : "false");
-      } catch (e) {
-        console.warn("Could not cache moderator status (players):", e);
-      }
-      console.log("Moderator status:", isModerator);
-
-      // Re-render players after moderator status resolves so inline-edit icons appear if enabled
+      } catch (e) {}
       try {
         renderPlayers();
-      } catch (e) {
-        // renderPlayers may not be defined yet in some load orders; ignore if so
-      }
-
-      // Add moderation + inline edit buttons to nav if moderator
-      if (isModerator) {
-        // Moderation button is provided globally in `app.js`; avoid adding a duplicate here.
-
-        // Also add a mobile moderation link if mobile container exists
-        const mobileModContainer = $("mobile-moderation-container");
-        // Mobile moderation link is provided globally in `app.js`; avoid adding a duplicate here.
-        // Note: inline edit toggle is provided globally; do not add duplicate here.
-        if (mobileModContainer) {
-          // leave mobile container untouched (global buttons will render there)
-        }
-      }
+      } catch (e) {}
     }
   })();
 
-  // Initialize
   loadData();
   setInterval(loadData, 10000);
 
-  // Open inline editor for a specific player
-  // Open inline editor for a specific player
-  // Open inline editor for a specific player
   async function openPlayerInlineEditor(playerName, event) {
-    console.log(
-      "🔍 openPlayerInlineEditor called with playerName:",
-      playerName
-    );
-
     if (event) {
       event.preventDefault();
       event.stopPropagation();
     }
-
     const player = players.find((p) => p.name === playerName);
-    if (!player) {
-      console.error("❌ Player not found in players array:", playerName);
-      console.log(
-        "Available players:",
-        players.map((p) => p.name)
-      );
-      alert("Error: Could not find player data for " + playerName);
-      return;
-    }
-
-    console.log("✅ Player found, attempting to open modal...");
-
-    // ✅ SAFEGUARD: Ensure these are always arrays to prevent .map() crashes
-    if (!Array.isArray(availableAwards)) {
-      console.warn(
-        "⚠️ availableAwards is not an array! Defaulting to []. Raw value:",
-        availableAwards
-      );
-      availableAwards = [];
-    }
-    if (!Array.isArray(pageAvailableRoles)) {
-      console.warn(
-        "⚠️ pageAvailableRoles is not an array! Defaulting to []. Raw value:",
-        pageAvailableRoles
-      );
-      pageAvailableRoles = [];
-    }
-
-    // Create modal dynamically since it doesn't exist in players.html
-    let modal = document.getElementById("moderator-modal");
-    let content = document.getElementById("moderator-panel-content");
-
-    // If modal doesn't exist, create it
+    if (!player)
+      return alert("Error: Could not find player data for " + playerName);
+    if (!Array.isArray(availableAwards)) availableAwards = [];
+    if (!Array.isArray(pageAvailableRoles)) pageAvailableRoles = [];
+    let modal = document.getElementById("moderator-modal"),
+      content = document.getElementById("moderator-panel-content");
     if (!modal) {
       modal = document.createElement("div");
       modal.id = "moderator-modal";
       modal.className =
         "fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4";
       modal.onclick = function (e) {
-        if (e.target.id === "moderator-modal") {
-          closeModeratorModal();
-        }
+        if (e.target.id === "moderator-modal") closeModeratorModal();
       };
       document.body.appendChild(modal);
-
       const panel = document.createElement("div");
       panel.className =
         "bg-slate-800 rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto";
       panel.onclick = function (e) {
         e.stopPropagation();
       };
-
       const header = document.createElement("div");
       header.className = "flex justify-between items-center mb-4";
-      header.innerHTML = `
-      <h2 class="text-xl font-bold text-white">Moderation Panel</h2>
-      <button onclick="closeModeratorModal()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
-    `;
+      header.innerHTML = `<h2 class="text-xl font-bold text-white">Moderation Panel</h2><button onclick="closeModeratorModal()" class="text-slate-400 hover:text-white text-2xl">&times;</button>`;
       panel.appendChild(header);
-
       content = document.createElement("div");
       content.id = "moderator-panel-content";
       panel.appendChild(content);
-
       modal.appendChild(panel);
     }
-
-    // Ensure content is defined even if modal already existed in the HTML
     content = document.getElementById("moderator-panel-content") || content;
-
-    // ✅ KEEP EVERYTHING BELOW THIS LINE EXACTLY AS IT WAS IN YOUR FILE ✅
-    // Fetch permissions to determine whether to show Manage Awards button
     let permissions = { manageAwards: false, manageRoles: false };
     try {
       permissions = await AUTH.getPermissions();
-    } catch (err) {
-      console.warn("Could not fetch permissions for inline editor:", err);
-    }
-    // ... (the rest of your existing code continues here)
-
-    // Ensure roles are loaded so we can render role creation UI
+    } catch (err) {}
     try {
       await loadRoles();
-    } catch (e) {
-      console.warn("Could not load roles for inline editor:", e);
-    }
+    } catch (e) {}
 
-    // Build roles HTML
     let rolesHtml = "";
     if (pageAvailableRoles.length > 0) {
       rolesHtml =
         '<div class="space-y-2"><label class="text-sm font-semibold text-slate-300">Assign/Remove Roles</label>';
-      pageAvailableRoles.forEach((role) => {
-        const isChecked =
-          player.roles && player.roles.includes(role.name) ? "checked" : "";
-        rolesHtml += `
-        <div class="flex items-center gap-2">
-          <input type="checkbox" id="inline-role-${role.name}" ${isChecked} class="inline-edit-role-checkbox w-4 h-4 rounded cursor-pointer">
-          <label for="inline-role-${role.name}" class="cursor-pointer flex items-center gap-2">
-            <span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:12px; font-size:0.8rem; font-weight:700; background-color:${role.color}33; color:${role.color}; border:1px solid ${role.color};">
-              <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background-color:${role.color};"></span>
-              <span style="color:inherit;">${role.name}</span>
-            </span>
-          </label>
-        </div>
-      `;
+      pageAvailableRoles.forEach((r) => {
+        const isC =
+          player.roles && player.roles.includes(r.name) ? "checked" : "";
+        rolesHtml += `<div class="flex items-center gap-2"><input type="checkbox" id="inline-role-${r.name}" ${isC} class="inline-edit-role-checkbox w-4 h-4 rounded cursor-pointer"><label for="inline-role-${r.name}" class="cursor-pointer flex items-center gap-2"><span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:12px; font-size:0.8rem; font-weight:700; background-color:${r.color}33; color:${r.color}; border:1px solid ${r.color};"><span style="display:inline-block; width:6px; height:6px; border-radius:50%; background-color:${r.color};"></span><span style="color:inherit;">${r.name}</span></span></label></div>`;
       });
       rolesHtml += "</div>";
     }
 
-    // Build create-role / manage-roles HTML (shown when moderator can manage roles)
     let createRoleHtml = "";
     if (permissions.manageRoles) {
-      createRoleHtml = `
-      <div class="mt-3">
-        <label class="text-sm font-semibold text-slate-300">Create New Role</label>
-        <div class="mt-2 space-y-2">
-          <div class="flex gap-2">
-            <input type="text" id="inline-new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1">
-            <input type="color" id="inline-new-role-color" value="#ff0000" class="bg-slate-800/50 border border-slate-700 rounded-lg px-2 py-2 h-10 w-12">
-            <button onclick="addRoleInline(${JSON.stringify(player.name)})" id="inline-add-role-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap">Add Role</button>
-          </div>
-        </div>
-        <div class="mt-3">
-          <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
-          <div id="inline-role-preview" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700">
-            <span class="text-sm text-slate-400">Start typing to see preview...</span>
-          </div>
-        </div>
-        <div id="inline-roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto mt-2"></div>
-      </div>
-    `;
+      createRoleHtml = `<div class="mt-3"><label class="text-sm font-semibold text-slate-300">Create New Role</label><div class="mt-2 space-y-2"><div class="flex gap-2"><input type="text" id="inline-new-role-name" placeholder="Role Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white flex-1"><input type="color" id="inline-new-role-color" value="#ff0000" class="bg-slate-800/50 border border-slate-700 rounded-lg px-2 py-2 h-10 w-12"><button onclick="addRoleInline(${JSON.stringify(player.name)})" id="inline-add-role-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg whitespace-nowrap">Add Role</button></div></div><div class="mt-3"><h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5><div id="inline-role-preview" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/50 border border-slate-700"><span class="text-sm text-slate-400">Start typing to see preview...</span></div></div><div id="inline-roles-edit-list" class="space-y-2 max-h-44 overflow-y-auto mt-2"></div></div>`;
     }
 
-    // Build awards HTML
-    let awardsHtml = "";
-    if (availableAwards.length > 0) {
-      awardsHtml = '<div class="space-y-2">';
-      availableAwards.forEach((award) => {
-        const isChecked =
-          player.awards && player.awards.includes(award.name) ? "checked" : "";
-        const icon = award.icon.startsWith("fa-")
-          ? `<i class="fa-solid ${award.icon}" style="color: ${award.color};"></i>`
-          : award.icon;
-        awardsHtml += `
-        <div class="flex items-center gap-2">
-          <input type="checkbox" id="inline-award-${award.name}" ${isChecked} class="inline-edit-award-checkbox w-4 h-4 rounded cursor-pointer">
-          <label for="inline-award-${award.name}" class="cursor-pointer flex items-center gap-2">
-            ${icon}
-            <span style="color: #e2e8f0; font-size: 0.875rem;">${award.name}</span>
-          </label>
-        </div>
-      `;
-      });
-      awardsHtml += "</div>";
-    }
-
-    content.innerHTML = `
-        <div class="space-y-6">
-            <!-- Edit Player Section -->
-            <div class="glass rounded-lg p-4">
-                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-user text-ap-accent mr-2"></i>Edit Player: ${player.name}</h3>
-                <div id="inline-edit-player-form-container" class="space-y-4">
-                    <input type="text" id="inline-edit-player-name" placeholder="Player Name" value="${player.name}" disabled class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full opacity-50">
-                    <input type="url" id="inline-edit-player-pfp" placeholder="Profile Picture URL" value="${player.pfp_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-                    <textarea id="inline-edit-player-bio" placeholder="Bio" rows="3" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">${player.bio || ""}</textarea>
-                    <input type="text" id="inline-edit-player-pronouns" placeholder="Pronouns" value="${player.pronouns || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-                    <input type="text" id="inline-edit-player-discord" placeholder="Discord Username" value="${player.discord || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-                </div>
-                <div class="border-t border-slate-700 my-4"></div>
-                ${permissions.manageRoles || pageAvailableRoles.length > 0 ? `<div class="mt-4"><h4 class="text-sm font-semibold text-slate-300 mb-2">Manage Roles</h4></div>` : ""}
-                ${createRoleHtml ? `<div class="mt-4">${createRoleHtml}</div>` : ""}
-                ${rolesHtml ? `<div class="mt-4">${rolesHtml}</div>` : ""}
-
-${
-  permissions.manageAwards
-    ? `
-  <div id="inline-awards-management" class="mt-4 border-t border-slate-700 pt-4">
-                        <div class="mt-4">
-                      <label class="text-sm font-semibold text-slate-300">Create New Award</label>
-                      <div class="mt-2 space-y-3">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          <input id="inline-new-award-name" type="text" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white focus:border-ap-accent focus:outline-none transition-colors">
-                          <input id="inline-new-award-icon" type="text" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white focus:border-ap-accent focus:outline-none transition-colors">
-                        </div>
-                        <textarea id="inline-new-award-desc" rows="2" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full resize-y min-h-[3rem] focus:border-ap-accent focus:outline-none transition-colors" style="resize: vertical; min-height: 3rem;"></textarea>
-                        
-                        <!-- Boxed Live Preview -->
-                        <div class="mt-3 glass rounded-lg p-3">
-                          <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
-                          <div id="inline-award-preview" class="w-full p-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400 flex items-center gap-3">
-                            <span id="inline-award-preview-icon" class="text-2xl w-8 text-center"></span>
-                            <div>
-                              <div id="inline-award-preview-name" class="font-bold text-white">Award Name</div>
-                              <div id="inline-award-preview-desc" class="text-xs text-slate-400">Start typing to see preview...</div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="mt-2 flex gap-2">
-                          <button onclick="addNewAward(${JSON.stringify(player.name).replace(/'/g, "\\'")})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg w-full transition-colors">Create Award</button>
-                        </div>
-                      </div>
-                    </div>
-
-    <h4 class="text-sm font-semibold text-slate-300 mb-2 mt-4">Manage Awards</h4>
-    <div id="inline-awards-list" class="mt-2 space-y-2">
-      ${
-        (availableAwards || []).length > 0
-          ? (availableAwards || [])
-              .map(
-                (a) => `
-        <div class="flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded">
-          <div class="flex items-center gap-3">
-            ${a.icon && a.icon.startsWith && a.icon.startsWith("fa-") ? `<i class="fa-solid ${a.icon}" style="color: ${a.color || "#38bdf8"};"></i>` : `<span style="font-size:1.2rem;">${a.icon || "🏆"}</span>`}
-            <div style="min-width:0;">
-              <div style="color:#e2e8f0; font-weight:700;">${a.name}</div>
-              <div style="color:#94a3b8; font-size:0.85rem;">${a.description || ""}</div>
-            </div>
-          </div>
-          <div style="display:flex; gap:8px;">
-            <button onclick="prefillAwardForEdit(${JSON.stringify(a).replace(/'/g, "\\'")})" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">Edit</button>
-            <button onclick="promptDeleteAward(${JSON.stringify(a.name).replace(/'/g, "\\'")})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Delete</button>
-          </div>
-        </div>
-      `
-              )
-              .join("")
-          : '<div class="text-slate-500">No awards defined.</div>'
-      }
-    </div>
-
-    ${
-      (availableAwards || []).length > 0
-        ? `
-    <div class="mt-4">
-      <label class="text-sm font-semibold text-slate-300 block">Assign Awards</label>
-      <div class="mt-2 space-y-2">
-        ${(availableAwards || [])
-          .map((award) => {
-            // FIX: Safely check if player has the award, handling both object and string formats
-            const hasAward =
-              player.awards &&
-              player.awards.some((a) =>
-                typeof a === "string" ? a === award.name : a.name === award.name
-              );
-            const isChecked = hasAward ? "checked" : "";
-            return `
-          <div class="flex items-center gap-2">
-            <input type="checkbox" id="inline-award-${award.name}" ${isChecked} class="inline-edit-award-checkbox w-4 h-4 rounded cursor-pointer">
-            <label for="inline-award-${award.name}" class="cursor-pointer flex items-center gap-2">
-              ${award.icon && award.icon.startsWith("fa-") ? `<i class="fa-solid ${award.icon}" style="color: ${award.color || "#38bdf8"};"></i>` : `<span style="font-size:1.2rem;">${award.icon || "🏆"}</span>`}
-              <span style="color: #e2e8f0; font-size: 0.875rem;">${award.name}</span>
-            </label>
-          </div>
-          `;
-          })
-          .join("")}
-      </div>
-    </div>
-    `
+    content.innerHTML = `<div class="space-y-6"><div class="glass rounded-lg p-4"><h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-user text-ap-accent mr-2"></i>Edit Player: ${player.name}</h3><div id="inline-edit-player-form-container" class="space-y-4"><input type="text" id="inline-edit-player-name" placeholder="Player Name" value="${player.name}" disabled class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full opacity-50"><input type="url" id="inline-edit-player-pfp" placeholder="Profile Picture URL" value="${player.pfp_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full"><textarea id="inline-edit-player-bio" placeholder="Bio" rows="3" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">${player.bio || ""}</textarea><input type="text" id="inline-edit-player-pronouns" placeholder="Pronouns" value="${player.pronouns || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full"><input type="text" id="inline-edit-player-discord" placeholder="Discord Username" value="${player.discord || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full"></div><div class="border-t border-slate-700 my-4"></div>${permissions.manageRoles || pageAvailableRoles.length > 0 ? `<div class="mt-4"><h4 class="text-sm font-semibold text-slate-300 mb-2">Manage Roles</h4></div>` : ""}${createRoleHtml ? `<div class="mt-4">${createRoleHtml}</div>` : ""}${rolesHtml ? `<div class="mt-4">${rolesHtml}</div>` : ""}${
+      permissions.manageAwards
+        ? `<div id="inline-awards-management" class="mt-4 border-t border-slate-700 pt-4"><div class="mt-4"><label class="text-sm font-semibold text-slate-300">Create New Award</label><div class="mt-2 space-y-3"><div class="grid grid-cols-1 md:grid-cols-2 gap-2"><input id="inline-new-award-name" type="text" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white"><input id="inline-new-award-icon" type="text" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white"></div><textarea id="inline-new-award-desc" rows="2" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full resize-y min-h-[3rem]"></textarea><div class="mt-3 glass rounded-lg p-3"><h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5><div id="inline-award-preview" class="w-full p-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400 flex items-center gap-3"><span id="inline-award-preview-icon" class="text-2xl w-8 text-center"></span><div><div id="inline-award-preview-name" class="font-bold text-white">Award Name</div><div id="inline-award-preview-desc" class="text-xs text-slate-400">Start typing to see preview...</div></div></div></div><div class="mt-2 flex gap-2"><button onclick="addNewAward(${JSON.stringify(player.name).replace(/'/g, "\\'")})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg w-full">Create Award</button></div></div></div><h4 class="text-sm font-semibold text-slate-300 mb-2 mt-4">Manage Awards</h4><div id="inline-awards-list" class="mt-2 space-y-2">${(availableAwards || []).length > 0 ? (availableAwards || []).map((a) => `<div class="flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded"><div class="flex items-center gap-3">${a.icon && a.icon.startsWith("fa-") ? `<i class="fa-solid ${a.icon}" style="color: ${a.color || "#38bdf8"};"></i>` : `<span style="font-size:1.2rem;">${a.icon || "🏆"}</span>`}<div style="min-width:0;"><div style="color:#e2e8f0; font-weight:700;">${a.name}</div><div style="color:#94a3b8; font-size:0.85rem;">${a.description || ""}</div></div></div><div style="display:flex; gap:8px;"><button onclick="prefillAwardForEdit(${JSON.stringify(a).replace(/'/g, "\\'")})" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">Edit</button><button onclick="promptDeleteAward(${JSON.stringify(a.name).replace(/'/g, "\\'")})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Delete</button></div></div>`).join("") : '<div class="text-slate-500">No awards defined.</div>'}</div>${
+            (availableAwards || []).length > 0
+              ? `<div class="mt-4"><label class="text-sm font-semibold text-slate-300 block">Assign Awards (Checkboxes)</label><div class="mt-2 space-y-2">${(
+                  availableAwards || []
+                )
+                  .map((award) => {
+                    const hasA =
+                      player.awards &&
+                      player.awards.some((a) =>
+                        typeof a === "string"
+                          ? a === award.name
+                          : a.name === award.name
+                      );
+                    const isC = hasA ? "checked" : "";
+                    return `<div class="flex items-center gap-2"><input type="checkbox" id="inline-award-${award.name}" ${isC} class="inline-edit-award-checkbox w-4 h-4 rounded cursor-pointer"><label for="inline-award-${award.name}" class="cursor-pointer flex items-center gap-2">${award.icon && award.icon.startsWith("fa-") ? `<i class="fa-solid ${award.icon}" style="color: ${award.color || "#38bdf8"};"></i>` : `<span style="font-size:1.2rem;">${award.icon || "🏆"}</span>`}<span style="color: #e2e8f0; font-size: 0.875rem;">${award.name}</span></label></div>`;
+                  })
+                  .join("")}</div></div>`
+              : ""
+          }</div>`
         : ""
-    }
-  </div>
-`
-    : ""
-}
-
-${
-  permissions.manageAwards
-    ? `
-<select id="inline-award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
-  <option value="">Select an award...</option>
-  ${(availableAwards || [])
-    .map(
-      (a) =>
-        `<option value='${JSON.stringify({
-          name: a.name,
-          icon: a.icon || "",
-          description: a.description || ""
-        }).replace(
-          /'/g,
-          "\\'"
-        )}'>${a.icon ? (a.icon.startsWith("fa-") ? "" : a.icon + " ") : ""}${a.name}</option>`
-    )
-    .join("")}
-</select>
-    <div class="flex gap-2">
-      <button onclick="assignAwardInline('add', '${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Assign Award</button>
-      <button onclick="assignAwardInline('remove', '${player.name}')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Award</button>
-    </div>
-  </div>
-`
-    : ""
-}
-
-                <div class="flex gap-2 mt-4">
-<button onclick="saveInlineEditedPlayer(${JSON.stringify(player.name)})" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
-                  <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
-                </div>
-            </div>
-            
-            <!-- Live Preview -->
-            <div class="glass rounded-lg p-4">
-              <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
-              <div id="inline-edit-player-preview" class="glass rounded-xl p-4 flex flex-col items-center gap-3"></div>
-            </div>
-        </div>
-    `;
-
+    }${permissions.manageAwards ? `<div class="mt-4 border-t border-slate-700 pt-4"><h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Awards (Dropdown)</h4><select id="inline-award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2"><option value="">Select an award...</option>${(availableAwards || []).map((a) => `<option value='${JSON.stringify({ name: a.name, icon: a.icon || "", description: a.description || "" }).replace(/'/g, "\\'")}'>${a.icon ? (a.icon.startsWith("fa-") ? "" : a.icon + " ") : ""}${a.name}</option>`).join("")}</select><div class="flex gap-2"><button onclick="assignAwardInline('add', '${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Assign Award</button><button onclick="assignAwardInline('remove', '${player.name}')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Award</button></div></div>` : ""}<div class="flex gap-2 mt-4"><button onclick="saveInlineEditedPlayer(${JSON.stringify(player.name)})" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button><button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button></div></div><div class="glass rounded-lg p-4"><h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4><div id="inline-edit-player-preview" class="glass rounded-xl p-4 flex flex-col items-center gap-3"></div></div></div>`;
     modal.classList.remove("hidden");
-
-    // Populate inline roles edit list and setup live preview
     try {
       populateInlineRolesList(player.name);
     } catch (e) {}
-    // Attach inline preview listeners for roles and awards
     try {
       attachInlineRolePreviewListeners();
       attachInlineAwardPreviewListeners();
@@ -1388,7 +593,6 @@ ${
     setupInlinePlayerPreview(player);
   }
 
-  // Setup live preview for player editing
   function setupInlinePlayerPreview(originalPlayer) {
     const inputs = [
       "inline-edit-player-pfp",
@@ -1396,198 +600,121 @@ ${
       "inline-edit-player-pronouns",
       "inline-edit-player-discord"
     ];
-
     function updatePreview() {
-      // Collect selected roles
-      const selectedRoles = [];
+      const sRoles = [];
       document
         .querySelectorAll(".inline-edit-role-checkbox:checked")
-        .forEach((checkbox) => {
-          const roleId = checkbox.id.replace("inline-role-", "");
-          selectedRoles.push(roleId);
-        });
-
-      const previewPlayer = {
+        .forEach((cb) => sRoles.push(cb.id.replace("inline-role-", "")));
+      const pP = {
         ...originalPlayer,
         pfp_link: $("inline-edit-player-pfp").value || originalPlayer.pfp_link,
         bio: $("inline-edit-player-bio").value,
         pronouns: $("inline-edit-player-pronouns").value,
         discord: $("inline-edit-player-discord").value,
-        roles: selectedRoles
+        roles: sRoles
       };
-
-      renderPlayerPreview(previewPlayer, "inline-edit-player-preview");
+      renderPlayerPreview(pP, "inline-edit-player-preview");
     }
-
     inputs.forEach((id) => {
       const el = $(id);
       if (el) el.addEventListener("input", updatePreview);
     });
-
-    // Listen for role and award checkbox changes
     document
       .querySelectorAll(".inline-edit-role-checkbox")
-      .forEach((checkbox) => {
-        checkbox.addEventListener("change", updatePreview);
-      });
+      .forEach((cb) => cb.addEventListener("change", updatePreview));
     document
       .querySelectorAll(".inline-edit-award-checkbox")
-      .forEach((checkbox) => {
-        checkbox.addEventListener("change", updatePreview);
-      });
-
+      .forEach((cb) => cb.addEventListener("change", updatePreview));
     updatePreview();
   }
 
-  // Render player preview
-  // Render player preview to match the pop-up profile layout
   function renderPlayerPreview(player, containerId) {
     const container = $(containerId);
     if (!container) return;
-
-    // If all fields empty, show placeholder
     const allEmpty =
       !(player && player.name && player.name.trim()) &&
       !(player && player.pfp_link && player.pfp_link.trim()) &&
       !(player && player.bio && player.bio.trim()) &&
       !(player && player.pronouns && player.pronouns.trim()) &&
       !(player && player.discord && player.discord.trim());
-
     if (allEmpty) {
       container.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
       return;
     }
-
-    // Avatar (Fixed a small syntax typo in the original fallback SVG)
-    const avatar =
+    const av =
       player.pfp_link && player.pfp_link.trim() !== ""
-        ? `<img src="${player.pfp_link}" alt="${player.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
-        : `<div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(56, 189, 248, 0.2); display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
-
-    // Name and Pronouns Row
-    let nameRowHtml = `<h2 style="margin: 0; font-size: 1.25rem; color: #e2e8f0;">${player.name || "Player Name"}</h2>`;
-    if (player.pronouns && player.pronouns.trim()) {
-      nameRowHtml += `<span style="display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #38bdf822; color: #38bdf8; border: 1px solid #38bdf8; white-space: nowrap;">${player.pronouns}</span>`;
-    }
-
-    // Roles
-    let rolesHtml = "";
-    const playerRoles = player.roles || [];
-    if (playerRoles.length > 0) {
-      rolesHtml =
+        ? `<img src="${player.pfp_link}" alt="${player.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;">`
+        : `<div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(56,189,248,0.2); display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
+    let nRH = `<h2 style="margin: 0; font-size: 1.25rem; color: #e2e8f0;">${player.name || "Player Name"}</h2>`;
+    if (player.pronouns && player.pronouns.trim())
+      nRH += `<span style="display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #38bdf822; color: #38bdf8; border: 1px solid #38bdf8; white-space: nowrap;">${player.pronouns}</span>`;
+    let rH = "";
+    const pRoles = player.roles || [];
+    if (pRoles.length > 0) {
+      rH =
         '<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;">';
-      playerRoles.forEach((roleName) => {
-        const role = pageAvailableRoles.find((r) => r.name === roleName);
-        if (role) {
-          rolesHtml += `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; background-color: ${role.color}33; color: ${role.color}; border: 1px solid ${role.color};"><span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${role.color};"></span>${role.name}</span>`;
-        }
+      pRoles.forEach((rN) => {
+        const r = pageAvailableRoles.find((r) => r.name === rN);
+        if (r)
+          rH += `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; background-color: ${r.color}33; color: ${r.color}; border: 1px solid ${r.color};"><span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${r.color};"></span>${r.name}</span>`;
       });
-      rolesHtml += "</div>";
+      rH += "</div>";
     }
-
-    // Awards (Handles both string names and full objects)
-    let awardsHtml = "";
-    const playerAwards = player.awards || [];
-    if (playerAwards.length > 0) {
-      awardsHtml =
+    let aH = "";
+    const pAwards = player.awards || [];
+    if (pAwards.length > 0) {
+      aH =
         '<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">';
-      playerAwards.forEach((awardEntry) => {
-        let awardData = null;
-        if (typeof awardEntry === "string") {
-          awardData = availableAwards.find((a) => a.name === awardEntry) || {
-            name: awardEntry
-          };
-        } else if (awardEntry && typeof awardEntry === "object") {
-          awardData = awardEntry;
-        } else {
-          awardData = { name: String(awardEntry) };
-        }
-
-        const icon = awardData.icon || "🏆";
-        let iconHtml = "";
-        if (typeof icon === "string" && icon.startsWith("fa-")) {
-          iconHtml = `<i class="fa-solid ${icon}" style="color:${awardData.color || "#38bdf8"};"></i>`;
-        } else {
-          iconHtml = icon;
-        }
-
-        awardsHtml += `<span title="${awardData.description || awardData.name}" style="display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:9999px; background: rgba(255,255,255,0.03); color:#e2e8f0; font-size:0.85rem;">
-          <span style="min-width:18px; display:inline-flex; align-items:center; justify-content:center;">${iconHtml}</span>
-          <span style="color:#94a3b8; font-weight:600;">${awardData.name}</span>
-        </span>`;
+      pAwards.forEach((aE) => {
+        let aD = null;
+        if (typeof aE === "string")
+          aD = availableAwards.find((a) => a.name === aE) || { name: aE };
+        else if (aE && typeof aE === "object") aD = aE;
+        else aD = { name: String(aE) };
+        const icon = aD.icon || "🏆";
+        let iH = "";
+        if (typeof icon === "string" && icon.startsWith("fa-"))
+          iH = `<i class="fa-solid ${icon}" style="color:${aD.color || "#38bdf8"};"></i>`;
+        else iH = icon;
+        aH += `<span title="${aD.description || aD.name}" style="display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:9999px; background: rgba(255,255,255,0.03); color:#e2e8f0; font-size:0.85rem;"><span style="min-width:18px; display:inline-flex; align-items:center; justify-content:center;">${iH}</span><span style="color:#94a3b8; font-weight:600;">${aD.name}</span></span>`;
       });
-      awardsHtml += "</div>";
+      aH += "</div>";
     }
-
-    // Bio
-    let bioHtml = "";
-    if (player.bio && player.bio.trim()) {
-      bioHtml = `<div style="margin-top: 4px; overflow-wrap: anywhere; word-break: break-word;"><span style="color: #94a3b8; font-size: 0.9rem;">${player.bio}</span></div>`;
-    }
-
-    // Discord
-    let discordHtml = "";
-    if (player.discord && player.discord.trim()) {
-      discordHtml = `<div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;"><i class="fa-brands fa-discord" style="color: #5865F2;"></i><span style="color: #5865F2; font-size: 0.9rem;">${player.discord}</span></div>`;
-    }
-
-    // Render the horizontal layout matching the pop-up profile header
-    container.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 20px; width: 100%;">
-        <div style="flex-shrink: 0;">
-          ${avatar}
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1;">
-          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            ${nameRowHtml}
-          </div>
-          ${rolesHtml}
-          ${awardsHtml}
-          ${bioHtml}
-          ${discordHtml}
-        </div>
-      </div>
-    `;
+    let bH = "";
+    if (player.bio && player.bio.trim())
+      bH = `<div style="margin-top: 4px; overflow-wrap: anywhere; word-break: break-word;"><span style="color: #94a3b8; font-size: 0.9rem;">${player.bio}</span></div>`;
+    let dH = "";
+    if (player.discord && player.discord.trim())
+      dH = `<div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;"><i class="fa-brands fa-discord" style="color: #5865F2;"></i><span style="color: #5865F2; font-size: 0.9rem;">${player.discord}</span></div>`;
+    container.innerHTML = `<div style="display: flex; align-items: center; gap: 20px; width: 100%;"><div style="flex-shrink: 0;">${av}</div><div style="display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1;"><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">${nRH}</div>${rH}${aH}${bH}${dH}</div></div>`;
   }
 
-  // Save inline edited player
   async function saveInlineEditedPlayer(playerName) {
-    // Collect selected roles
-    const selectedRoles = [];
+    const sRoles = [];
     document
       .querySelectorAll(".inline-edit-role-checkbox:checked")
-      .forEach((checkbox) => {
-        const roleId = checkbox.id.replace("inline-role-", "");
-        selectedRoles.push(roleId);
-      });
-
-    // Collect selected awards
-    const selectedAwards = [];
+      .forEach((cb) => sRoles.push(cb.id.replace("inline-role-", "")));
+    const sAwards = [];
     document
       .querySelectorAll(".inline-edit-award-checkbox:checked")
-      .forEach((checkbox) => {
-        const awardId = checkbox.id.replace("inline-award-", "");
-        selectedAwards.push(awardId);
-      });
-
-    const playerData = {
+      .forEach((cb) => sAwards.push(cb.id.replace("inline-award-", "")));
+    const pData = {
       name: playerName,
       pfp_link: $("inline-edit-player-pfp").value.trim(),
       bio: $("inline-edit-player-bio").value.trim(),
       pronouns: $("inline-edit-player-pronouns").value.trim(),
       discord: $("inline-edit-player-discord").value.trim(),
-      roles: selectedRoles,
-      awards: selectedAwards
+      roles: sRoles,
+      awards: sAwards
     };
-
     try {
       const res = await fetch("/api/moderator-actions", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
-        body: JSON.stringify({ action: "updatePlayer", playerData })
+        body: JSON.stringify({ action: "updatePlayer", playerData: pData })
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error);
       alert("Player updated successfully!");
       closeModeratorModal();
       loadData();
@@ -1596,7 +723,6 @@ ${
     }
   }
 
-  // Assign or remove an award for a player via /api/manage-awards
   async function assignAwardToPlayer(
     action,
     playerName,
@@ -1605,26 +731,17 @@ ${
     description = ""
   ) {
     try {
-      const body = {
-        action: "assignAward",
-        assignAwardData: {
-          playerName,
-          awardName,
-          action,
-          icon,
-          description
-        }
-      };
-
       const res = await fetch("/api/manage-awards", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
-        body: JSON.stringify(body)
+        body: JSON.stringify({
+          action: "assignAward",
+          assignAwardData: { playerName, awardName, action, icon, description }
+        })
       });
-      const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.error || data.message || "Failed to update award");
-      alert(data.message || "Award updated");
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || d.message);
+      alert(d.message || "Award updated");
       await loadData();
       openPlayerInlineEditor(playerName);
     } catch (err) {
@@ -1632,59 +749,47 @@ ${
     }
   }
 
-  // Assign or remove an award in the inline player editor
   async function assignAwardInline(action, playerName) {
-    const selectElement = document.getElementById("inline-award-select");
-    if (!selectElement || !selectElement.value) {
-      alert("Please select an award");
-      return;
-    }
-
+    const sEl = document.getElementById("inline-award-select");
+    if (!sEl || !sEl.value) return alert("Please select an award");
     try {
-      const awardData = JSON.parse(selectElement.value);
+      const aD = JSON.parse(sEl.value);
       await assignAwardToPlayer(
         action,
         playerName,
-        awardData.name,
-        awardData.icon,
-        awardData.description
+        aD.name,
+        aD.icon,
+        aD.description
       );
-      selectElement.value = "";
+      sEl.value = "";
     } catch (err) {
       alert("Error: " + err.message);
     }
   }
 
-  // Add a new award to the awards list
   async function addNewAward(playerName) {
     const name = (
-      document.getElementById("inline-new-award-name") || { value: "" }
-    ).value.trim();
-    const icon = (
-      document.getElementById("inline-new-award-icon") || { value: "" }
-    ).value.trim();
-    const description = (
-      document.getElementById("inline-new-award-desc") || { value: "" }
-    ).value.trim();
-    if (!name) {
-      alert("Award name is required");
-      return;
-    }
-
+        document.getElementById("inline-new-award-name") || { value: "" }
+      ).value.trim(),
+      icon = (
+        document.getElementById("inline-new-award-icon") || { value: "" }
+      ).value.trim(),
+      description = (
+        document.getElementById("inline-new-award-desc") || { value: "" }
+      ).value.trim();
+    if (!name) return alert("Award name is required");
     try {
-      const body = {
-        action: "addAward",
-        awardData: { name, icon, description }
-      };
       const res = await fetch("/api/manage-awards", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
-        body: JSON.stringify(body)
+        body: JSON.stringify({
+          action: "addAward",
+          awardData: { name, icon, description }
+        })
       });
-      const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.error || data.message || "Failed to add award");
-      alert(data.message || "Award added");
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || d.message);
+      alert(d.message || "Award added");
       await loadData();
       openPlayerInlineEditor(playerName);
     } catch (err) {
@@ -1692,46 +797,36 @@ ${
     }
   }
 
-  // Add a new role from the inline player editor
-  // Inline role creation removed — use the global Roles Manager modal instead.
-
-  // Inline role management helpers for the player inline editor
   let editingRoleOriginalInline = null;
-
   async function addRoleInline(currentPlayerName) {
-    const roleNameEl = document.getElementById("inline-new-role-name") || {
-      value: ""
-    };
-    const roleColorEl = document.getElementById("inline-new-role-color") || {
-      value: "#ff0000"
-    };
-    const roleName = roleNameEl.value.trim();
-    const roleColor = roleColorEl.value || "#ff0000";
-    if (!roleName) return alert("Please enter a role name");
-
+    const rNEl = document.getElementById("inline-new-role-name") || {
+        value: ""
+      },
+      rCEl = document.getElementById("inline-new-role-color") || {
+        value: "#ff0000"
+      };
+    const rName = rNEl.value.trim(),
+      rColor = rCEl.value || "#ff0000";
+    if (!rName) return alert("Please enter a role name");
     try {
       const payload = editingRoleOriginalInline
         ? {
             action: "updateRole",
             originalName: editingRoleOriginalInline,
-            roleData: { name: roleName, color: roleColor }
+            roleData: { name: rName, color: rColor }
           }
-        : { action: "addRole", roleData: { name: roleName, color: roleColor } };
-
+        : { action: "addRole", roleData: { name: rName, color: rColor } };
       const res = await fetch("/api/moderator-actions", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
         body: JSON.stringify(payload)
       });
-      const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.error || data.message || "Failed to save role");
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || d.message);
       alert(
-        data.message ||
-          (editingRoleOriginalInline ? "Role updated" : "Role added")
+        d.message || (editingRoleOriginalInline ? "Role updated" : "Role added")
       );
       editingRoleOriginalInline = null;
-      // reload roles and refresh inline editor
       await loadRoles();
       populateInlineRolesList(currentPlayerName);
       openPlayerInlineEditor(currentPlayerName);
@@ -1755,44 +850,31 @@ ${
         const item = document.createElement("div");
         item.className =
           "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
-        item.innerHTML = `
-        <div class="flex items-center gap-3">
-          <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;font-size:0.8rem;font-weight:700;background:${r.color}33;color:${r.color};border:1px solid ${r.color};">
-            <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${r.color};"></span>
-            <span style="color:inherit;">${r.name}</span>
-          </span>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillInlineRoleForEdit(${JSON.stringify(r)}, ${JSON.stringify(currentPlayerName)})'>Edit</button>
-          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteRoleInline(${JSON.stringify(r.name)}, ${JSON.stringify(currentPlayerName)})'>Delete</button>
-        </div>
-      `;
+        item.innerHTML = `<div class="flex items-center gap-3"><span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;font-size:0.8rem;font-weight:700;background:${r.color}33;color:${r.color};border:1px solid ${r.color};"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${r.color};"></span><span style="color:inherit;">${r.name}</span></span></div><div style="display:flex;gap:8px;"><button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillInlineRoleForEdit(${JSON.stringify(r)}, ${JSON.stringify(currentPlayerName)})'>Edit</button><button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteRoleInline(${JSON.stringify(r.name)}, ${JSON.stringify(currentPlayerName)})'>Delete</button></div>`;
         list.appendChild(item);
       });
   }
 
   function prefillInlineRoleForEdit(role, currentPlayerName) {
-    const nameInput = document.getElementById("inline-new-role-name");
-    const colorInput = document.getElementById("inline-new-role-color");
-    if (nameInput && colorInput) {
-      nameInput.value = role.name;
-      colorInput.value = role.color || "#ff0000";
-      nameInput.focus();
+    const nI = document.getElementById("inline-new-role-name"),
+      cI = document.getElementById("inline-new-role-color");
+    if (nI && cI) {
+      nI.value = role.name;
+      cI.value = role.color || "#ff0000";
+      nI.focus();
       editingRoleOriginalInline = role.name;
-      // update add button text to Save
-      const btn = document.getElementById("inline-add-role-btn");
-      if (btn) btn.textContent = "Save";
+      const b = document.getElementById("inline-add-role-btn");
+      if (b) b.textContent = "Save";
     }
   }
 
   function promptDeleteRoleInline(roleName, currentPlayerName) {
     if (
-      !confirm(
+      confirm(
         `Delete role "${roleName}"? This will remove it from all players.`
       )
     )
-      return;
-    deleteRoleInlineFromPlayers(roleName, currentPlayerName);
+      deleteRoleInlineFromPlayers(roleName, currentPlayerName);
   }
 
   async function deleteRoleInlineFromPlayers(roleName, currentPlayerName) {
@@ -1802,10 +884,9 @@ ${
         headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
         body: JSON.stringify({ action: "deleteRole", roleName })
       });
-      const data = await res.json();
-      if (!res.ok)
-        throw new Error(data.error || data.message || "Failed to delete role");
-      alert(data.message || "Role deleted");
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || d.message);
+      alert(d.message || "Role deleted");
       await loadRoles();
       populateInlineRolesList(currentPlayerName);
       openPlayerInlineEditor(currentPlayerName);
@@ -1814,37 +895,32 @@ ${
     }
   }
 
-  // Inline preview helpers
   function updateInlineRolePreview() {
     const name = (
-      document.getElementById("inline-new-role-name") || { value: "" }
-    ).value.trim();
-    const color =
-      (document.getElementById("inline-new-role-color") || { value: "#ff0000" })
-        .value || "#ff0000";
+        document.getElementById("inline-new-role-name") || { value: "" }
+      ).value.trim(),
+      color =
+        (
+          document.getElementById("inline-new-role-color") || {
+            value: "#ff0000"
+          }
+        ).value || "#ff0000";
     const preview = document.getElementById("inline-role-preview");
     if (!preview) return;
-
     if (!name) {
       preview.style.color = "";
       preview.style.borderColor = "";
       preview.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
       return;
     }
-
     preview.style.color = "";
     preview.style.borderColor = "";
-    preview.innerHTML = `
-      <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 0.875rem; font-weight:700; background-color: ${color}33; color: ${color}; border: 1px solid ${color};">
-        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span>
-        <span style="color:inherit;">${escapeHtml(name)}</span>
-      </span>
-    `;
+    preview.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 0.875rem; font-weight:700; background-color: ${color}33; color: ${color}; border: 1px solid ${color};"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span><span style="color:inherit;">${escapeHtml(name)}</span></span>`;
   }
 
   function attachInlineRolePreviewListeners() {
-    const name = document.getElementById("inline-new-role-name");
-    const color = document.getElementById("inline-new-role-color");
+    const name = document.getElementById("inline-new-role-name"),
+      color = document.getElementById("inline-new-role-color");
     if (name) {
       name.removeEventListener("input", updateInlineRolePreview);
       name.addEventListener("input", updateInlineRolePreview);
@@ -1858,41 +934,37 @@ ${
 
   function updateInlineAwardPreview() {
     const name = (
-      document.getElementById("inline-new-award-name") || { value: "" }
-    ).value.trim();
-    const icon = (
-      document.getElementById("inline-new-award-icon") || { value: "" }
-    ).value.trim();
-    const desc = (
-      document.getElementById("inline-new-award-desc") || { value: "" }
-    ).value.trim();
-    const iconEl = document.getElementById("inline-award-preview-icon");
-    const nameEl = document.getElementById("inline-award-preview-name");
-    const descEl = document.getElementById("inline-award-preview-desc");
-    if (!nameEl || !iconEl || !descEl) return;
-
+        document.getElementById("inline-new-award-name") || { value: "" }
+      ).value.trim(),
+      icon = (
+        document.getElementById("inline-new-award-icon") || { value: "" }
+      ).value.trim(),
+      desc = (
+        document.getElementById("inline-new-award-desc") || { value: "" }
+      ).value.trim();
+    const iEl = document.getElementById("inline-award-preview-icon"),
+      nEl = document.getElementById("inline-award-preview-name"),
+      dEl = document.getElementById("inline-award-preview-desc");
+    if (!nEl || !iEl || !dEl) return;
     if (!name && !icon && !desc) {
-      iconEl.style.display = "none";
-      nameEl.style.display = "none";
-      descEl.textContent = "Start typing to see preview...";
+      iEl.style.display = "none";
+      nEl.style.display = "none";
+      dEl.textContent = "Start typing to see preview...";
       return;
     }
-
-    iconEl.style.display = "";
-    nameEl.style.display = "";
-    nameEl.textContent = name || "Award Name";
-    descEl.textContent = desc || "Start typing to see preview...";
-    if (icon && icon.startsWith && icon.startsWith("fa-")) {
-      iconEl.innerHTML = `<i class="fa-solid ${escapeHtml(icon)}"></i>`;
-    } else {
-      iconEl.textContent = icon || "";
-    }
+    iEl.style.display = "";
+    nEl.style.display = "";
+    nEl.textContent = name || "Award Name";
+    dEl.textContent = desc || "Start typing to see preview...";
+    if (icon && icon.startsWith("fa-"))
+      iEl.innerHTML = `<i class="fa-solid ${escapeHtml(icon)}"></i>`;
+    else iEl.textContent = icon || "";
   }
 
   function attachInlineAwardPreviewListeners() {
-    const name = document.getElementById("inline-new-award-name");
-    const icon = document.getElementById("inline-new-award-icon");
-    const desc = document.getElementById("inline-new-award-desc");
+    const name = document.getElementById("inline-new-award-name"),
+      icon = document.getElementById("inline-new-award-icon"),
+      desc = document.getElementById("inline-new-award-desc");
     if (name) {
       name.removeEventListener("input", updateInlineAwardPreview);
       name.addEventListener("input", updateInlineAwardPreview);
@@ -1916,28 +988,22 @@ ${
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
-
-  // Close moderator modal
   function closeModeratorModal() {
     const modal = document.getElementById("moderator-modal");
     if (modal) modal.classList.add("hidden");
   }
 
-  // Initialize the players page
   document.addEventListener("DOMContentLoaded", () => {
     loadData();
   });
 
-  // Expose functions for inline HTML handlers
   try {
     window.openPlayerInlineEditor = openPlayerInlineEditor;
     window.saveInlineEditedPlayer = saveInlineEditedPlayer;
     window.closeModeratorModal = closeModeratorModal;
-    window.openModeratorModal = openModeratorModal;
     window.assignAwardToPlayer = assignAwardToPlayer;
     window.assignAwardInline = assignAwardInline;
     window.addNewAward = addNewAward;
-    // Expose inline role management helpers
     window.addRoleInline = addRoleInline;
     window.prefillInlineRoleForEdit = prefillInlineRoleForEdit;
     window.promptDeleteRoleInline = promptDeleteRoleInline;
