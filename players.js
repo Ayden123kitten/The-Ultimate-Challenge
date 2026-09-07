@@ -1045,6 +1045,7 @@
   setInterval(loadData, 10000);
 
   // Open inline editor for a specific player
+  // Open inline editor for a specific player
   async function openPlayerInlineEditor(playerName, event) {
     console.log(
       "🔍 openPlayerInlineEditor called with playerName:",
@@ -1069,7 +1070,8 @@
 
     console.log("✅ Player found, attempting to open modal...");
 
-    // ... keep the rest of your existing openPlayerInlineEditor code below this line ...
+    // ✅ CRITICAL: These two lines MUST be present to define 'modal' and 'content'
+    let modal = document.getElementById("moderator-modal");
     let content = document.getElementById("moderator-panel-content");
 
     // If modal doesn't exist, create it
@@ -1095,9 +1097,9 @@
       const header = document.createElement("div");
       header.className = "flex justify-between items-center mb-4";
       header.innerHTML = `
-            <h2 class="text-xl font-bold text-white">Moderation Panel</h2>
-            <button onclick="closeModeratorModal()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
-        `;
+      <h2 class="text-xl font-bold text-white">Moderation Panel</h2>
+      <button onclick="closeModeratorModal()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+    `;
       panel.appendChild(header);
 
       content = document.createElement("div");
@@ -1107,8 +1109,18 @@
       modal.appendChild(panel);
     }
 
-    content = document.getElementById("moderator-panel-content");
+    // Ensure content is defined even if modal already existed in the HTML
+    content = document.getElementById("moderator-panel-content") || content;
 
+    // ✅ KEEP EVERYTHING BELOW THIS LINE EXACTLY AS IT WAS IN YOUR FILE ✅
+    // Fetch permissions to determine whether to show Manage Awards button
+    let permissions = { manageAwards: false, manageRoles: false };
+    try {
+      permissions = await AUTH.getPermissions();
+    } catch (err) {
+      console.warn("Could not fetch permissions for inline editor:", err);
+    }
+    // ... (the rest of your existing code continues here)
     // Fetch permissions to determine whether to show Manage Awards button
     let permissions = { manageAwards: false, manageRoles: false };
     try {
