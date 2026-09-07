@@ -340,7 +340,7 @@ ${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${link
 <!-- ALWAYS VISIBLE CHEESETRACKER PROGRESS BAR -->
 <div class="bg-slate-800/50 rounded-lg p-3 border border-slate-700 mt-2">
   <div class="flex justify-between items-center mb-2">
-    <span class="text-xs font-bold text-slate-400 uppercase">Cheesetracker Progress</span>
+    <span class="text-xs font-bold text-slate-400"> Progress</span>
     <span class="text-sm font-mono ${hasCheesetracker ? "text-ap-accent" : "text-slate-400"}">
       ${hasCheesetracker ? `${completedChecks}/${totalChecks} (${checkPercentage}%)` : `?/? (?%)`}
     </span>
