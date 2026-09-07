@@ -337,10 +337,10 @@
    ${hasExtraInfo ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Information:</span> <span class="break-words overflow-wrap-anywhere">${game.extra_information}</span></div>` : ""}
    ${hasCheesetracker ? `<div class="bg-slate-800/50 rounded-lg p-3 border border-slate-700"><div class="flex justify-between items-center mb-2"><span class="text-xs font-bold text-slate-400 uppercase">Cheesetracker Progress</span><span class="text-sm font-mono text-ap-accent">${completedChecks}/${totalChecks} (${checkPercentage}%)</span></div><div class="w-full bg-slate-700 rounded-full h-3 overflow-hidden"><div class="bg-gradient-to-r from-green-500 to-green-400 h-full transition-all duration-500" style="width: ${checkPercentage}%"></div></div></div>` : ""}
    ${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary)).join("")}</div>` : ""}
-   <div class="mt-2">
-     <div class="text-center text-xs text-slate-400 mt-1">Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span></div>
-     ${isMyClaim ? `<button onclick="unclaimGame('${game.id}', event)" class="w-full mt-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-upload"></i> Mark as Done</button>` : canClaim ? `<button onclick="claimGame('${game.id}', event)" class="w-full mt-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Claim Game</button>` : `<button disabled class="w-full mt-1 bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"><i class="fa-solid fa-lock"></i> ${eventNotStarted ? "Event hasn't started" : currentPlayer === "" ? "Log In on Players Page" : "Currently Unavailable"}</button>`}
-   </div>
+      <div class="mt-2">
+        ${isMyClaim ? `<button onclick="unclaimGame('${game.id}', event)" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-upload"></i> Mark as Done</button>` : canClaim ? `<button onclick="claimGame('${game.id}', event)" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Claim Game</button>` : `<button disabled class="w-full bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"><i class="fa-solid fa-lock"></i> ${eventNotStarted ? "Event hasn't started" : currentPlayer === "" ? "Log In on Players Page" : "Currently Unavailable"}</button>`}
+        <div class="text-center text-xs text-slate-400 mt-2">Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span></div>
+      </div>
    ${
      game.logs && game.logs.length > 0
        ? `<div class="mt-4 border-t border-slate-700 pt-3"><h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Session Logs</h3><div class="max-h-32 overflow-y-auto scrollbar-hide space-y-1">${game.logs
@@ -911,60 +911,7 @@
              </div>
          </div>`;
     }
-    // Reordered sections: Event Time & Cheesetracker first (after Add New Game)
-    // Event Time Settings Section (requires manageSettings permission)
-    if (permissions.manageSettings) {
-      htmlContent += `
-     <!-- Event Time Settings Section (with merged Live Preview) -->
-     <div class="glass rounded-lg p-4">
-       <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-cyan-400 mr-2"></i>Event Time Settings</h3>
-       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-         <div>
-           <div class="space-y-4">
-             <div>
-               <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
-               <input type="datetime-local" id="event-start-time-input" value="${settings.start_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-               <p class="text-xs text-slate-400 mt-2">Set when the event starts. Before this time, a countdown will be shown.</p>
-             </div>
-             <div>
-               <label class="block text-sm font-semibold text-slate-300 mb-2">Event End Time (optional)</label>
-               <input type="datetime-local" id="event-end-time-input" value="${settings.end_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-               <p class="text-xs text-slate-400 mt-2">Set when the event ends. Leave empty for an ongoing event.</p>
-             </div>
-             <div class="flex gap-2">
-               <button onclick="updateEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Event Time Settings</button>
-               <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
-             </div>
-           </div>
-         </div>
-         <div>
-           <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
-           <div id="event-timer-preview" class="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-             <div class="text-center w-full">
-               <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent">${formatTime(Date.now() - (settings.start_time ? new Date(settings.start_time).getTime() : 0))}</div>
-               <div id="preview-status" class="text-xs text-slate-400 uppercase">${settings.start_time ? "Event Live" : "Not Set"}</div>
-             </div>
-           </div>
-         </div>
-       </div>
-     </div>`;
-    }
-    // Cheesetracker Settings Section (requires manageSettings permission)
-    if (permissions.manageSettings) {
-      htmlContent += `
-         <!-- Cheesetracker Settings Section -->
-         <div class="glass rounded-lg p-4">
-             <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-link text-orange-400 mr-2"></i>Cheesetracker Integration</h3>
-             <div class="space-y-4">
-                 <div>
-                     <label class="block text-sm font-semibold text-slate-300 mb-2">Cheesetracker URL</label>
-                     <input type="url" id="cheesetracker-url-input" value="${settings.cheesetracker_url || ""}" placeholder="https://cheesetrackers.theincrediblewheelofchee.se/..." class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-                     <p class="text-xs text-slate-400 mt-2">Enter the URL to your Cheesetracker page to enable automatic check tracking and progress display.</p>
-                 </div>
-                 <button onclick="updateCheesetrackerSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Cheesetracker Settings</button>
-             </div>
-         </div>`;
-    }
+
     // Game Management: Edit / Remove / Logs (requires manageGames)
     if (permissions.manageGames) {
       htmlContent += `
@@ -1247,6 +1194,64 @@
              </div>
          </div>`;
     }
+    // ========== SETTINGS SECTIONS (MOVED TO BOTTOM) ==========
+
+    // Event Time Settings Section (requires manageSettings permission)
+    if (permissions.manageSettings) {
+      htmlContent += `
+        <!-- Event Time Settings Section (with merged Live Preview) -->
+        <div class="glass rounded-lg p-4">
+          <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-cyan-400 mr-2"></i>Event Time Settings</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+            <div>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
+                  <input type="datetime-local" id="event-start-time-input" value="${settings.start_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                  <p class="text-xs text-slate-400 mt-2">Set when the event starts. Before this time, a countdown will be shown.</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-300 mb-2">Event End Time (optional)</label>
+                  <input type="datetime-local" id="event-end-time-input" value="${settings.end_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                  <p class="text-xs text-slate-400 mt-2">Set when the event ends. Leave empty for an ongoing event.</p>
+                </div>
+                <div class="flex gap-2">
+                  <button onclick="updateEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Event Time Settings</button>
+                  <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
+              <div id="event-timer-preview" class="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                <div class="text-center w-full">
+                  <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent">${formatTime(Date.now() - (settings.start_time ? new Date(settings.start_time).getTime() : 0))}</div>
+                  <div id="preview-status" class="text-xs text-slate-400 uppercase">${settings.start_time ? "Event Live" : "Not Set"}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // Cheesetracker Settings Section (requires manageSettings permission)
+    if (permissions.manageSettings) {
+      htmlContent += `
+            <!-- Cheesetracker Settings Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-link text-orange-400 mr-2"></i>Cheesetracker Integration</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Cheesetracker URL</label>
+                        <input type="url" id="cheesetracker-url-input" value="${settings.cheesetracker_url || ""}" placeholder="https://cheesetrackers.theincrediblewheelofchee.se/..." class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                        <p class="text-xs text-slate-400 mt-2">Enter the URL to your Cheesetracker page to enable automatic check tracking and progress display.</p>
+                    </div>
+                    <button onclick="updateCheesetrackerSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Cheesetracker Settings</button>
+                </div>
+            </div>`;
+    }
+
+    // Render the final HTML
     content.innerHTML = htmlContent;
     modal.classList.remove("hidden");
     // Listen for Escape to close modal

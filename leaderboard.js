@@ -487,10 +487,12 @@
     header.appendChild(info);
 
     // Awards Section
+    // Awards Section
     const playerAwards = playerObj && playerObj.awards ? playerObj.awards : [];
+    let awardsSection = null;
 
     if (playerAwards.length > 0) {
-      const awardsSection = document.createElement("div");
+      awardsSection = document.createElement("div");
       awardsSection.style.cssText = `margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
       const awardsTitle = document.createElement("h3");
       awardsTitle.textContent = "Awards";
@@ -533,7 +535,6 @@
       });
 
       awardsSection.appendChild(awardsList);
-      content.appendChild(awardsSection);
     }
 
     // Stats Grid
@@ -596,8 +597,12 @@
     historySection.appendChild(historyTitle);
     historySection.appendChild(historyList);
 
+    // --- UPDATED APPEND ORDER ---
     content.appendChild(closeBtn);
     content.appendChild(header);
+    if (awardsSection) {
+      content.appendChild(awardsSection); // Now appended directly under the main profile header
+    }
     content.appendChild(statsGrid);
     content.appendChild(historySection);
     modal.appendChild(content);

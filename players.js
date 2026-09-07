@@ -459,14 +459,22 @@
     }
     hSec.appendChild(hTit);
     hSec.appendChild(hList);
+    // --- UPDATED APPEND ORDER ---
     content.appendChild(cBtn);
     content.appendChild(header);
+    if (awardsSection) {
+      content.appendChild(awardsSection); // Moved to be directly under the main profile header
+    }
     content.appendChild(sGrid);
     content.appendChild(hSec);
+    
     modal.appendChild(content);
+
+    // Close on outside click
     modal.onclick = (e) => {
       if (e.target === modal) modal.remove();
     };
+
     document.body.appendChild(modal);
   }
 
