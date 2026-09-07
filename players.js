@@ -38,7 +38,9 @@
       if (cached) {
         try {
           const parsed = JSON.parse(cached);
-          pageAvailableRoles = Array.isArray(parsed) ? parsed : (parsed.roles || []);
+          pageAvailableRoles = Array.isArray(parsed)
+            ? parsed
+            : parsed.roles || [];
         } catch (e) {
           console.debug("Invalid rolesCache, ignoring", e);
         }
@@ -47,9 +49,12 @@
       const res = await fetch(`/api/get-data?type=roles&t=${Date.now()}`);
       if (res.ok) {
         const data = await res.json();
-        pageAvailableRoles = Array.isArray(data) ? data : (data.roles || []);
+        pageAvailableRoles = Array.isArray(data) ? data : data.roles || [];
         try {
-          localStorage.setItem("rolesCache", JSON.stringify(pageAvailableRoles));
+          localStorage.setItem(
+            "rolesCache",
+            JSON.stringify(pageAvailableRoles)
+          );
         } catch (e) {
           console.debug("Could not cache roles:", e);
         }
@@ -77,13 +82,28 @@
       if (cached) {
         try {
           const parsed = JSON.parse(cached);
-          availableAwards = Array.isArray(parsed) ? parsed : (parsed.awards || []);
+          availableAwards = Array.isArray(parsed)
+            ? parsed
+            : parsed.awards || [];
         } catch (e) {
           console.debug("Invalid awardsCache, ignoring", e);
         }
       }
 
-      const res = await fetch(`/api/get-data?type=awards&t=${Date.now
+      const res = await fetch(`/api/get-data?type=awards&t=${Date.now()}`);
+      if (res.ok) {
+        const data = await res.json();
+        availableAwards = Array.isArray(data) ? data : data.awards || [];
+        try {
+          localStorage.setItem("awardsCache", JSON.stringify(availableAwards));
+        } catch (e) {
+          console.debug("Could not cache awards:", e);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to load awards:", err);
+    }
+  }
 
   function getModeratorIcon(playerName) {
     const role = moderatorRoles[playerName];
@@ -1317,22 +1337,22 @@ ${
     ? `
   <div class="mt-4 border-t border-slate-700 pt-4">
     <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Awards (Dropdown)</h4>
-    <select id="inline-award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
-      <option value="">Select an award...</option>
-      ${(availableAwards || [])
-        .map(
-          (a) =>
-            `<option value='${JSON.stringify({
-              name: a.name,
-              icon: a.icon || "",
-              description: a.description || ""
-            }).replace(
-              /'/g,
-              "\\'"
-            )}'>${a.icon ? (a.icon.startsWith("fa-") ? "" : a.icon + " ") : ""}${a.name}</option>`
-        )
-        .join("")}
-    </select>
+<select id="inline-award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+  <option value="">Select an award...</option>
+  ${(availableAwards || [])
+    .map(
+      (a) =>
+        `<option value='${JSON.stringify({
+          name: a.name,
+          icon: a.icon || "",
+          description: a.description || ""
+        }).replace(
+          /'/g,
+          "\\'"
+        )}'>${a.icon ? (a.icon.startsWith("fa-") ? "" : a.icon + " ") : ""}${a.name}</option>`
+    )
+    .join("")}
+</select>
     <div class="flex gap-2">
       <button onclick="assignAwardInline('add', '${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Assign Award</button>
       <button onclick="assignAwardInline('remove', '${player.name}')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Award</button>
@@ -1738,21 +1758,17 @@ ${
         item.className =
           "flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded";
         item.innerHTML = `
-          <div class="flex items-center gap-3">
-            <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;font-size:0.8rem;font-weight:700;background:${r.color}33;color:${r.color};border:1px solid ${r.color};">
-              <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${r.color};"></span>
-              <span style="color:inherit;">${r.name}</span>
-            </span>
-          </div>
-          <div style="display:flex;gap:8px;">
-            <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillInlineRoleForEdit(${JSON.stringify(
-              r
-            )}, ${JSON.stringify(currentPlayerName)})'>Edit</button>
-            <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteRoleInline(${JSON.stringify(
-              r.name
-            )}, ${JSON.stringify(currentPlayerName)})'>Delete</button>
-          </div>
-        `;
+        <div class="flex items-center gap-3">
+          <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:12px;font-size:0.8rem;font-weight:700;background:${r.color}33;color:${r.color};border:1px solid ${r.color};">
+            <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${r.color};"></span>
+            <span style="color:inherit;">${r.name}</span>
+          </span>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm" onclick='prefillInlineRoleForEdit(${JSON.stringify(r)}, ${JSON.stringify(currentPlayerName)})'>Edit</button>
+          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm" onclick='promptDeleteRoleInline(${JSON.stringify(r.name)}, ${JSON.stringify(currentPlayerName)})'>Delete</button>
+        </div>
+      `;
         list.appendChild(item);
       });
   }
@@ -1894,7 +1910,6 @@ ${
     updateInlineAwardPreview();
   }
 
-  // Simple escaping for inserted text
   function escapeHtml(str) {
     return String(str)
       .replace(/&/g, "&amp;")
