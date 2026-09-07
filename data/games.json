@@ -2045,5 +2045,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "celeste64",
+    "name": "Celeste 64: Fragments of the Mountain",
+    "logo": "https://cdn2.steamgriddb.com/logo/3a042baabf136fc5fac7b30ad4103b0a.png",
+    "yaml_slot_name": "Celeste64",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/PoryGoneDev/Celeste64/releases/download/v1.4.1/celeste64.apworld",
+    "apworld_version": "1.4.1",
+    "mod_link": "https://github.com/PoryGoneDev/Celeste64/releases/download/v1.4.1/Celeste64-Archipelago-v1.4.1-win-x64.zip",
+    "mod_version": "1.4.1",
+    "mod_setup_guide_link": "https://archipelago.gg/tutorial/Celeste%2064/guide_en",
+    "tracker_link": "https://github.com/PoryGone/Celeste-64-AP-Tracker/releases/download/v1.3.1/celeste_64_randomizer_porygone.zip",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1224388599160635552",
+    "save_file_link": "https://drive.google.com/drive/folders/1uNO8htiA5HE4VeIBSQm_1kAnoNQNrdJb?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
