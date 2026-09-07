@@ -22,12 +22,10 @@ export default async function handler(req, res) {
   };
 
   if (!type || !fileMap[type]) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "Invalid or missing data type. Supported: games, players, roles, moderators, awards, settings"
-      });
+    return res.status(400).json({
+      error:
+        "Invalid or missing data type. Supported: games, players, roles, moderators, awards, settings"
+    });
   }
 
   const filePath = fileMap[type];
@@ -72,7 +70,8 @@ export default async function handler(req, res) {
         pronouns: p.pronouns || "",
         discord: p.discord || "",
         website: p.website || "",
-        roles: p.roles || []
+        roles: p.roles || [],
+        awards: p.awards || [] // <-- ADD THIS LINE
       }));
     }
 

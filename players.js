@@ -55,18 +55,30 @@
 
   async function loadAwards() {
     try {
+      // Use cached awards if available for faster UI population
       const cached = localStorage.getItem("awardsCache");
       if (cached) {
         try {
-          const p = JSON.parse(cached);
-          availableAwards = Array.isArray(p) ? p : p.awards || [];
-        } catch (e) {}
+          availableAwards = JSON.parse(cached);
+        } catch (e) {
+          console.debug("Invalid awardsCache, ignoring", e);
+        }
       }
+
+      // Always refresh from server in case of updates
       const res = await fetch(`/api/get-data?type=awards&t=${Date.now()}`);
       if (res.ok) {
-        const d = await res.json();
-        availableAwards = Array.isArray(d) ? d : d.awards || [];
-        localStorage.setItem("awardsCache", JSON.stringify(availableAwards));
+        const responseData = await res.json();
+        // FIX: Extract the awards array from the response object safely
+        availableAwards =
+          responseData.awards ||
+          (Array.isArray(responseData) ? responseData : []);
+
+        try {
+          localStorage.setItem("awardsCache", JSON.stringify(availableAwards));
+        } catch (e) {
+          console.debug("Could not cache awards:", e);
+        }
       }
     } catch (err) {
       console.error("Failed to load awards:", err);
