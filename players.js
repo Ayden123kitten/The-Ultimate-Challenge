@@ -470,44 +470,57 @@
         this.style.transform = "translateY(0)";
         this.style.boxShadow = "none";
       };
-      card.onclick = () => showPlayerModal(stat);
+
+      // ✅ FIX: Ignore clicks on the card if the edit button was clicked
+      card.onclick = (e) => {
+        if (e.target.closest(".inline-edit-btn")) {
+          return; // Let the button's own listener handle it
+        }
+        showPlayerModal(stat);
+      };
 
       const avatar = stat.pfpLink
         ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>'">`
         : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
 
-      // Get moderator icon (admin or moderator)
       const modIcon = getModeratorIcon(stat.name);
-      const playerObj = players.find((p) => p.name === stat.name);
       const playerRank = leaderboardPositions[stat.name] || null;
+
       card.innerHTML = `
             <div style="position: relative;">
                 ${avatar}
                 ${
                   inlineEditMode && effectiveModerator
                     ? `
-                    <button class="inline-edit-btn" style="position: absolute; top: -5px; right: -5px; background: #1e293b; border: 2px solid #38bdf8; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10;" title="Edit Player">
+                    <button class="inline-edit-btn" style="position: absolute; top: -5px; right: -5px; background: #1e293b; border: 2px solid #38bdf8; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20;" title="Edit Player">
                         <i class="fa-solid fa-gear" style="color: #38bdf8;"></i>
                     </button>
                 `
                     : ""
                 }
-          ${playerRank ? `<div title="Leaderboard Position" style="position: absolute; bottom: -8px; right: -8px; background: rgba(17,24,39,0.95); border: 2px solid #0ea5e9; color: #0ea5e9; padding: 4px 6px; border-radius: 9999px; font-weight: 700; font-size: 0.75rem;">#${playerRank}</div>` : ""}
+                ${playerRank ? `<div title="Leaderboard Position" style="position: absolute; bottom: -8px; right: -8px; background: rgba(17,24,39,0.95); border: 2px solid #0ea5e9; color: #0ea5e9; padding: 4px 6px; border-radius: 9999px; font-weight: 700; font-size: 0.75rem; z-index: 10;">#${playerRank}</div>` : ""}
             </div>
-                ${modIcon ? `<div style="position: absolute; top: -5px; left: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">${modIcon}</div>` : ""}
+            ${modIcon ? `<div style="position: absolute; top: -5px; left: -5px; background: #1e293b; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; z-index: 10;">${modIcon}</div>` : ""}
             <div style="display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; overflow: hidden;">
                 <h2 style="margin: 0; font-size: 0.95rem; color: #e2e8f0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;">${stat.name} ${isSelected ? '<span style="font-size: 0.65rem; color: #38bdf8;">(You)</span>' : ""}</h2>
             </div>
         `;
 
-      // ✅ FIX: Attach event listener directly to prevent bubbling to card.onclick
+      // ✅ FIX: Robustly attach the event listener
       if (inlineEditMode && effectiveModerator) {
         const editBtn = card.querySelector(".inline-edit-btn");
         if (editBtn) {
           editBtn.addEventListener("click", (e) => {
-            e.stopPropagation(); // Reliably prevents the card's onclick (showPlayerModal) from firing
+            console.log("⚙️ Edit button clicked for:", stat.name);
+            e.preventDefault();
+            e.stopPropagation();
             openPlayerInlineEditor(stat.name, e);
           });
+        } else {
+          console.warn(
+            "⚠️ Edit button element not found in DOM for",
+            stat.name
+          );
         }
       }
 
@@ -1033,13 +1046,30 @@
 
   // Open inline editor for a specific player
   async function openPlayerInlineEditor(playerName, event) {
-    if (event) event.stopPropagation();
+    console.log(
+      "🔍 openPlayerInlineEditor called with playerName:",
+      playerName
+    );
+
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
 
     const player = players.find((p) => p.name === playerName);
-    if (!player) return;
+    if (!player) {
+      console.error("❌ Player not found in players array:", playerName);
+      console.log(
+        "Available players:",
+        players.map((p) => p.name)
+      );
+      alert("Error: Could not find player data for " + playerName);
+      return;
+    }
 
-    // Create modal dynamically since it doesn't exist in players.html
-    let modal = document.getElementById("moderator-modal");
+    console.log("✅ Player found, attempting to open modal...");
+
+    // ... keep the rest of your existing openPlayerInlineEditor code below this line ...
     let content = document.getElementById("moderator-panel-content");
 
     // If modal doesn't exist, create it
