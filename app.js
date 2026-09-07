@@ -716,8 +716,12 @@
           const isSettingsPage =
             pagePath.endsWith("/settings.html") ||
             pagePath.endsWith("settings.html");
+          const isPlayersPage =
+            pagePath.endsWith("/players.html") ||
+            pagePath.endsWith("players.html"); // <-- ADD THIS LINE
+
           // Don't add the inline-edit toggle on the leaderboard or settings pages (user requested)
-          if (!isLeaderboardPage && !isSettingsPage) {
+          if (!isLeaderboardPage && !isSettingsPage && !isPlayersPage) {
             const inlineEditBtn = document.createElement("button");
             inlineEditBtn.id = "inline-edit-toggle-btn";
             inlineEditBtn.className =
