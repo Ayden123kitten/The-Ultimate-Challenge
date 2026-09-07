@@ -1,3 +1,9 @@
 {
-  "awards": []
+  "awards": [
+    {
+      "name": "Veteran",
+      "icon": "fa-medal",
+      "description": "Made an account before the async started."
+    }
+  ]
 }
