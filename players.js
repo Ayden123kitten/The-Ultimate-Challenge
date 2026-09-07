@@ -297,177 +297,252 @@
   }
 
   function showPlayerModal(stat) {
-    const ex = document.getElementById("player-detail-modal");
-    if (ex) ex.remove();
+    // Remove existing modal if any
+    const existing = document.getElementById("player-detail-modal");
+    if (existing) existing.remove();
+
     const modal = document.createElement("div");
     modal.id = "player-detail-modal";
-    modal.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.4); z-index: 1000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px);`;
+    modal.style.cssText = `
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(15, 23, 42, 0.4);
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(4px);
+    `;
+
     const content = document.createElement("div");
-    content.style.cssText = `background: rgba(30, 41, 59, 0.98); backdrop-filter: blur(10px); padding: 30px; border-radius: 16px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5);`;
-    const cBtn = document.createElement("button");
-    cBtn.innerHTML = "&times;";
-    cBtn.style.cssText = `position: absolute; top: 15px; right: 20px; background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;`;
-    cBtn.onclick = () => modal.remove();
+    content.style.cssText = `
+        background: rgba(30, 41, 59, 0.98);
+        backdrop-filter: blur(10px);
+        padding: 30px;
+        border-radius: 16px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    `;
+
+    // Close Button
+    const closeBtn = document.createElement("button");
+    closeBtn.innerHTML = "&times;";
+    closeBtn.style.cssText = `
+        position: absolute;
+        top: 15px; right: 20px;
+        background: none;
+        border: none;
+        color: #94a3b8;
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+    `;
+    closeBtn.onclick = () => modal.remove();
+
+    // Header
     const header = document.createElement("div");
     header.style.cssText = `display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;`;
-    const av = stat.pfpLink
-      ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;">`
-      : `<div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(56,189,248,0.2); display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
+
+    const avatar = stat.pfpLink
+      ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888\'><path d=\'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z\'/></svg>\'">`
+      : `<div style="width: 60px; height: 60px; border-radius: 50%; background: #38bdf8/0.2; display: flex; align-items: center; justify-content: center;"><i class="fa-solid fa-user" style="font-size: 1.5rem; color: #38bdf8;"></i></div>`;
+
     const info = document.createElement("div");
     info.style.cssText = `display: flex; flex-direction: column; gap: 4px;`;
-    const nRow = document.createElement("div");
-    nRow.style.cssText = `display: flex; align-items: center; gap: 8px; flex-wrap: wrap;`;
+
+    // Name row with pronouns badge
+    const nameRow = document.createElement("div");
+    nameRow.style.cssText = `display: flex; align-items: center; gap: 8px; flex-wrap: wrap;`;
+
     const h2 = document.createElement("h2");
     h2.textContent = stat.name;
-    h2.style.cssText = `margin: 0; font-size: 1.25rem; color: #e2e8f0;`;
-    const pObj = players.find((p) => p.name === stat.name),
-      pPronouns = pObj && pObj.pronouns ? pObj.pronouns.trim() : "";
-    if (pPronouns) {
-      const b = document.createElement("span");
-      b.textContent = pPronouns;
-      b.style.cssText = `display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #38bdf822; color: #38bdf8; border: 1px solid #38bdf8;`;
-      nRow.appendChild(h2);
-      nRow.appendChild(b);
+    h2.style.margin = "0";
+    h2.style.fontSize = "1.25rem";
+    h2.style.color = "#e2e8f0";
+
+    // Pronouns badge
+    const playerObj = players.find((p) => p.name === stat.name);
+    const playerPronouns =
+      playerObj && playerObj.pronouns ? playerObj.pronouns.trim() : "";
+    if (playerPronouns) {
+      const pronounsBadge = document.createElement("span");
+      pronounsBadge.textContent = playerPronouns;
+      pronounsBadge.style.cssText = `display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background-color: #38bdf822; color: #38bdf8; border: 1px solid #38bdf8; white-space: nowrap;`;
+      nameRow.appendChild(h2);
+      nameRow.appendChild(pronounsBadge);
     } else {
-      nRow.appendChild(h2);
-    }
-    const pRoles = pObj && pObj.roles ? pObj.roles : [],
-      mRoles = document.createElement("div");
-    mRoles.style.cssText = `display: flex; flex-wrap: wrap; gap: 6px;`;
-    pRoles.forEach((rN) => {
-      const r = pageAvailableRoles.find((r) => r.name === rN);
-      if (r) {
-        const b = document.createElement("span");
-        b.textContent = r.name;
-        b.style.cssText = `display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; background-color: ${r.color}33; color: ${r.color}; border: 1px solid ${r.color};`;
-        const d = document.createElement("span");
-        d.style.cssText = `display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: ${r.color};`;
-        b.prepend(d);
-        mRoles.appendChild(b);
-      }
-    });
-    info.appendChild(nRow);
-    if (mRoles.children.length > 0) info.appendChild(mRoles);
-
-    // AWARDS RENDERING LOGIC
-    const pAwardsC = pObj && pObj.awards ? pObj.awards : [];
-    if (pAwardsC.length > 0) {
-      const bRow = document.createElement("div");
-      bRow.style.cssText = `display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;`;
-      pAwardsC.forEach((aE) => {
-        let aD = null;
-        if (typeof aE === "string")
-          aD = availableAwards.find((a) => a.name === aE) || { name: aE };
-        else if (aE && typeof aE === "object") aD = aE;
-        else aD = { name: String(aE) };
-        const badge = document.createElement("span");
-        badge.title = aD.description || aD.name;
-        badge.style.cssText = `display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:9999px; background: rgba(255,255,255,0.03); color:#e2e8f0; font-size:0.85rem;`;
-        const iSpan = document.createElement("span");
-        iSpan.style.cssText = `min-width:18px; display:inline-flex; align-items:center; justify-content:center;`;
-        const icon = aD.icon || "🏆";
-        if (typeof icon === "string" && icon.startsWith("fa-"))
-          iSpan.innerHTML = `<i class="fa-solid ${icon}" style="color:${aD.color || "#38bdf8"};"></i>`;
-        else iSpan.textContent = icon;
-        const nSpan = document.createElement("span");
-        nSpan.textContent = aD.name;
-        nSpan.style.cssText = `color:#94a3b8; font-weight:600;`;
-        badge.appendChild(iSpan);
-        badge.appendChild(nSpan);
-        bRow.appendChild(badge);
-      });
-      info.appendChild(bRow);
+      nameRow.appendChild(h2);
     }
 
-    const pBio = pObj && pObj.bio ? pObj.bio.trim() : "";
-    if (pBio) {
-      const bD = document.createElement("div");
-      bD.style.cssText = `margin-top: 4px; overflow-wrap: anywhere; word-break: break-word;`;
-      const bT = document.createElement("span");
-      bT.textContent = pBio;
-      bT.style.cssText = `color: #94a3b8; font-size: 0.9rem;`;
-      bD.appendChild(bT);
-      info.appendChild(bD);
+    // Bio under name
+    const playerBio = playerObj && playerObj.bio ? playerObj.bio.trim() : "";
+    if (playerBio) {
+      const bioDiv = document.createElement("div");
+      bioDiv.style.cssText = `margin-top: 4px; overflow-wrap: anywhere; word-break: break-word;`;
+      const bioText = document.createElement("span");
+      bioText.textContent = playerBio;
+      bioText.style.cssText = `color: #94a3b8; overflow-wrap: anywhere; word-break: break-word; font-size: 0.9rem;`;
+      bioDiv.appendChild(bioText);
+      info.appendChild(bioDiv);
     }
-    const pDisc = pObj && pObj.discord ? pObj.discord.trim() : "";
-    if (pDisc) {
-      const dD = document.createElement("div");
-      dD.style.cssText = `display: flex; align-items: center; gap: 6px; margin-top: 4px;`;
-      const dI = document.createElement("i");
-      dI.className = "fa-brands fa-discord";
-      dI.style.cssText = `color: #5865F2;`;
-      const dT = document.createElement("span");
-      dT.textContent = pDisc;
-      dT.style.cssText = `color: #5865F2; font-size: 0.9rem;`;
-      dD.appendChild(dI);
-      dD.appendChild(dT);
-      info.appendChild(dD);
+
+    // Discord username under bio
+    const playerDiscord =
+      playerObj && playerObj.discord ? playerObj.discord.trim() : "";
+    if (playerDiscord) {
+      const discordDiv = document.createElement("div");
+      discordDiv.style.cssText = `display: flex; align-items: center; gap: 6px; margin-top: 4px;`;
+      const discordIcon = document.createElement("i");
+      discordIcon.className = "fa-brands fa-discord";
+      discordIcon.style.cssText = `color: #5865F2;`;
+      const discordText = document.createElement("span");
+      discordText.textContent = playerDiscord;
+      discordText.style.cssText = `color: #5865F2; overflow-wrap: anywhere; word-break: break-word; font-size: 0.9rem;`;
+      discordDiv.appendChild(discordIcon);
+      discordDiv.appendChild(discordText);
+      info.appendChild(discordDiv);
     }
-    header.innerHTML = av;
+
+    header.innerHTML = avatar;
     header.appendChild(info);
+
+    // Show leaderboard rank in header (aligned right)
     const rank = leaderboardPositions[stat.name] || null;
     if (rank) {
-      const rD = document.createElement("div");
-      rD.style.cssText = `margin-left: auto; display: flex; flex-direction: column; align-items: center; gap: 4px;`;
-      const rL = document.createElement("div");
-      rL.textContent = "Rank";
-      rL.style.cssText = `font-size: 0.75rem; color: #94a3b8;`;
-      const rV = document.createElement("div");
-      rV.textContent = `#${rank}`;
-      rV.style.cssText = `font-size: 1.1rem; font-weight: 700; color: #38bdf8;`;
-      rD.appendChild(rL);
-      rD.appendChild(rV);
-      header.appendChild(rD);
+      const rankDiv = document.createElement("div");
+      rankDiv.style.cssText = `margin-left: auto; display: flex; flex-direction: column; align-items: center; gap: 4px;`;
+      const rankLabel = document.createElement("div");
+      rankLabel.textContent = "Rank";
+      rankLabel.style.cssText = `font-size: 0.75rem; color: #94a3b8;`;
+      const rankValue = document.createElement("div");
+      rankValue.textContent = `#${rank}`;
+      rankValue.style.cssText = `font-size: 1.1rem; font-weight: 700; color: #38bdf8;`;
+      rankDiv.appendChild(rankLabel);
+      rankDiv.appendChild(rankValue);
+      header.appendChild(rankDiv);
     }
 
-    const sGrid = document.createElement("div");
-    sGrid.style.cssText = `display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 25px;`;
-    [
-      { l: "Games Played", v: stat.gamesPlayed },
-      { l: "Total Time", v: formatTime(stat.totalTimeMs) },
-      { l: "Total Claims", v: stat.totalClaims }
-    ].forEach((s) => {
-      const b = document.createElement("div");
-      b.style.cssText = `background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center;`;
-      const v = document.createElement("div");
-      v.style.cssText = `font-size: 1.5rem; font-weight: bold; color: #38bdf8;`;
-      v.textContent = s.v;
-      const l = document.createElement("div");
-      l.style.cssText = `font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 5px;`;
-      l.textContent = s.l;
-      b.appendChild(v);
-      b.appendChild(l);
-      sGrid.appendChild(b);
+    // Awards Section
+    const playerAwards = playerObj && playerObj.awards ? playerObj.awards : [];
+    let awardsSection = null;
+
+    if (playerAwards.length > 0) {
+      awardsSection = document.createElement("div");
+      awardsSection.style.cssText = `margin-bottom: 25px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
+      const awardsTitle = document.createElement("h3");
+      awardsTitle.textContent = "Awards";
+      awardsTitle.style.cssText = `border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px; font-size: 1.2rem; color: #e2e8f0;`;
+      awardsSection.appendChild(awardsTitle);
+
+      const awardsList = document.createElement("div");
+      awardsList.style.cssText = `display: flex; flex-direction: column; gap: 10px;`;
+
+      playerAwards.forEach((awardEntry) => {
+        let awardData = null;
+        if (typeof awardEntry === "string") {
+          awardData = availableAwards.find((a) => a.name === awardEntry) || {
+            name: awardEntry
+          };
+        } else if (awardEntry && typeof awardEntry === "object") {
+          awardData = awardEntry;
+        } else {
+          awardData = { name: String(awardEntry) };
+        }
+
+        const awardItem = document.createElement("div");
+        awardItem.style.cssText = `display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px;`;
+
+        let iconHtml = "";
+        const icon = awardData.icon || "";
+        if (icon && icon.startsWith && icon.startsWith("fa-")) {
+          iconHtml = `<i class="fa-solid ${icon}" style="font-size: 1.5rem; color: #38bdf8; min-width: 24px;"></i>`;
+        } else {
+          iconHtml = `<span style="font-size: 1.5rem; min-width: 24px;">${icon || "🏆"}</span>`;
+        }
+
+        const awardInfo = document.createElement("div");
+        awardInfo.style.cssText = `flex: 1; min-width: 0;`;
+
+        const awardName = document.createElement("div");
+        awardName.innerHTML = `${iconHtml} <strong style="color: #38bdf8;">${awardData.name}</strong>`;
+        awardName.style.cssText = `display: flex; align-items: center; gap: 8px; margin-bottom: 4px;`;
+
+        const awardDesc = document.createElement("div");
+        awardDesc.textContent = awardData.description || "";
+        awardDesc.style.cssText = `font-size: 0.85rem; color: #94a3b8; overflow-wrap: anywhere; word-break: break-word;`;
+
+        awardInfo.appendChild(awardName);
+        awardInfo.appendChild(awardDesc);
+        awardItem.appendChild(awardInfo);
+        awardsList.appendChild(awardItem);
+      });
+
+      awardsSection.appendChild(awardsList);
+    }
+
+    // Stats Grid
+    const statsGrid = document.createElement("div");
+    statsGrid.style.cssText = `display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 25px;`;
+
+    const statBoxes = [
+      { label: "Games Played", value: stat.gamesPlayed },
+      { label: "Total Time", value: formatTime(stat.totalTimeMs) },
+      { label: "Total Claims", value: stat.totalClaims }
+    ];
+
+    statBoxes.forEach((s) => {
+      const box = document.createElement("div");
+      box.style.cssText = `background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center;`;
+      const val = document.createElement("div");
+      val.style.cssText = `font-size: 1.5rem; font-weight: bold; color: #38bdf8;`;
+      val.textContent = s.value;
+      const lbl = document.createElement("div");
+      lbl.style.cssText = `font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; margin-top: 5px;`;
+      lbl.textContent = s.label;
+      box.appendChild(val);
+      box.appendChild(lbl);
+      statsGrid.appendChild(box);
     });
 
-    const hSec = document.createElement("div");
-    hSec.style.cssText = `margin-top: 20px;`;
-    const hTit = document.createElement("h3");
-    hTit.textContent = "Games Played";
-    hTit.style.cssText = `border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px;`;
-    const hList = document.createElement("div");
-    hList.style.cssText = `display: flex; flex-direction: column; gap: 10px;`;
+    // Game History Section
+    const historySection = document.createElement("div");
+    historySection.style.cssText = `margin-top: 20px;`;
+    const historyTitle = document.createElement("h3");
+    historyTitle.textContent = "Games Played";
+    historyTitle.style.cssText = `border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px;`;
+
+    const historyList = document.createElement("div");
+    historyList.style.cssText = `display: flex; flex-direction: column; gap: 10px;`;
+
     if (stat.gameHistory.length > 0) {
-      stat.gameHistory.forEach((g) => {
-        const i = document.createElement("div");
-        i.style.cssText = `background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border-left: 3px solid #38bdf8; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;`;
-        i.innerHTML = `<strong style="color: #e2e8f0;">${g.gameName}</strong><span style="color: #38bdf8; font-weight: bold; font-family: monospace;">${formatTime(g.timeMs)}</span>`;
-        hList.appendChild(i);
+      stat.gameHistory.forEach((game) => {
+        const item = document.createElement("div");
+        item.style.cssText = `background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border-left: 3px solid #38bdf8; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;`;
+        item.innerHTML = `<strong style="color: #e2e8f0;">${game.gameName}</strong><span style="color: #38bdf8; font-weight: bold; font-family: monospace;">${formatTime(game.timeMs)}</span>`;
+        historyList.appendChild(item);
       });
     } else {
-      hList.innerHTML = `<p style="color:#94a3b8; text-align:center;">No games played yet.</p>`;
+      historyList.innerHTML =
+        '<p style="color:#94a3b8; text-align:center;">No games played yet.</p>';
     }
-    hSec.appendChild(hTit);
-    hSec.appendChild(hList);
-    // --- UPDATED APPEND ORDER ---
-    content.appendChild(cBtn);
+
+    historySection.appendChild(historyTitle);
+    historySection.appendChild(historyList);
+
+    // --- APPEND ORDER ---
+    content.appendChild(closeBtn);
     content.appendChild(header);
     if (awardsSection) {
-      content.appendChild(awardsSection); // Moved to be directly under the main profile header
+      content.appendChild(awardsSection);
     }
-    content.appendChild(sGrid);
-    content.appendChild(hSec);
-    
+    content.appendChild(statsGrid);
+    content.appendChild(historySection);
+
     modal.appendChild(content);
 
     // Close on outside click
