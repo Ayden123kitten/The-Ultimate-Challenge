@@ -38,7 +38,11 @@
       const cached = localStorage.getItem("rolesCache");
       if (cached) {
         try {
-          pageAvailableRoles = JSON.parse(cached);
+          const parsed = JSON.parse(cached);
+          // Fix: Extract the array whether it's stored as a direct array or nested object
+          pageAvailableRoles = Array.isArray(parsed)
+            ? parsed
+            : parsed.roles || [];
         } catch (e) {
           console.debug("Invalid rolesCache, ignoring", e);
         }
@@ -47,7 +51,9 @@
       // Always refresh from server in case of updates
       const res = await fetch(`/api/get-data?type=roles&t=${Date.now()}`);
       if (res.ok) {
-        pageAvailableRoles = await res.json();
+        const data = await res.json();
+        // Fix: Extract the array from the { roles: [...] } response structure
+        pageAvailableRoles = Array.isArray(data) ? data : data.roles || [];
         try {
           localStorage.setItem(
             "rolesCache",
@@ -79,7 +85,11 @@
       const cached = localStorage.getItem("awardsCache");
       if (cached) {
         try {
-          availableAwards = JSON.parse(cached);
+          const parsed = JSON.parse(cached);
+          // Fix: Extract the array whether it's stored as a direct array or nested object
+          availableAwards = Array.isArray(parsed)
+            ? parsed
+            : parsed.awards || [];
         } catch (e) {
           console.debug("Invalid awardsCache, ignoring", e);
         }
@@ -88,7 +98,9 @@
       // Always refresh from server in case of updates
       const res = await fetch(`/api/get-data?type=awards&t=${Date.now()}`);
       if (res.ok) {
-        availableAwards = await res.json();
+        const data = await res.json();
+        // Fix: Extract the array from the { awards: [...] } response structure
+        availableAwards = Array.isArray(data) ? data : data.awards || [];
         try {
           localStorage.setItem("awardsCache", JSON.stringify(availableAwards));
         } catch (e) {
@@ -1233,120 +1245,131 @@
                 ${createRoleHtml ? `<div class="mt-4">${createRoleHtml}</div>` : ""}
                 ${rolesHtml ? `<div class="mt-4">${rolesHtml}</div>` : ""}
 
-                ${
-                  permissions.manageAwards
-                    ? `
-                  <div id="inline-awards-management" class="mt-4 border-t border-slate-700 pt-4">
-                    <div class="mt-3">
+${
+  permissions.manageAwards
+    ? `
+  <div id="inline-awards-management" class="mt-4 border-t border-slate-700 pt-4">
+                        <div class="mt-4">
                       <label class="text-sm font-semibold text-slate-300">Create New Award</label>
-                      <div class="mt-2 space-y-2">
+                      <div class="mt-2 space-y-3">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          <input id="inline-new-award-name" type="text" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
-                          <input id="inline-new-award-icon" type="text" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white">
+                          <input id="inline-new-award-name" type="text" placeholder="Award Name" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white focus:border-ap-accent focus:outline-none transition-colors">
+                          <input id="inline-new-award-icon" type="text" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white focus:border-ap-accent focus:outline-none transition-colors">
                         </div>
-                        <textarea id="inline-new-award-desc" rows="2" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full resize-y min-h-[3rem]" style="resize: vertical; min-height: 3rem;"></textarea>
-                        <div class="mt-3">
-                          <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
-                          <div id="inline-award-preview" class="w-full p-2 rounded bg-slate-800/50 border border-slate-700 text-sm text-slate-400 flex items-center gap-3">
-                            <span id="inline-award-preview-icon" class="text-2xl w-8 text-center"></span>
-                            <div>
-                              <div id="inline-award-preview-name" class="font-bold text-white">Award Name</div>
-                              <div id="inline-award-preview-desc" class="text-xs text-slate-400">Start typing to see preview...</div>
+                        <textarea id="inline-new-award-desc" rows="2" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-white w-full resize-y min-h-[3rem] focus:border-ap-accent focus:outline-none transition-colors" style="resize: vertical; min-height: 3rem;"></textarea>
+                        
+                        <!-- Boxed Live Preview -->
+                        <div class="mt-3 p-4 glass rounded-lg border border-slate-700/50">
+                          <h5 class="text-xs font-semibold text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-eye"></i> Live Preview
+                          </h5>
+                          <div id="inline-award-preview" class="w-full p-3 rounded-md bg-slate-900/60 border border-slate-700 flex items-center gap-3 min-h-[60px] transition-all">
+                            <span id="inline-award-preview-icon" class="text-2xl w-8 h-8 flex items-center justify-center flex-shrink-0 text-slate-500">🏆</span>
+                            <div class="min-w-0 flex-1">
+                              <div id="inline-award-preview-name" class="font-bold text-white text-sm">Award Name</div>
+                              <div id="inline-award-preview-desc" class="text-xs text-slate-400 break-words">Start typing to see preview...</div>
                             </div>
                           </div>
                         </div>
+
                         <div class="mt-2 flex gap-2">
-                          <button onclick="addNewAward(${JSON.stringify(player.name)})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg w-full">Create Award</button>
+                          <button onclick="addNewAward(${JSON.stringify(player.name).replace(/'/g, "\\'")})" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg w-full transition-colors">Create Award</button>
                         </div>
                       </div>
                     </div>
 
-                    <h4 class="text-sm font-semibold text-slate-300 mb-2 mt-4">Manage Awards</h4>
-                    <div id="inline-awards-list" class="mt-2 space-y-2">
-                      ${
-                        availableAwards.length > 0
-                          ? availableAwards
-                              .map(
-                                (a) => `
-                        <div class="flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded">
-                          <div class="flex items-center gap-3">
-                            ${a.icon && a.icon.startsWith && a.icon.startsWith("fa-") ? `<i class="fa-solid ${a.icon}" style="color: ${a.color || "#38bdf8"};"></i>` : `<span style="font-size:1.2rem;">${a.icon || "🏆"}</span>`}
-                            <div style="min-width:0;">
-                              <div style="color:#e2e8f0; font-weight:700;">${a.name}</div>
-                              <div style="color:#94a3b8; font-size:0.85rem;">${a.description || ""}</div>
-                            </div>
-                          </div>
-                          <div style="display:flex; gap:8px;">
-                            <button onclick="prefillAwardForEdit(${JSON.stringify(a)})" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">Edit</button>
-                            <button onclick="promptDeleteAward(${JSON.stringify(a.name)})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Delete</button>
-                          </div>
-                        </div>
-                      `
-                              )
-                              .join("")
-                          : '<div class="text-slate-500">No awards defined.</div>'
-                      }
-                    </div>
+    <h4 class="text-sm font-semibold text-slate-300 mb-2 mt-4">Manage Awards</h4>
+    <div id="inline-awards-list" class="mt-2 space-y-2">
+      ${
+        (availableAwards || []).length > 0
+          ? (availableAwards || [])
+              .map(
+                (a) => `
+        <div class="flex items-center justify-between gap-2 bg-slate-800/40 p-2 rounded">
+          <div class="flex items-center gap-3">
+            ${a.icon && a.icon.startsWith && a.icon.startsWith("fa-") ? `<i class="fa-solid ${a.icon}" style="color: ${a.color || "#38bdf8"};"></i>` : `<span style="font-size:1.2rem;">${a.icon || "🏆"}</span>`}
+            <div style="min-width:0;">
+              <div style="color:#e2e8f0; font-weight:700;">${a.name}</div>
+              <div style="color:#94a3b8; font-size:0.85rem;">${a.description || ""}</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button onclick="prefillAwardForEdit(${JSON.stringify(a).replace(/'/g, "\\'")})" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-sm">Edit</button>
+            <button onclick="promptDeleteAward(${JSON.stringify(a.name).replace(/'/g, "\\'")})" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Delete</button>
+          </div>
+        </div>
+      `
+              )
+              .join("")
+          : '<div class="text-slate-500">No awards defined.</div>'
+      }
+    </div>
 
-                    ${
-                      availableAwards.length > 0
-                        ? `
-                    <div class="mt-4">
-                      <label class="text-sm font-semibold text-slate-300 block">Assign Awards</label>
-                      <div class="mt-2 space-y-2">
-                        ${availableAwards
-                          .map((award) => {
-                            const isChecked =
-                              player.awards &&
-                              player.awards.includes(award.name)
-                                ? "checked"
-                                : "";
-                            return `
-                          <div class="flex items-center gap-2">
-                            <input type="checkbox" id="inline-award-${award.name}" ${isChecked} class="inline-edit-award-checkbox w-4 h-4 rounded cursor-pointer">
-                            <label for="inline-award-${award.name}" class="cursor-pointer flex items-center gap-2">
-                              ${award.icon && award.icon.startsWith("fa-") ? `<i class="fa-solid ${award.icon}" style="color: ${award.color || "#38bdf8"};"></i>` : `<span style="font-size:1.2rem;">${award.icon || "🏆"}</span>`}
-                              <span style="color: #e2e8f0; font-size: 0.875rem;">${award.name}</span>
-                            </label>
-                          </div>
-                          `;
-                          })
-                          .join("")}
-                      </div>
-                    </div>
-                    `
-                        : ""
-                    }
-                  </div>
-                `
-                    : ""
-                }
+    ${
+      (availableAwards || []).length > 0
+        ? `
+    <div class="mt-4">
+      <label class="text-sm font-semibold text-slate-300 block">Assign Awards (Checkboxes)</label>
+      <div class="mt-2 space-y-2">
+        ${(availableAwards || [])
+          .map((award) => {
+            // FIX: Safely check if player has the award, handling both object and string formats
+            const hasAward =
+              player.awards &&
+              player.awards.some((a) =>
+                typeof a === "string" ? a === award.name : a.name === award.name
+              );
+            const isChecked = hasAward ? "checked" : "";
+            return `
+          <div class="flex items-center gap-2">
+            <input type="checkbox" id="inline-award-${award.name}" ${isChecked} class="inline-edit-award-checkbox w-4 h-4 rounded cursor-pointer">
+            <label for="inline-award-${award.name}" class="cursor-pointer flex items-center gap-2">
+              ${award.icon && award.icon.startsWith("fa-") ? `<i class="fa-solid ${award.icon}" style="color: ${award.color || "#38bdf8"};"></i>` : `<span style="font-size:1.2rem;">${award.icon || "🏆"}</span>`}
+              <span style="color: #e2e8f0; font-size: 0.875rem;">${award.name}</span>
+            </label>
+          </div>
+          `;
+          })
+          .join("")}
+      </div>
+    </div>
+    `
+        : ""
+    }
+  </div>
+`
+    : ""
+}
 
-                ${
-                  permissions.manageAwards
-                    ? `
-                  <div class="mt-6">
-                    <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Awards</h4>
-                    <select id="inline-award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
-                      <option value="">Select an award...</option>
-                      ${availableAwards
-                        .map(
-                          (a) =>
-                            `<option value="${JSON.stringify({
-                              name: a.name,
-                              icon: a.icon || "",
-                              description: a.description || ""
-                            })}">${a.icon ? (a.icon.startsWith("fa-") ? "" : a.icon + " ") : ""}${a.name}</option>`
-                        )
-                        .join("")}
-                    </select>
-                    <div class="flex gap-2">
-<button onclick="assignAwardInline('add', ${JSON.stringify(player.name)})" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Assign Award</button>
-<button onclick="assignAwardInline('remove', ${JSON.stringify(player.name)})" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Award</button>                    </div>
-                  </div>
-                `
-                    : ""
-                }
+${
+  permissions.manageAwards
+    ? `
+  <div class="mt-4 border-t border-slate-700 pt-4">
+    <h4 class="text-sm font-semibold text-slate-300 mb-2">Assign/Remove Awards (Dropdown)</h4>
+    <select id="inline-award-select" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full mb-2">
+      <option value="">Select an award...</option>
+      ${(availableAwards || [])
+        .map(
+          (a) =>
+            `<option value='${JSON.stringify({
+              name: a.name,
+              icon: a.icon || "",
+              description: a.description || ""
+            }).replace(
+              /'/g,
+              "\\'"
+            )}'>${a.icon ? (a.icon.startsWith("fa-") ? "" : a.icon + " ") : ""}${a.name}</option>`
+        )
+        .join("")}
+    </select>
+    <div class="flex gap-2">
+      <button onclick="assignAwardInline('add', '${player.name}')" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Assign Award</button>
+      <button onclick="assignAwardInline('remove', '${player.name}')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Remove Award</button>
+    </div>
+  </div>
+`
+    : ""
+}
 
                 <div class="flex gap-2 mt-4">
 <button onclick="saveInlineEditedPlayer(${JSON.stringify(player.name)})" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Changes</button>
@@ -1803,26 +1826,41 @@
     const desc = (
       document.getElementById("inline-new-award-desc") || { value: "" }
     ).value.trim();
+
     const iconEl = document.getElementById("inline-award-preview-icon");
     const nameEl = document.getElementById("inline-award-preview-name");
     const descEl = document.getElementById("inline-award-preview-desc");
+
     if (!nameEl || !iconEl || !descEl) return;
 
+    // Empty state
     if (!name && !icon && !desc) {
-      iconEl.style.display = "none";
+      iconEl.style.display = "flex";
+      iconEl.innerHTML = "🏆";
+      iconEl.style.color = "#64748b"; // slate-500
+      iconEl.style.fontSize = "1.5rem";
       nameEl.style.display = "none";
       descEl.textContent = "Start typing to see preview...";
+      descEl.className = "text-xs text-slate-500 italic";
       return;
     }
 
-    iconEl.style.display = "";
-    nameEl.style.display = "";
+    // Active state
+    iconEl.style.display = "flex";
+    nameEl.style.display = "block";
     nameEl.textContent = name || "Award Name";
-    descEl.textContent = desc || "Start typing to see preview...";
+    nameEl.className = "font-bold text-white text-sm";
+
+    descEl.textContent = desc || "No description provided";
+    descEl.className = "text-xs text-slate-400 break-words";
+
+    // Handle FontAwesome vs Emoji icons
     if (icon && icon.startsWith && icon.startsWith("fa-")) {
-      iconEl.innerHTML = `<i class="fa-solid ${escapeHtml(icon)}"></i>`;
+      iconEl.innerHTML = `<i class="fa-solid ${escapeHtml(icon)}" style="color: #38bdf8; font-size: 1.25rem;"></i>`;
     } else {
-      iconEl.textContent = icon || "";
+      iconEl.textContent = icon || "🏆";
+      iconEl.style.color = "#e2e8f0";
+      iconEl.style.fontSize = "1.5rem";
     }
   }
 
