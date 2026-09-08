@@ -28,7 +28,9 @@
     "bio": "A is for \"Apple\".",
     "pronouns": "she/her",
     "discord": "ayden123kitten",
-    "roles": ["Choo-Choo Charles Fan Club"],
+    "roles": [
+      "Choo-Choo Charles Fan Club"
+    ],
     "awards": [
       {
         "name": "Veteran",
@@ -41,6 +43,12 @@
         "icon": "fa-hands-helping",
         "description": "Contributed to The Ultimate Challenge.",
         "awardedAt": "2026-09-07T17:57:45.853Z"
+      },
+      {
+        "name": "Founder",
+        "icon": "fa-chess-king",
+        "description": "Created The Ultimate Challenge.",
+        "awardedAt": "2026-09-08T01:00:19.855Z"
       }
     ]
   },
