@@ -15,10 +15,81 @@
   let players = [];
   let pageAvailableRoles = []; // [{ name, color }]
   let currentPlayer = AUTH.getName();
-  let currentSortType = "games"; // 'games', 'time', 'claims', 'completion'
+
+  // View & Sorting state
+  let currentView = "all-time"; // 'all-time', 'monthly', 'history'
+  let selectedHistoryMonth = "";
+  let currentSortColumn = "games"; // 'rank', 'player', 'games', 'avgTime', 'totalTime'
+  let sortDirection = "desc"; // 'asc' or 'desc'
 
   const $ = (id) => document.getElementById(id);
 
+  function getCurrentMonthYear() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  }
+
+  function getMonthYear(timestamp) {
+    const d = new Date(timestamp);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  }
+
+  function getAvailableMonths() {
+    const months = new Set();
+    games.forEach((game) => {
+      if (game.logs) {
+        game.logs.forEach((log) => {
+          if (log.end || log.start)
+            months.add(getMonthYear(log.end || log.start));
+        });
+      }
+      if (game.current_player && game.claimed_at) {
+        months.add(getMonthYear(game.claimed_at));
+      }
+    });
+    return Array.from(months).sort().reverse(); // Newest first
+  }
+
+  function toggleSort(column) {
+    if (currentSortColumn === column) {
+      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+    } else {
+      currentSortColumn = column;
+      sortDirection = "desc"; // Default to descending for new columns
+    }
+    updateSortIndicators();
+    renderLeaderboard();
+  }
+
+  function updateSortIndicators() {
+    const columns = ["rank", "player", "games", "avgTime", "totalTime"];
+    columns.forEach((col) => {
+      const th = $(`sort-${col}`);
+      if (th) {
+        const icon = th.querySelector("i");
+        if (currentSortColumn === col) {
+          icon.className =
+            sortDirection === "asc"
+              ? "fa-solid fa-sort-up ml-1 text-ap-accent"
+              : "fa-solid fa-sort-down ml-1 text-ap-accent";
+          th.classList.add("text-ap-accent");
+        } else {
+          icon.className = "fa-solid fa-sort ml-1 text-slate-500";
+          th.classList.remove("text-ap-accent");
+        }
+      }
+    });
+  }
+  function setupSortListeners() {
+    const columns = ["rank", "player", "games", "avgTime", "totalTime"];
+    columns.forEach((col) => {
+      const th = $(`sort-${col}`);
+      if (th) {
+        th.addEventListener("click", () => toggleSort(col));
+      }
+    });
+    updateSortIndicators(); // Set initial icon state
+  }
   function formatTime(ms) {
     if (!ms || ms < 0) return "0:00:00";
     const seconds = Math.floor((ms / 1000) % 60);
@@ -79,14 +150,20 @@
   // CALCULATE PLAYER STATS
   // ==========================================
   function calculatePlayerStats() {
+    const targetMonth =
+      currentView === "history"
+        ? selectedHistoryMonth
+        : currentView === "monthly"
+          ? getCurrentMonthYear()
+          : null;
+    const viewType = currentView;
+    const now = Date.now();
+
     const playerStats = players.map((p) => {
       const playerName = p.name;
-      const playerGames = games.filter(
-        (g) => g.logs && g.logs.some((log) => log.player === playerName)
-      );
-
       let totalTimeMs = 0;
       let totalClaims = 0;
+      const gamesPlayedSet = new Set();
       const gameHistory = [];
 
       games.forEach((game) => {
@@ -96,30 +173,35 @@
         if (game.logs) {
           game.logs.forEach((log) => {
             if (log.player === playerName) {
-              gameTotalMs += log.duration_ms;
-              totalTimeMs += log.duration_ms;
-              claimCount++;
+              const logMonth = getMonthYear(log.end || log.start);
+              if (viewType === "all-time" || logMonth === targetMonth) {
+                gameTotalMs += log.duration_ms;
+                totalTimeMs += log.duration_ms;
+                claimCount++;
+                gamesPlayedSet.add(game.id);
+              }
             }
           });
         }
 
-        // Add current session time if player is currently playing this game
+        // Add current session time if it started in the target period
         if (game.current_player === playerName && game.claimed_at) {
-          const currentSessionMs =
-            Date.now() - new Date(game.claimed_at).getTime();
-          gameTotalMs += currentSessionMs;
-          totalTimeMs += currentSessionMs;
-          claimCount++;
+          const claimMonth = getMonthYear(game.claimed_at);
+          if (viewType === "all-time" || claimMonth === targetMonth) {
+            const currentSessionMs = now - game.claimed_at;
+            gameTotalMs += currentSessionMs;
+            totalTimeMs += currentSessionMs;
+            claimCount++;
+            gamesPlayedSet.add(game.id);
+          }
         }
 
         totalClaims += claimCount;
-
-        if (gameTotalMs > 0) {
+        if (gameTotalMs > 0)
           gameHistory.push({ gameName: game.name, timeMs: gameTotalMs });
-        }
       });
 
-      const gamesPlayed = playerGames.length;
+      const gamesPlayed = gamesPlayedSet.size;
       const avgTimePerGame = gamesPlayed > 0 ? totalTimeMs / gamesPlayed : 0;
       const completionRate =
         games.length > 0 ? (gamesPlayed / games.length) * 100 : 0;
@@ -136,6 +218,12 @@
       };
     });
 
+    // Filter out players with 0 activity for monthly/history views to keep it clean
+    if (viewType !== "all-time") {
+      return playerStats.filter(
+        (s) => s.totalTimeMs > 0 || s.gamesPlayed > 0 || s.totalClaims > 0
+      );
+    }
     return playerStats;
   }
 
@@ -170,10 +258,47 @@
         ncomp * weights.completion;
     });
 
-    playerStats.sort((a, b) => b.combinedScore - a.combinedScore);
+    // Apply column sorting (with alphabetical tie-breaker)
+    playerStats.sort((a, b) => {
+      let valA, valB;
+      switch (currentSortColumn) {
+        case "rank":
+          return (
+            b.combinedScore - a.combinedScore || a.name.localeCompare(b.name)
+          );
+        case "player":
+          valA = a.name.toLowerCase();
+          valB = b.name.toLowerCase();
+          return sortDirection === "asc"
+            ? valA.localeCompare(valB)
+            : valB.localeCompare(valA);
+        case "games":
+          valA = a.gamesPlayed;
+          valB = b.gamesPlayed;
+          break;
+        case "avgTime":
+          valA = a.avgTimePerGame;
+          valB = b.avgTimePerGame;
+          break;
+        case "totalTime":
+          valA = a.totalTimeMs;
+          valB = b.totalTimeMs;
+          break;
+        default:
+          valA = a.combinedScore;
+          valB = b.combinedScore;
+      }
 
-    // Update header text to reflect consolidated scoring
-    $("metric-header").textContent = "Overall Score";
+      let result = 0;
+      if (valA < valB) result = sortDirection === "asc" ? -1 : 1;
+      else if (valA > valB) result = sortDirection === "asc" ? 1 : -1;
+
+      // Secondary sort by name if values are equal
+      if (result === 0) {
+        return a.name.localeCompare(b.name);
+      }
+      return result;
+    });
 
     // Render table rows
     container.innerHTML = "";
@@ -315,31 +440,124 @@
   // TAB SWITCHING
   // ==========================================
   function setupTabListeners() {
-    const tabs = {
-      "tab-games": "games",
-      "tab-time": "time",
-      "tab-claims": "claims",
-      "tab-completion": "completion"
-    };
+    const tabAllTime = $("tab-all-time");
+    const tabMonthly = $("tab-monthly");
+    const tabHistory = $("tab-history");
+    const historyContainer = $("history-selector-container");
+    const historySelect = $("history-month-select");
 
-    Object.entries(tabs).forEach(([tabId, sortType]) => {
-      const tab = $(tabId);
-      if (tab) {
-        tab.addEventListener("click", () => {
-          // Update active tab styling
-          document.querySelectorAll(".ranking-tab").forEach((t) => {
-            t.className =
-              "ranking-tab flex-1 md:flex-none px-6 py-3 rounded-lg font-semibold bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition-all";
-          });
+    function setActiveTab(activeTab) {
+      [tabAllTime, tabMonthly, tabHistory].forEach((tab) => {
+        if (tab)
           tab.className =
-            "ranking-tab flex-1 md:flex-none px-6 py-3 rounded-lg font-semibold bg-ap-accent/20 text-ap-accent border border-ap-accent/30 transition-all";
+            "ranking-tab flex-1 sm:flex-none px-6 py-2 rounded-md font-semibold text-slate-400 hover:text-white transition-all";
+      });
+      if (activeTab)
+        activeTab.className =
+          "ranking-tab flex-1 sm:flex-none px-6 py-2 rounded-md font-semibold bg-ap-accent/20 text-ap-accent transition-all";
+    }
 
-          // Update sort type and re-render
-          currentSortType = sortType;
-          renderLeaderboard();
-        });
+    if (tabAllTime)
+      tabAllTime.addEventListener("click", () => {
+        currentView = "all-time";
+        setActiveTab(tabAllTime);
+        if (historyContainer) historyContainer.classList.add("hidden");
+        renderLeaderboard();
+      });
+
+    if (tabMonthly)
+      tabMonthly.addEventListener("click", () => {
+        currentView = "monthly";
+        setActiveTab(tabMonthly);
+        if (historyContainer) historyContainer.classList.add("hidden");
+        renderLeaderboard();
+      });
+
+    if (tabHistory)
+      tabHistory.addEventListener("click", () => {
+        currentView = "history";
+        setActiveTab(tabHistory);
+        if (historyContainer) historyContainer.classList.remove("hidden");
+        populateHistorySelector();
+        renderLeaderboard();
+      });
+
+    if (historySelect)
+      historySelect.addEventListener("change", (e) => {
+        selectedHistoryMonth = e.target.value;
+        renderLeaderboard();
+      });
+  }
+
+  function populateHistorySelector() {
+    const select = $("history-month-select");
+    if (!select) return;
+    select.innerHTML = "";
+    const months = getAvailableMonths();
+    const currentMonth = getCurrentMonthYear();
+
+    if (months.length === 0) {
+      const opt = document.createElement("option");
+      opt.value = currentMonth;
+      opt.textContent = "No history available";
+      select.appendChild(opt);
+      return;
+    }
+
+    months.forEach((month) => {
+      const opt = document.createElement("option");
+      opt.value = month;
+      const [year, mon] = month.split("-");
+      const monthName = new Date(year, mon - 1).toLocaleString("default", {
+        month: "long",
+        year: "numeric"
+      });
+      opt.textContent =
+        month === currentMonth ? `${monthName} (Current)` : monthName;
+      select.appendChild(opt);
+    });
+
+    const pastMonths = months.filter((m) => m !== currentMonth);
+    selectedHistoryMonth = pastMonths.length > 0 ? pastMonths[0] : currentMonth;
+    select.value = selectedHistoryMonth;
+  }
+
+  function toggleSort(column) {
+    if (currentSortColumn === column) {
+      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+    } else {
+      currentSortColumn = column;
+      sortDirection = "desc";
+    }
+    updateSortIndicators();
+    renderLeaderboard();
+  }
+
+  function updateSortIndicators() {
+    ["rank", "player", "games", "avgTime", "totalTime"].forEach((col) => {
+      const th = $(`sort-${col}`);
+      if (th) {
+        const icon = th.querySelector("i");
+        if (currentSortColumn === col) {
+          icon.className =
+            sortDirection === "asc"
+              ? "fa-solid fa-sort-up ml-1 text-ap-accent"
+              : "fa-solid fa-sort-down ml-1 text-ap-accent";
+          th.classList.add("text-ap-accent");
+        } else {
+          icon.className = "fa-solid fa-sort ml-1 text-slate-500";
+          th.classList.remove("text-ap-accent");
+        }
       }
     });
+  }
+
+  function setupSortListeners() {
+    ["rank", "player", "games", "avgTime", "totalTime"].forEach((col) => {
+      const th = $(`sort-${col}`);
+      if (th) th.addEventListener("click", () => toggleSort(col));
+    });
+    updateSortIndicators();
   }
 
   // ==========================================
@@ -621,6 +839,7 @@
   document.addEventListener("DOMContentLoaded", () => {
     loadRoles();
     setupTabListeners();
+    setupSortListeners();
     loadData();
 
     // Refresh data every 10 seconds

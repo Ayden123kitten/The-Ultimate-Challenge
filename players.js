@@ -252,16 +252,30 @@
         leaderboardPositions[s.name] = i + 1;
       });
     })();
-    if (playersSortOption === "az")
-      pStats.sort((a, b) => a.name.localeCompare(b.name));
-    else if (playersSortOption === "za")
-      pStats.sort((a, b) => b.name.localeCompare(a.name));
-    else if (playersSortOption === "games-played")
-      pStats.sort((a, b) => b.gamesPlayed - a.gamesPlayed);
-    else if (playersSortOption === "total-time")
-      pStats.sort((a, b) => b.totalTimeMs - a.totalTimeMs);
-    else if (playersSortOption === "most-claims")
-      pStats.sort((a, b) => b.totalClaims - a.totalClaims);
+    // Apply sorting (with alphabetical tie-breaker)
+    if (playersSortOption === "az") {
+      playerStats.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (playersSortOption === "za") {
+      playerStats.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (playersSortOption === "games-played") {
+      playerStats.sort((a, b) => {
+        if (b.gamesPlayed !== a.gamesPlayed)
+          return b.gamesPlayed - a.gamesPlayed;
+        return a.name.localeCompare(b.name);
+      });
+    } else if (playersSortOption === "total-time") {
+      playerStats.sort((a, b) => {
+        if (b.totalTimeMs !== a.totalTimeMs)
+          return b.totalTimeMs - a.totalTimeMs;
+        return a.name.localeCompare(b.name);
+      });
+    } else if (playersSortOption === "most-claims") {
+      playerStats.sort((a, b) => {
+        if (b.totalClaims !== a.totalClaims)
+          return b.totalClaims - a.totalClaims;
+        return a.name.localeCompare(b.name);
+      });
+    }
     let fStats = pStats;
     if (searchQuery.trim() !== "") {
       const q = searchQuery.toLowerCase();
@@ -295,7 +309,318 @@
     if (fStats.length === 0)
       container.innerHTML = `<div class="col-span-full text-center text-slate-500 py-20"><p>No players found</p></div>`;
   }
+  // Show game info modal
+  async function showGameInfoModal(gameName) {
+    // Find the game in the games array
+    const game = games.find((g) => g.name === gameName);
+    if (!game) {
+      alert("Game information not found");
+      return;
+    }
 
+    // Remove existing modal if any
+    const existing = document.getElementById("game-info-modal");
+    if (existing) existing.remove();
+
+    const modal = document.createElement("div");
+    modal.id = "game-info-modal";
+    modal.style.cssText = `
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(15, 23, 42, 0.8);
+        z-index: 2000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(4px);
+        padding: 20px;
+    `;
+
+    const content = document.createElement("div");
+    content.style.cssText = `
+        background: rgba(30, 41, 59, 0.98);
+        backdrop-filter: blur(10px);
+        padding: 30px;
+        border-radius: 16px;
+        max-width: 700px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    `;
+
+    // Close Button
+    const closeBtn = document.createElement("button");
+    closeBtn.innerHTML = "&times;";
+    closeBtn.style.cssText = `
+        position: absolute;
+        top: 15px; right: 20px;
+        background: none;
+        border: none;
+        color: #94a3b8;
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+        z-index: 10;
+    `;
+    closeBtn.onclick = () => modal.remove();
+
+    // Header with logo
+    const header = document.createElement("div");
+    header.style.cssText = `display: flex; align-items: flex-start; gap: 20px; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);`;
+
+    if (game.logo) {
+      const logo = document.createElement("img");
+      logo.src = game.logo;
+      logo.alt = game.name;
+      logo.style.cssText = `width: 80px; height: 80px; object-fit: contain; border-radius: 8px; background: rgba(255,255,255,0.05);`;
+      logo.onerror = function () {
+        this.style.display = "none";
+      };
+      header.appendChild(logo);
+    }
+
+    const titleDiv = document.createElement("div");
+    titleDiv.style.cssText = `flex: 1;`;
+
+    const h2 = document.createElement("h2");
+    h2.textContent = game.name;
+    h2.style.cssText = `margin: 0 0 10px 0; font-size: 1.8rem; color: #e2e8f0;`;
+
+    const statusBadge = document.createElement("span");
+    const isCompleted = game.completed === true;
+    statusBadge.textContent = isCompleted ? "Completed" : "In Progress";
+    statusBadge.style.cssText = `display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; ${isCompleted ? "background: #22c55e/20; color: #22c55e;" : "background: #38bdf8/20; color: #38bdf8;"}`;
+
+    titleDiv.appendChild(h2);
+    titleDiv.appendChild(statusBadge);
+    header.appendChild(titleDiv);
+
+    // Stats Grid
+    const statsGrid = document.createElement("div");
+    statsGrid.style.cssText = `display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px;`;
+
+    const totalTimeMs = game.total_time_ms || 0;
+    const claimsCount = game.logs ? game.logs.length : 0;
+    const uniquePlayers = game.logs
+      ? new Set(game.logs.map((log) => log.player)).size
+      : 0;
+
+    const statBoxes = [
+      { label: "Total Time", value: formatTime(totalTimeMs), icon: "fa-clock" },
+      { label: "Total Claims", value: claimsCount, icon: "fa-clipboard-list" },
+      { label: "Unique Players", value: uniquePlayers, icon: "fa-users" }
+    ];
+
+    if (game.slot_count > 0) {
+      statBoxes.push({
+        label: "Slot Count",
+        value: game.slot_count,
+        icon: "fa-layer-group"
+      });
+    }
+
+    statBoxes.forEach((stat) => {
+      const box = document.createElement("div");
+      box.style.cssText = `background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center;`;
+
+      const icon = document.createElement("i");
+      icon.className = `fa-solid ${stat.icon}`;
+      icon.style.cssText = `font-size: 1.5rem; color: #38bdf8; margin-bottom: 8px;`;
+
+      const val = document.createElement("div");
+      val.style.cssText = `font-size: 1.3rem; font-weight: bold; color: #e2e8f0; margin-bottom: 4px;`;
+      val.textContent = stat.value;
+
+      const lbl = document.createElement("div");
+      lbl.style.cssText = `font-size: 0.75rem; color: #94a3b8; text-transform: uppercase;`;
+      lbl.textContent = stat.label;
+
+      box.appendChild(icon);
+      box.appendChild(val);
+      box.appendChild(lbl);
+      statsGrid.appendChild(box);
+    });
+
+    // Version Info
+    if (game.apworld_version || game.mod_version) {
+      const versionSection = document.createElement("div");
+      versionSection.style.cssText = `margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
+
+      const versionTitle = document.createElement("h3");
+      versionTitle.textContent = "Versions";
+      versionTitle.style.cssText = `font-size: 1rem; color: #e2e8f0; margin-bottom: 10px;`;
+
+      const versionContent = document.createElement("div");
+      versionContent.style.cssText = `display: flex; gap: 20px; flex-wrap: wrap;`;
+
+      if (game.apworld_version) {
+        const apworldDiv = document.createElement("div");
+        apworldDiv.innerHTML = `<span style="color: #94a3b8;">Apworld:</span> <span style="color: #38bdf8; font-weight: 600;">${game.apworld_version}</span>`;
+        versionContent.appendChild(apworldDiv);
+      }
+
+      if (game.mod_version) {
+        const modDiv = document.createElement("div");
+        modDiv.innerHTML = `<span style="color: #94a3b8;">Mod:</span> <span style="color: #38bdf8; font-weight: 600;">${game.mod_version}</span>`;
+        versionContent.appendChild(modDiv);
+      }
+
+      versionSection.appendChild(versionTitle);
+      versionSection.appendChild(versionContent);
+      content.appendChild(versionSection);
+    }
+
+    // Rules
+    if (game.rules && game.rules.trim() !== "") {
+      const rulesSection = document.createElement("div");
+      rulesSection.style.cssText = `margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
+
+      const rulesTitle = document.createElement("h3");
+      rulesTitle.textContent = "Rules";
+      rulesTitle.style.cssText = `font-size: 1rem; color: #e2e8f0; margin-bottom: 10px;`;
+
+      const rulesText = document.createElement("div");
+      rulesText.textContent = game.rules;
+      rulesText.style.cssText = `color: #94a3b8; line-height: 1.6; overflow-wrap: anywhere; word-break: break-word;`;
+
+      rulesSection.appendChild(rulesTitle);
+      rulesSection.appendChild(rulesText);
+      content.appendChild(rulesSection);
+    }
+
+    // Extra Information
+    if (game.extra_information && game.extra_information.trim() !== "") {
+      const infoSection = document.createElement("div");
+      infoSection.style.cssText = `margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px;`;
+
+      const infoTitle = document.createElement("h3");
+      infoTitle.textContent = "Additional Information";
+      infoTitle.style.cssText = `font-size: 1rem; color: #e2e8f0; margin-bottom: 10px;`;
+
+      const infoText = document.createElement("div");
+      infoText.textContent = game.extra_information;
+      infoText.style.cssText = `color: #94a3b8; line-height: 1.6; overflow-wrap: anywhere; word-break: break-word;`;
+
+      infoSection.appendChild(infoTitle);
+      infoSection.appendChild(infoText);
+      content.appendChild(infoSection);
+    }
+
+    // Links Section
+    const links = [
+      { url: game.apworld_link, icon: "fa-globe", label: "Apworld Link" },
+      { url: game.mod_link, icon: "fa-puzzle-piece", label: "Mod Link" },
+      { url: game.mod_setup_guide_link, icon: "fa-book", label: "Setup Guide" },
+      { url: game.tracker_link, icon: "fa-map", label: "Tracker" },
+      { url: game.game_info_link, icon: "fa-circle-info", label: "Game Info" },
+      { url: game.support_link, icon: "fa-circle-question", label: "Support" },
+      { url: game.save_file_link, icon: "fa-download", label: "Save File" }
+    ].filter((l) => l.url && l.url.trim() !== "");
+
+    if (links.length > 0) {
+      const linksSection = document.createElement("div");
+      linksSection.style.cssText = `margin-bottom: 20px;`;
+
+      const linksTitle = document.createElement("h3");
+      linksTitle.textContent = "Links & Resources";
+      linksTitle.style.cssText = `font-size: 1rem; color: #e2e8f0; margin-bottom: 15px;`;
+
+      const linksGrid = document.createElement("div");
+      linksGrid.style.cssText = `display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;`;
+
+      links.forEach((link) => {
+        const linkBtn = document.createElement("a");
+        linkBtn.href = link.url;
+        linkBtn.target = "_blank";
+        linkBtn.rel = "noopener noreferrer";
+        linkBtn.style.cssText = `display: flex; align-items: center; gap: 10px; padding: 12px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; color: #38bdf8; text-decoration: none; transition: all 0.2s;`;
+        linkBtn.onmouseover = function () {
+          this.style.background = "rgba(56, 189, 248, 0.2)";
+          this.style.transform = "translateY(-2px)";
+        };
+        linkBtn.onmouseout = function () {
+          this.style.background = "rgba(56, 189, 248, 0.1)";
+          this.style.transform = "translateY(0)";
+        };
+
+        const icon = document.createElement("i");
+        icon.className = `fa-solid ${link.icon}`;
+        icon.style.cssText = `font-size: 1.2rem;`;
+
+        const labelText = document.createElement("span");
+        labelText.textContent = link.label;
+        labelText.style.cssText = `font-weight: 600;`;
+
+        linkBtn.appendChild(icon);
+        linkBtn.appendChild(labelText);
+        linksGrid.appendChild(linkBtn);
+      });
+
+      linksSection.appendChild(linksTitle);
+      linksSection.appendChild(linksGrid);
+      content.appendChild(linksSection);
+    }
+
+    // Recent Activity (last 5 logs)
+    if (game.logs && game.logs.length > 0) {
+      const activitySection = document.createElement("div");
+      activitySection.style.cssText = `margin-bottom: 20px;`;
+
+      const activityTitle = document.createElement("h3");
+      activityTitle.textContent = "Recent Activity";
+      activityTitle.style.cssText = `font-size: 1rem; color: #e2e8f0; margin-bottom: 15px;`;
+
+      const activityList = document.createElement("div");
+      activityList.style.cssText = `display: flex; flex-direction: column; gap: 8px;`;
+
+      const recentLogs = game.logs.slice(-5).reverse();
+      recentLogs.forEach((log) => {
+        const logItem = document.createElement("div");
+        logItem.style.cssText = `display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 6px;`;
+
+        const playerInfo = document.createElement("div");
+        playerInfo.style.cssText = `display: flex; align-items: center; gap: 8px;`;
+
+        const playerIcon = document.createElement("i");
+        playerIcon.className = "fa-solid fa-user";
+        playerIcon.style.cssText = `color: #38bdf8;`;
+
+        const playerName = document.createElement("span");
+        playerName.textContent = log.player;
+        playerName.style.cssText = `color: #e2e8f0; font-weight: 600;`;
+
+        playerInfo.appendChild(playerIcon);
+        playerInfo.appendChild(playerName);
+
+        const duration = document.createElement("span");
+        duration.textContent = formatTime(log.duration_ms);
+        duration.style.cssText = `color: #94a3b8; font-family: monospace; font-size: 0.9rem;`;
+
+        logItem.appendChild(playerInfo);
+        logItem.appendChild(duration);
+        activityList.appendChild(logItem);
+      });
+
+      activitySection.appendChild(activityTitle);
+      activitySection.appendChild(activityList);
+      content.appendChild(activitySection);
+    }
+
+    content.appendChild(closeBtn);
+    content.appendChild(header);
+    content.appendChild(statsGrid);
+    modal.appendChild(content);
+
+    // Close on outside click
+    modal.onclick = (e) => {
+      if (e.target === modal) modal.remove();
+    };
+
+    document.body.appendChild(modal);
+  }
   function showPlayerModal(stat) {
     // Remove existing modal if any
     const existing = document.getElementById("player-detail-modal");
@@ -522,8 +847,33 @@
     if (stat.gameHistory.length > 0) {
       stat.gameHistory.forEach((game) => {
         const item = document.createElement("div");
-        item.style.cssText = `background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border-left: 3px solid #38bdf8; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;`;
-        item.innerHTML = `<strong style="color: #e2e8f0;">${game.gameName}</strong><span style="color: #38bdf8; font-weight: bold; font-family: monospace;">${formatTime(game.timeMs)}</span>`;
+        item.style.cssText = `
+                background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; 
+                border-left: 3px solid #38bdf8; font-size: 0.9rem;
+                display: flex; justify-content: space-between; align-items: center;
+                cursor: pointer; transition: all 0.2s ease;
+            `;
+
+        // Add hover effect
+        item.onmouseover = function () {
+          this.style.background = "rgba(56, 189, 248, 0.1)";
+          this.style.transform = "translateX(4px)";
+        };
+        item.onmouseout = function () {
+          this.style.background = "rgba(255,255,255,0.03)";
+          this.style.transform = "translateX(0)";
+        };
+
+        item.innerHTML = `
+                <strong style="color: #e2e8f0;">${game.gameName}</strong>
+                <span style="color: #38bdf8; font-weight: bold; font-family: monospace;">${formatTime(game.timeMs)}</span>
+            `;
+
+        // Make it clickable to show game info
+        item.addEventListener("click", () => {
+          showGameInfoModal(game.gameName);
+        });
+
         historyList.appendChild(item);
       });
     } else {
@@ -554,11 +904,35 @@
   }
 
   const sInput = $("players-search");
-  if (sInput)
+  const sClearBtn = $("players-search-clear");
+  if (sInput) {
+    // Initial visibility check (in case of browser autofill/refresh)
+    if (sClearBtn && sInput.value.trim() !== "") {
+      sClearBtn.classList.remove("hidden");
+    }
+
     sInput.addEventListener("input", (e) => {
       searchQuery = e.target.value;
       renderPlayers();
+      if (sClearBtn) {
+        if (searchQuery.trim() !== "") {
+          sClearBtn.classList.remove("hidden");
+        } else {
+          sClearBtn.classList.add("hidden");
+        }
+      }
     });
+
+    if (sClearBtn) {
+      sClearBtn.addEventListener("click", () => {
+        sInput.value = "";
+        searchQuery = "";
+        sClearBtn.classList.add("hidden");
+        sInput.dispatchEvent(new Event("input")); // Triggers renderPlayers()
+        sInput.focus();
+      });
+    }
+  }
   const sSort = $("players-sort");
   if (sSort)
     sSort.addEventListener("change", (e) => {

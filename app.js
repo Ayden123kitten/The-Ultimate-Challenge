@@ -643,11 +643,34 @@ ${
   setInterval(updateCompletedGamesCount, 5000);
   // Search functionality
   const searchInput = $("games-search");
+  const searchClearBtn = $("games-search-clear");
   if (searchInput) {
+    // Initial visibility check (in case of browser autofill/refresh)
+    if (searchClearBtn && searchInput.value.trim() !== "") {
+      searchClearBtn.classList.remove("hidden");
+    }
+
     searchInput.addEventListener("input", (e) => {
       searchQuery = e.target.value;
       renderGames();
+      if (searchClearBtn) {
+        if (searchQuery.trim() !== "") {
+          searchClearBtn.classList.remove("hidden");
+        } else {
+          searchClearBtn.classList.add("hidden");
+        }
+      }
     });
+
+    if (searchClearBtn) {
+      searchClearBtn.addEventListener("click", () => {
+        searchInput.value = "";
+        searchQuery = "";
+        searchClearBtn.classList.add("hidden");
+        searchInput.dispatchEvent(new Event("input")); // Triggers renderGames()
+        searchInput.focus();
+      });
+    }
   }
   // Sort functionality
   const sortSelect = $("games-sort");
@@ -2785,6 +2808,7 @@ ${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${link
     setInterval(loadData, 10000);
   });
   // Expose modal helpers and inline edit functions for inline HTML handlers
+  // Expose modal helpers and inline edit functions for inline HTML handlers
   try {
     window.closeModeratorModal = closeModeratorModal;
     window.closeModeratorModalOnClick = closeModeratorModalOnClick;
@@ -2809,7 +2833,7 @@ ${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${link
     window.setAdmin = setAdmin;
     window.updateModeratorPermissions = updateModeratorPermissions;
     window.switchRolesTab = switchRolesTab;
-    window.switchAwardsTab = switchAwardsTab;
+    window.showGameInfoModal = showGameInfoModal; // Add this line
     // Expose role/award helper functions used by inline onclick attributes
     window.prefillRoleForEdit = prefillRoleForEdit;
     window.promptDeleteRole = promptDeleteRole;

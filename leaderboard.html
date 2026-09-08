@@ -258,37 +258,47 @@
       </div>
     </header>
     
+      <!-- View Tabs & History Selector -->
+      <div class="flex flex-col sm:flex-row gap-4 mb-6 items-center justify-between">
+        <div class="flex gap-2 bg-slate-800/50 p-1 rounded-lg border border-slate-700 w-full sm:w-auto">
+          <button id="tab-all-time" class="ranking-tab flex-1 sm:flex-none px-6 py-2 rounded-md font-semibold bg-ap-accent/20 text-ap-accent transition-all">
+            All Time
+          </button>
+          <button id="tab-monthly" class="ranking-tab flex-1 sm:flex-none px-6 py-2 rounded-md font-semibold text-slate-400 hover:text-white transition-all">
+            Current Month
+          </button>
+          <button id="tab-history" class="ranking-tab flex-1 sm:flex-none px-6 py-2 rounded-md font-semibold text-slate-400 hover:text-white transition-all">
+            History
+          </button>
+        </div>
+        
+        <div id="history-selector-container" class="hidden w-full sm:w-auto">
+          <select id="history-month-select" class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-ap-accent w-full sm:w-auto cursor-pointer">
+            <!-- Options populated by JS -->
+          </select>
+        </div>
+      </div>
+
       <!-- Leaderboard Table -->
       <div class="glass rounded-b-xl overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full leaderboard-table">
             <thead class="bg-slate-800/50">
               <tr>
-                <th
-                  class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider col-rank"
-                >
-                  Rank
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider col-rank cursor-pointer hover:text-white transition-colors select-none" id="sort-rank">
+                  Rank <i class="fa-solid fa-sort ml-1 text-slate-500"></i>
                 </th>
-                <th
-                  class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider col-player"
-                >
-                  Player
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider col-player cursor-pointer hover:text-white transition-colors select-none" id="sort-player">
+                  Player <i class="fa-solid fa-sort ml-1 text-slate-500"></i>
                 </th>
-                <th
-                  class="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider col-metric"
-                  id="metric-header"
-                >
-                  Games Played
+                <th class="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider col-metric cursor-pointer hover:text-white transition-colors select-none" id="sort-games">
+                  Games Played <i class="fa-solid fa-sort ml-1 text-slate-500"></i>
                 </th>
-                <th
-                  class="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider col-avg-time hidden md:table-cell"
-                >
-                  Avg Time/Game
+                <th class="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider col-avg-time hidden md:table-cell cursor-pointer hover:text-white transition-colors select-none" id="sort-avgTime">
+                  Avg Time/Game <i class="fa-solid fa-sort ml-1 text-slate-500"></i>
                 </th>
-                <th
-                  class="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider col-total-time hidden lg:table-cell"
-                >
-                  Total Time
+                <th class="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider col-total-time hidden lg:table-cell cursor-pointer hover:text-white transition-colors select-none" id="sort-totalTime">
+                  Total Time <i class="fa-solid fa-sort ml-1 text-slate-500"></i>
                 </th>
               </tr>
             </thead>
