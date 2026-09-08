@@ -308,10 +308,10 @@
         return a.name.localeCompare(b.name);
       });
     }
-    let fStats = pStats;
+    let fStats = playerStats;
     if (searchQuery.trim() !== "") {
       const q = searchQuery.toLowerCase();
-      fStats = pStats.filter((s) => s.name.toLowerCase().includes(q));
+      fStats = playerStats.filter((s) => s.name.toLowerCase().includes(q));
     }
     fStats.forEach((stat) => {
       const card = document.createElement("div"),
