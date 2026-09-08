@@ -9,6 +9,11 @@
       "name": "Contributor",
       "icon": "fa-hands-helping",
       "description": "Contributed to The Ultimate Challenge."
+    },
+    {
+      "name": "Founder",
+      "icon": "fa-chess-king",
+      "description": "Created The Ultimate Challenge."
     }
   ]
 }
