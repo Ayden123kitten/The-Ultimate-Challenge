@@ -234,9 +234,21 @@
     const container = $("leaderboard-body");
     const topCardsContainer = $("top-players-cards");
 
-    const playerStats = calculatePlayerStats();
-    // Compute combined score across metrics and sort by it
-    // Weights: games 30%, time 30%, claims 25%, completion 15%
+    // 1. Measure old positions for FLIP animation
+    const oldPositions = {};
+    const existingRows = container.querySelectorAll("tr[data-player]");
+    existingRows.forEach((row) => {
+      oldPositions[row.dataset.player] = row.getBoundingClientRect().top;
+    });
+
+    // Keep a map of existing rows to reuse them
+    const rowMap = {};
+    existingRows.forEach((row) => {
+      rowMap[row.dataset.player] = row;
+    });
+
+    let playerStats = calculatePlayerStats();
+
     const weights = { games: 0.3, time: 0.3, claims: 0.25, completion: 0.15 };
     const maxGames = Math.max(...playerStats.map((s) => s.gamesPlayed), 1);
     const maxTime = Math.max(...playerStats.map((s) => s.totalTimeMs), 1);
@@ -247,15 +259,11 @@
     );
 
     playerStats.forEach((s) => {
-      const ng = s.gamesPlayed / maxGames;
-      const nt = s.totalTimeMs / maxTime;
-      const nc = s.totalClaims / maxClaims;
-      const ncomp = s.completionRate / (maxCompletion || 100);
       s.combinedScore =
-        ng * weights.games +
-        nt * weights.time +
-        nc * weights.claims +
-        ncomp * weights.completion;
+        (s.gamesPlayed / maxGames) * weights.games +
+        (s.totalTimeMs / maxTime) * weights.time +
+        (s.totalClaims / maxClaims) * weights.claims +
+        (s.completionRate / (maxCompletion || 100)) * weights.completion;
     });
 
     // Apply column sorting (with alphabetical tie-breaker)
@@ -293,87 +301,106 @@
       if (valA < valB) result = sortDirection === "asc" ? -1 : 1;
       else if (valA > valB) result = sortDirection === "asc" ? 1 : -1;
 
-      // Secondary sort by name if values are equal
       if (result === 0) {
         return a.name.localeCompare(b.name);
       }
       return result;
     });
 
-    // Render table rows
+    // Update header text based on view
+    const metricHeader = $("metric-header");
+    if (metricHeader) {
+      metricHeader.textContent =
+        currentView === "all-time"
+          ? "Overall Score"
+          : currentView === "monthly"
+            ? "Monthly Score"
+            : "Historical Score";
+    }
+
+    // 2. Update DOM
     container.innerHTML = "";
 
     if (playerStats.length === 0) {
-      container.innerHTML = `
-            <tr>
-                <td colspan="5" class="px-6 py-20 text-center text-slate-500">
-                    <i class="fa-solid fa-users-slash text-4xl mb-4"></i>
-                    <p>No players found</p>
-                </td>
-            </tr>`;
+      container.innerHTML = `<tr><td colspan="5" class="px-6 py-20 text-center text-slate-500"><i class="fa-solid fa-users-slash text-4xl mb-4"></i><p>No player activity found for this period.</p></td></tr>`;
+      if (topCardsContainer) topCardsContainer.innerHTML = "";
       return;
     }
 
+    const newRows = [];
+
     playerStats.forEach((stat, index) => {
       const rank = index + 1;
-      const row = document.createElement("tr");
-      row.className = "hover:bg-slate-800/30 transition-colors cursor-pointer";
+      let row = rowMap[stat.name];
+      const isNew = !row;
 
-      // Add special styling for top 3
-      if (rank <= 3) {
-        row.classList.add(`rank-${rank}`);
+      if (!row) {
+        row = document.createElement("tr");
+        row.dataset.player = stat.name;
       }
 
-      // Rank badge
-      let rankBadge = "";
-      if (rank === 1)
-        rankBadge =
-          '<i class="fa-solid fa-trophy text-yellow-400 text-2xl"></i>';
-      else if (rank === 2)
-        rankBadge = '<i class="fa-solid fa-medal text-gray-400 text-2xl"></i>';
-      else if (rank === 3)
-        rankBadge =
-          '<i class="fa-solid fa-medal text-orange-600 text-2xl"></i>';
-      else rankBadge = `<span class="text-slate-400 font-bold">#${rank}</span>`;
+      row.className = "hover:bg-slate-800/30 transition-colors cursor-pointer";
+      if (rank <= 3) row.classList.add(`rank-${rank}`);
+      else row.classList.remove("rank-1", "rank-2", "rank-3");
 
-      // Player avatar and name
+      let rankBadge =
+        rank === 1
+          ? '<i class="fa-solid fa-trophy text-yellow-400 text-2xl"></i>'
+          : rank === 2
+            ? '<i class="fa-solid fa-medal text-gray-400 text-2xl"></i>'
+            : rank === 3
+              ? '<i class="fa-solid fa-medal text-orange-600 text-2xl"></i>'
+              : `<span class="text-slate-400 font-bold">#${rank}</span>`;
+
       const avatar = stat.pfpLink
         ? `<img src="${stat.pfpLink}" alt="${stat.name}" class="w-10 h-10 rounded-full object-cover border-2 border-slate-600" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
         : "";
       const fallbackAvatar = `<div class="w-10 h-10 rounded-full bg-ap-accent/20 flex items-center justify-center" style="${stat.pfpLink ? "display:none;" : ""}"><i class="fa-solid fa-user text-ap-accent"></i></div>`;
-
-      // Metric value now shows the consolidated score as percent
-      const metricValue = `<span class="text-lg font-bold text-ap-accent">${(
-        stat.combinedScore * 100
-      ).toFixed(1)}%</span>`;
+      const metricValue = `<span class="text-lg font-bold text-ap-accent">${(stat.combinedScore * 100).toFixed(1)}%</span>`;
 
       row.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap col-rank">
-                ${rankBadge}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap col-player">
-                <div class="flex items-center gap-3">
-                    ${avatar}${fallbackAvatar}
-                    <span class="font-semibold text-white">${stat.name}</span>
-                </div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center col-metric">
-                ${metricValue}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center hidden md:table-cell col-avg-time">
-                <span class="text-slate-300">${formatTime(stat.avgTimePerGame)}</span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-center hidden lg:table-cell col-total-time">
-                <span class="text-slate-300">${formatTime(stat.totalTimeMs)}</span>
-            </td>
-        `;
+        <td class="px-6 py-4 whitespace-nowrap col-rank">${rankBadge}</td>
+        <td class="px-6 py-4 whitespace-nowrap col-player"><div class="flex items-center gap-3">${avatar}${fallbackAvatar}<span class="font-semibold text-white">${stat.name}</span></div></td>
+        <td class="px-6 py-4 whitespace-nowrap text-center col-metric">${metricValue}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-center hidden md:table-cell col-avg-time"><span class="text-slate-300">${formatTime(stat.avgTimePerGame)}</span></td>
+        <td class="px-6 py-4 whitespace-nowrap text-center hidden lg:table-cell col-total-time"><span class="text-slate-300">${formatTime(stat.totalTimeMs)}</span></td>`;
 
-      row.addEventListener("click", () => showPlayerModal(stat));
-
+      row.onclick = () => showPlayerModal(stat);
       container.appendChild(row);
+      newRows.push({ row, stat, isNew });
     });
 
-    // Render top 3 cards for mobile/tablet view
+    // 3. FLIP Animation (Invert & Play)
+    newRows.forEach(({ row, stat, isNew }) => {
+      const oldTop = oldPositions[stat.name];
+      const newTop = row.getBoundingClientRect().top;
+
+      if (oldTop !== undefined && !isNew) {
+        const deltaY = oldTop - newTop;
+        if (deltaY !== 0) {
+          // Temporarily disable transition and move to old position
+          row.style.transition = "none";
+          row.style.transform = `translateY(${deltaY}px)`;
+
+          // Force browser reflow
+          row.getBoundingClientRect();
+
+          // Enable transition and animate to new position
+          row.style.transition = "transform 0.4s ease-in-out";
+          row.style.transform = "translateY(0)";
+        }
+      } else if (isNew) {
+        // Fade in new rows when switching views
+        row.style.opacity = "0";
+        row.style.transform = "translateY(10px)";
+        row.getBoundingClientRect();
+        row.style.transition =
+          "opacity 0.4s ease-in-out, transform 0.4s ease-in-out";
+        row.style.opacity = "1";
+        row.style.transform = "translateY(0)";
+      }
+    });
+
     renderTopCards(playerStats.slice(0, 3));
   }
 
@@ -401,8 +428,7 @@
       if (!stat) return;
 
       const card = document.createElement("div");
-      card.className = `glass rounded-xl p-6 ${borderColors[index]} border-t-4`;
-
+      card.className = `glass rounded-xl p-6 border-t ${borderColors[index]}`;
       const avatar = stat.pfpLink
         ? `<img src="${stat.pfpLink}" alt="${stat.name}" class="w-20 h-20 rounded-full object-cover border-4 border-slate-600 mx-auto" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
         : "";

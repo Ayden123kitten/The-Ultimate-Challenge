@@ -189,69 +189,101 @@
       effMod = isModerator || cachedMod;
     const container = $("players-container");
     container.innerHTML = "";
-    const pStats = players.map((p) => {
-      const pGames = games.filter(
-          (g) => g.logs && g.logs.some((l) => l.player === p.name)
-        ),
-        cGame = games.find((g) => g.current_player === p.name);
-      let tMs = 0,
-        gHist = [],
-        tCl = 0;
-      games.forEach((g) => {
-        let gMs = 0,
-          cC = 0;
-        if (g.logs)
-          g.logs.forEach((l) => {
-            if (l.player === p.name) {
-              gMs += l.duration_ms;
-              tMs += l.duration_ms;
-              cC++;
+    const playerStats = players.map((p) => {
+      const playerName = p.name;
+      const playerGames = games.filter(
+        (g) => g.logs && g.logs.some((log) => log.player === playerName)
+      );
+      const currentGame = games.find((g) => g.current_player === playerName);
+
+      let totalTimeMs = 0;
+      const gameHistory = [];
+      let totalClaims = 0;
+
+      games.forEach((game) => {
+        let gameTotalMs = 0;
+        let claimCount = 0;
+
+        if (game.logs) {
+          game.logs.forEach((log) => {
+            if (log.player === playerName) {
+              gameTotalMs += log.duration_ms;
+              totalTimeMs += log.duration_ms;
+              claimCount++;
             }
           });
-        if (cGame && cGame.id === g.id && g.claimed_at) {
-          const sMs = Date.now() - g.claimed_at;
-          gMs += sMs;
-          tMs += sMs;
-          cC++;
         }
-        tCl += cC;
-        if (gMs > 0) gHist.push({ gameName: g.name, timeMs: gMs });
+
+        if (currentGame && currentGame.id === game.id && game.claimed_at) {
+          const currentSessionMs = Date.now() - game.claimed_at;
+          gameTotalMs += currentSessionMs;
+          totalTimeMs += currentSessionMs;
+          claimCount++;
+        }
+
+        totalClaims += claimCount;
+
+        if (gameTotalMs > 0) {
+          gameHistory.push({ gameName: game.name, timeMs: gameTotalMs });
+        }
       });
-      gHist.sort((a, b) => b.timeMs - a.timeMs);
+
+      gameHistory.sort((a, b) => b.timeMs - a.timeMs);
+
       return {
-        name: p.name,
+        name: playerName,
         pfpLink: p.pfp_link,
-        totalTimeMs: tMs,
-        gamesPlayed: pGames.length,
-        currentGame: cGame ? cGame.name : null,
-        gameHistory: gHist,
-        totalClaims: tCl
+        totalTimeMs,
+        gamesPlayed: playerGames.length,
+        currentGame: currentGame ? currentGame.name : null,
+        gameHistory,
+        totalClaims
       };
     });
-    (function computePos() {
-      const sR = pStats.map((s) => ({ ...s }));
-      const w = { games: 0.3, time: 0.3, claims: 0.25, completion: 0.15 };
-      sR.forEach((s) => {
+
+    // Compute combined score and leaderboard positions (weights match leaderboard.js)
+    (function computePositions() {
+      const statsForRanking = playerStats.map((s) => ({ ...s }));
+      const weights = { games: 0.3, time: 0.3, claims: 0.25, completion: 0.15 };
+
+      statsForRanking.forEach((s) => {
         s.completionRate =
           games.length > 0 ? (s.gamesPlayed / games.length) * 100 : 0;
       });
-      const mG = Math.max(...sR.map((s) => s.gamesPlayed), 1),
-        mT = Math.max(...sR.map((s) => s.totalTimeMs), 1),
-        mC = Math.max(...sR.map((s) => s.totalClaims), 1),
-        mCo = Math.max(...sR.map((s) => s.completionRate), 0.0001);
-      sR.forEach((s) => {
+
+      const maxGames = Math.max(
+        ...statsForRanking.map((s) => s.gamesPlayed),
+        1
+      );
+      const maxTime = Math.max(...statsForRanking.map((s) => s.totalTimeMs), 1);
+      const maxClaims = Math.max(
+        ...statsForRanking.map((s) => s.totalClaims),
+        1
+      );
+      const maxCompletion = Math.max(
+        ...statsForRanking.map((s) => s.completionRate),
+        0.0001
+      );
+
+      statsForRanking.forEach((s) => {
+        const ng = s.gamesPlayed / maxGames;
+        const nt = s.totalTimeMs / maxTime;
+        const nc = s.totalClaims / maxClaims;
+        const ncomp = s.completionRate / (maxCompletion || 100);
         s.combinedScore =
-          (s.gamesPlayed / mG) * w.games +
-          (s.totalTimeMs / mT) * w.time +
-          (s.totalClaims / mC) * w.claims +
-          (s.completionRate / mCo) * w.completion;
+          ng * weights.games +
+          nt * weights.time +
+          nc * weights.claims +
+          ncomp * weights.completion;
       });
-      sR.sort((a, b) => b.combinedScore - a.combinedScore);
+
+      statsForRanking.sort((a, b) => b.combinedScore - a.combinedScore);
       leaderboardPositions = {};
-      sR.forEach((s, i) => {
+      statsForRanking.forEach((s, i) => {
         leaderboardPositions[s.name] = i + 1;
       });
     })();
+
     // Apply sorting (with alphabetical tie-breaker)
     if (playersSortOption === "az") {
       playerStats.sort((a, b) => a.name.localeCompare(b.name));
