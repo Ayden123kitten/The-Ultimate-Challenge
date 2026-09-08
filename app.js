@@ -126,9 +126,6 @@
              <i class="fa-solid fa-circle-exclamation text-4xl mb-4"></i>
              <p class="text-lg font-bold">Error loading games</p>
              <p class="text-sm mt-2">${err.message}</p>
-             <p class="text-xs mt-4 text-slate-500">
-                 Check that CONFIG in app.js has your correct GitHub username and repo name.
-             </p>
          </div>`;
       }
     }
