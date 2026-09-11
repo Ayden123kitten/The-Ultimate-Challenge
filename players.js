@@ -341,12 +341,12 @@
     if (fStats.length === 0)
       container.innerHTML = `<div class="col-span-full text-center text-slate-500 py-20"><p>No players found</p></div>`;
   }
-  // Show game info modal
+  // Show Apworld Info modal
   async function showGameInfoModal(gameName) {
     // Find the game in the games array
     const game = games.find((g) => g.name === gameName);
     if (!game) {
-      alert("Game information not found");
+      alert("Apworld Information not found");
       return;
     }
 
@@ -547,7 +547,11 @@
       { url: game.mod_link, icon: "fa-puzzle-piece", label: "Mod Link" },
       { url: game.mod_setup_guide_link, icon: "fa-book", label: "Setup Guide" },
       { url: game.tracker_link, icon: "fa-map", label: "Tracker" },
-      { url: game.game_info_link, icon: "fa-circle-info", label: "Game Info" },
+      {
+        url: game.game_info_link,
+        icon: "fa-circle-info",
+        label: "Apworld Info"
+      },
       { url: game.support_link, icon: "fa-circle-question", label: "Support" },
       { url: game.save_file_link, icon: "fa-download", label: "Save File" }
     ].filter((l) => l.url && l.url.trim() !== "");
@@ -901,7 +905,7 @@
                 <span style="color: #38bdf8; font-weight: bold; font-family: monospace;">${formatTime(game.timeMs)}</span>
             `;
 
-        // Make it clickable to show game info
+        // Make it clickable to show Apworld Info
         item.addEventListener("click", () => {
           showGameInfoModal(game.gameName);
         });

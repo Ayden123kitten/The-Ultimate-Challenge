@@ -79,17 +79,15 @@ export default async function handler(req, res) {
     if (!isAdmin && isModerator) {
       const moderator = moderators.find((m) => m.name === playerName);
       if (moderator && moderator.permissions) {
-        userPermissions = moderator.permissions;
+        userPermissions = {
+          manageModerators: !!moderator.permissions.manageModerators,
+          manageGames: !!moderator.permissions.manageGames,
+          managePlayers: !!moderator.permissions.managePlayers,
+          manageRoles: !!moderator.permissions.manageRoles,
+          manageAwards: !!moderator.permissions.manageAwards,
+          manageSettings: !!moderator.permissions.manageSettings
+        };
       }
-    } else if (isAdmin) {
-      userPermissions = {
-        manageModerators: true,
-        manageGames: true,
-        managePlayers: true,
-        manageRoles: true,
-        manageAwards: true,
-        manageSettings: true
-      };
     }
 
     return res

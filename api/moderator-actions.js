@@ -104,7 +104,7 @@ export default async function handler(req, res) {
     }
 
     const hasPermission = (permission) =>
-      isAdmin || userPermissions[permission] === true;
+      isAdmin || !!userPermissions[permission];
 
     const {
       action,

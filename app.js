@@ -191,7 +191,14 @@
       );
     } else if (gamesFilterOption === "custom") {
       filteredGames = filteredGames.filter(
-        (game) => game.apworld_version && game.apworld_version !== "Core"
+        (game) =>
+          game.apworld_version &&
+          game.apworld_version !== "Core" &&
+          game.apworld_version !== "Manual"
+      );
+    } else if (gamesFilterOption === "manual") {
+      filteredGames = filteredGames.filter(
+        (game) => game.apworld_version === "Manual"
       );
     }
     let sortedGames = filteredGames;
@@ -258,7 +265,7 @@
         {
           url: game.apworld_link,
           icon: "fa-globe",
-          label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === "Core" ? "Core" : "v" + game.apworld_version})` : ""}`
+          label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === "Core" ? "Core" : game.apworld_version === "Manual" ? "Manual" : "v" + game.apworld_version})` : ""}`
         },
         {
           url: game.mod_link,
@@ -274,7 +281,7 @@
         {
           url: game.game_info_link,
           icon: "fa-circle-info",
-          label: "Game Info"
+          label: "Apworld Info"
         },
         {
           url: game.support_link,
@@ -922,14 +929,14 @@ ${
                  <input type="text" id="game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-logo" placeholder="Logo URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-apworld-link" placeholder="Apworld Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                 <input type="text" id="game-apworld-version" placeholder="Apworld Version (or 'Core')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                 <input type="text" id="game-apworld-version" placeholder="Apworld Version (or 'Core'/'Manual')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-mod-link" placeholder="Mod Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="text" id="game-mod-version" placeholder="Mod Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-mod-setup-guide-link" placeholder="Setup Guide Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-tracker-link" placeholder="Tracker Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-support-link" placeholder="Support Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-save-file-link" placeholder="Save File Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                 <input type="url" id="game-game-info-link" placeholder="Game Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                 <input type="url" id="game-game-info-link" placeholder="Apworld Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="number" id="game-slot-count" placeholder="Slot Count (0 = no limit)" min="0" value="1" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <textarea id="game-rules" placeholder="Rules" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                  <textarea id="game-extra-information" placeholder="Extra Information" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
@@ -965,14 +972,14 @@ ${
                  <input type="text" id="edit-game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-logo" placeholder="Logo URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-apworld-link" placeholder="Apworld Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                 <input type="text" id="edit-game-apworld-version" placeholder="Apworld Version (or 'Core')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                 <input type="text" id="edit-game-apworld-version" placeholder="Apworld Version (or 'Core'/'Manual')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-mod-link" placeholder="Mod Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="text" id="edit-game-mod-version" placeholder="Mod Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-mod-setup-guide-link" placeholder="Setup Guide Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-tracker-link" placeholder="Tracker Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-support-link" placeholder="Support Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-save-file-link" placeholder="Save File Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                 <input type="url" id="edit-game-game-info-link" placeholder="Game Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                 <input type="url" id="edit-game-game-info-link" placeholder="Apworld Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="number" id="edit-game-slot-count" placeholder="Slot Count (0 = no limit)" min="0" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <textarea id="edit-game-rules" placeholder="Rules" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                  <textarea id="edit-game-extra-information" placeholder="Extra Information" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
@@ -1514,7 +1521,7 @@ ${
         {
           url: game.apworld_link,
           icon: "fa-globe",
-          label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === "Core" ? "Core" : "v" + game.apworld_version})` : ""}`
+          label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === "Core" ? "Core" : game.apworld_version === "Manual" ? "Manual" : "v" + game.apworld_version})` : ""}`
         },
         {
           url: game.mod_link,
@@ -1530,7 +1537,7 @@ ${
         {
           url: game.game_info_link,
           icon: "fa-circle-info",
-          label: "Game Info"
+          label: "Apworld Info"
         },
         {
           url: game.support_link,
@@ -1810,14 +1817,14 @@ ${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${link
                  <input type="text" id="inline-edit-game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" value="${game.yaml_slot_name || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-logo" placeholder="Logo URL" value="${game.logo || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-apworld-link" placeholder="Apworld Link" value="${game.apworld_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                 <input type="text" id="inline-edit-game-apworld-version" placeholder="Apworld Version (or 'Core')" value="${game.apworld_version || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                 <input type="text" id="inline-edit-game-apworld-version" placeholder="Apworld Version (or 'Core'/'Manual')" value="${game.apworld_version || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-mod-link" placeholder="Mod Link" value="${game.mod_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="text" id="inline-edit-game-mod-version" placeholder="Mod Version" value="${game.mod_version || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-mod-setup-guide-link" placeholder="Setup Guide Link" value="${game.mod_setup_guide_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-tracker-link" placeholder="Tracker Link" value="${game.tracker_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-support-link" placeholder="Support Link" value="${game.support_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-save-file-link" placeholder="Save File Link" value="${game.save_file_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                 <input type="url" id="inline-edit-game-game-info-link" placeholder="Game Info Link" value="${game.game_info_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                 <input type="url" id="inline-edit-game-game-info-link" placeholder="Apworld Info Link" value="${game.game_info_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="number" id="inline-edit-game-slot-count" placeholder="Slot Count (0 = no limit)" min="0" value="${game.slot_count || 1}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <textarea id="inline-edit-game-rules" placeholder="Rules" rows="2" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2">${game.rules || ""}</textarea>
                  <textarea id="inline-edit-game-extra-information" placeholder="Extra Information" rows="2" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2">${game.extra_information || ""}</textarea>
@@ -1955,7 +1962,11 @@ ${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${link
       },
       { url: game.mod_setup_guide_link, icon: "fa-book", label: "Setup Guide" },
       { url: game.tracker_link, icon: "fa-map", label: "Tracker" },
-      { url: game.game_info_link, icon: "fa-circle-info", label: "Game Info" },
+      {
+        url: game.game_info_link,
+        icon: "fa-circle-info",
+        label: "Apworld Info"
+      },
       { url: game.support_link, icon: "fa-circle-question", label: "Support" },
       {
         url: game.save_file_link,
@@ -2423,36 +2434,35 @@ ${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${link
       console.error("Failed to load moderator permissions:", err);
     }
   }
-  async function populateModeratorSelect() {
+  // ✅ FIXED CODE
+  async function loadModeratorPermissions(moderatorName) {
     try {
       const res = await fetch("/api/get-moderators", {
         headers: AUTH.authHeader()
       });
       if (res.ok) {
         const data = await res.json();
-        const modSelect = $("moderator-select");
-        if (modSelect) {
-          modSelect.innerHTML =
-            '<option value="">Select a moderator...</option>' +
-            data.moderators
-              .slice()
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((m) => `<option value="${m.name}">${m.name}</option>`)
-              .join("");
-        }
-        const adminSelect = $("admin-select");
-        if (adminSelect) {
-          adminSelect.innerHTML =
-            '<option value="">Select a moderator...</option>' +
-            data.moderators
-              .slice()
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((m) => `<option value="${m.name}">${m.name}</option>`)
-              .join("");
-        }
+        const mod = data.moderators.find((m) => m.name === moderatorName);
+
+        // Safely extract permissions, defaulting to an empty object if undefined
+        const perms = mod?.permissions || {};
+
+        // Always explicitly set the checkboxes to prevent state leakage
+        document.getElementById("perm-manageModerators").checked =
+          !!perms.manageModerators;
+        document.getElementById("perm-manageGames").checked =
+          !!perms.manageGames;
+        document.getElementById("perm-managePlayers").checked =
+          !!perms.managePlayers;
+        document.getElementById("perm-manageRoles").checked =
+          !!perms.manageRoles;
+        document.getElementById("perm-manageAwards").checked =
+          !!perms.manageAwards;
+        document.getElementById("perm-manageSettings").checked =
+          !!perms.manageSettings;
       }
     } catch (err) {
-      console.error("Failed to load moderators:", err);
+      console.error("Failed to load moderator permissions:", err);
     }
   }
   async function populateAdminSelect() {
