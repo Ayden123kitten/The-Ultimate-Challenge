@@ -261,7 +261,8 @@
         {
           url: game.apworld_link,
           icon: "fa-globe",
-          label: `Apworld${hasApworldVersion ? ` (${apworldDisplayVersion})` : ""}`
+          label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === "Core" ? "Core" : "v" + game.apworld_version})` : ""}`,
+          showTooltip: true // Enables tooltip for Apworld
         },
         {
           url: game.mod_link,
@@ -359,12 +360,23 @@ ${
       container.appendChild(card);
     });
   }
-  function renderLink(url, icon, label, isPrimary = false) {
+  function renderLink(
+    url,
+    icon,
+    label,
+    isPrimary = false,
+    showTooltip = false
+  ) {
     if (!url || url.trim() === "") return "";
     const bgClass = isPrimary
       ? "bg-ap-accent/20 text-ap-accent border-ap-accent/30 hover:bg-ap-accent/30"
       : "bg-slate-800 text-slate-400 border-slate-700 hover:text-white hover:border-slate-500";
-    return `<a href="${url}" target="_blank" class="flex items-center gap-2 p-2 rounded border ${bgClass} transition-all min-w-0"> <i class="fa-solid ${icon} flex-shrink-0"></i> <span class="truncate">${label}</span> </a>`;
+
+    const tooltipAttr = showTooltip
+      ? ` title="${label.replace(/"/g, "&quot;")}"`
+      : "";
+
+    return `<a href="${url}" target="_blank" class="flex items-center gap-2 p-2 rounded border ${bgClass} transition-all min-w-0"${tooltipAttr}> <i class="fa-solid ${icon} flex-shrink-0"></i> <span class="truncate">${label}</span> </a>`;
   }
   // ==========================================
   // ACTIONS
@@ -1257,8 +1269,7 @@ ${
      </div>
 ${hasRules ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Rules:</span> <span class="break-words overflow-wrap-anywhere">${game.rules}</span></div>` : ""}
 ${hasExtraInfo ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Information:</span> <span class="break-words overflow-wrap-anywhere">${game.extra_information}</span></div>` : ""}
-${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary)).join("")}</div>` : ""}
-
+${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary, link.showTooltip)).join("")}</div>` : ""}
 <!-- Always-visible Cheesetracker Progress Bar -->
 <div class="bg-slate-800/50 rounded-lg p-3 border border-slate-700 mt-2">
   <div class="flex justify-between items-center mb-2">
