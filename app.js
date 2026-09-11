@@ -163,12 +163,22 @@
       });
     } else if (gamesFilterOption === "core") {
       filteredGames = filteredGames.filter(
-        (game) => game.apworld_version === "Core"
+        (game) =>
+          game.apworld_version && game.apworld_version.toLowerCase() === "core"
+      );
+    } else if (gamesFilterOption === "manual") {
+      filteredGames = filteredGames.filter(
+        (game) =>
+          game.apworld_version &&
+          game.apworld_version.toLowerCase().includes("manual")
       );
     } else if (gamesFilterOption === "custom") {
-      filteredGames = filteredGames.filter(
-        (game) => game.apworld_version && game.apworld_version !== "Core"
-      );
+      filteredGames = filteredGames.filter((game) => {
+        if (!game.apworld_version) return false;
+        const lower = game.apworld_version.toLowerCase();
+        // Custom means it has a version, but it's NOT core and NOT manual
+        return !lower.includes("core") && !lower.includes("manual");
+      });
     }
     let sortedGames = filteredGames;
     // Apply sorting
@@ -219,6 +229,23 @@
       const hasApworldVersion =
         game.apworld_version && game.apworld_version.trim() !== "";
       const hasModVersion = game.mod_version && game.mod_version.trim() !== "";
+
+      // Smart version display logic
+      let apworldDisplayVersion = "";
+      if (hasApworldVersion) {
+        const lower = game.apworld_version.toLowerCase();
+        if (lower === "core") {
+          apworldDisplayVersion = "Core";
+        } else if (lower.includes("manual")) {
+          // If it contains "manual" (e.g., "Manual", "Manual v1.2"), use it exactly as typed
+          apworldDisplayVersion = game.apworld_version;
+        } else {
+          // For other custom versions, prepend "v" only if it doesn't already start with "v"
+          apworldDisplayVersion = lower.startsWith("v")
+            ? game.apworld_version
+            : "v" + game.apworld_version;
+        }
+      }
       const showEventTime =
         settings.start_time && settings.start_time.trim() !== "";
       // Cheesetracker data
@@ -234,7 +261,7 @@
         {
           url: game.apworld_link,
           icon: "fa-globe",
-          label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === "Core" ? "Core" : "v" + game.apworld_version})` : ""}`
+          label: `Apworld${hasApworldVersion ? ` (${apworldDisplayVersion})` : ""}`
         },
         {
           url: game.mod_link,
