@@ -126,6 +126,9 @@
              <i class="fa-solid fa-circle-exclamation text-4xl mb-4"></i>
              <p class="text-lg font-bold">Error loading games</p>
              <p class="text-sm mt-2">${err.message}</p>
+             <p class="text-xs mt-4 text-slate-500">
+                 Check that CONFIG in app.js has your correct GitHub username and repo name.
+             </p>
          </div>`;
       }
     }
@@ -191,14 +194,7 @@
       );
     } else if (gamesFilterOption === "custom") {
       filteredGames = filteredGames.filter(
-        (game) =>
-          game.apworld_version &&
-          game.apworld_version !== "Core" &&
-          game.apworld_version !== "Manual"
-      );
-    } else if (gamesFilterOption === "manual") {
-      filteredGames = filteredGames.filter(
-        (game) => game.apworld_version === "Manual"
+        (game) => game.apworld_version && game.apworld_version !== "Core"
       );
     }
     let sortedGames = filteredGames;
@@ -265,7 +261,7 @@
         {
           url: game.apworld_link,
           icon: "fa-globe",
-          label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === "Core" ? "Core" : game.apworld_version === "Manual" ? "Manual" : "v" + game.apworld_version})` : ""}`
+          label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === "Core" ? "Core" : "v" + game.apworld_version})` : ""}`
         },
         {
           url: game.mod_link,
@@ -281,7 +277,7 @@
         {
           url: game.game_info_link,
           icon: "fa-circle-info",
-          label: "Apworld Info"
+          label: "Game Info"
         },
         {
           url: game.support_link,
@@ -890,7 +886,6 @@ ${
     const modal = $("moderator-modal");
     const content = $("moderator-panel-content");
     if (!modal || !content) return;
-
     // Show modal immediately with a loading placeholder while permissions/data load
     content.innerHTML = `
    <div class="p-6">
@@ -901,7 +896,6 @@ ${
    </div>`;
     modal.classList.remove("hidden");
     document.addEventListener("keydown", onModeratorKeydown);
-
     // Fetch current user's permissions (do not block showing the modal)
     let permissions = {
       manageModerators: false,
@@ -916,11 +910,10 @@ ${
     } catch (error) {
       console.error("Failed to fetch permissions:", error);
     }
-
     // Build HTML based on permissions
     let htmlContent = '<div class="space-y-6">';
-
     // ========== GAME MANAGEMENT SECTION ==========
+    // Add Game Section (requires manageGames permission)
     if (permissions.manageGames) {
       htmlContent += `
          <!-- Add Game Section -->
@@ -932,14 +925,14 @@ ${
                  <input type="text" id="game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-logo" placeholder="Logo URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-apworld-link" placeholder="Apworld Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                 <input type="text" id="game-apworld-version" placeholder="Apworld Version (or 'Core'/'Manual')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                 <input type="text" id="game-apworld-version" placeholder="Apworld Version (or 'Core')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-mod-link" placeholder="Mod Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="text" id="game-mod-version" placeholder="Mod Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-mod-setup-guide-link" placeholder="Setup Guide Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-tracker-link" placeholder="Tracker Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-support-link" placeholder="Support Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="game-save-file-link" placeholder="Save File Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                 <input type="url" id="game-game-info-link" placeholder="Apworld Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                 <input type="url" id="game-game-info-link" placeholder="Game Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="number" id="game-slot-count" placeholder="Slot Count (0 = no limit)" min="0" value="1" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <textarea id="game-rules" placeholder="Rules" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                  <textarea id="game-extra-information" placeholder="Extra Information" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
@@ -953,7 +946,10 @@ ${
                  </div>
              </div>
          </div>`;
+    }
 
+    // Game Management: Edit / Remove / Logs (requires manageGames)
+    if (permissions.manageGames) {
       htmlContent += `
          <!-- Edit Game Section -->
          <div class="glass rounded-lg p-4">
@@ -972,14 +968,14 @@ ${
                  <input type="text" id="edit-game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-logo" placeholder="Logo URL" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-apworld-link" placeholder="Apworld Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                 <input type="text" id="edit-game-apworld-version" placeholder="Apworld Version (or 'Core'/'Manual')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                 <input type="text" id="edit-game-apworld-version" placeholder="Apworld Version (or 'Core')" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-mod-link" placeholder="Mod Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="text" id="edit-game-mod-version" placeholder="Mod Version" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-mod-setup-guide-link" placeholder="Setup Guide Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-tracker-link" placeholder="Tracker Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-support-link" placeholder="Support Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="edit-game-save-file-link" placeholder="Save File Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                 <input type="url" id="edit-game-game-info-link" placeholder="Apworld Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                 <input type="url" id="edit-game-game-info-link" placeholder="Game Info Link" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="number" id="edit-game-slot-count" placeholder="Slot Count (0 = no limit)" min="0" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <textarea id="edit-game-rules" placeholder="Rules" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                  <textarea id="edit-game-extra-information" placeholder="Extra Information" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
@@ -991,7 +987,8 @@ ${
                  <div id="edit-game-preview" class="glass rounded-xl p-6 flex flex-col gap-4 transition-all hover:border-ap-accent/50"></div>
              </div>
          </div>`;
-
+    }
+    if (permissions.manageGames) {
       htmlContent += `
          <!-- Remove Game Section -->
          <div class="glass rounded-lg p-4">
@@ -1009,7 +1006,8 @@ ${
              <button id="remove-game-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg w-full">Remove Game</button>
            </div>
          </div>`;
-
+    }
+    if (permissions.manageGames) {
       htmlContent += `
          <!-- Edit Logs Section -->
          <div class="glass rounded-lg p-4">
@@ -1028,8 +1026,7 @@ ${
              <div id="edit-logs-container" class="hidden space-y-2 max-h-64 overflow-y-auto"></div>
          </div>`;
     }
-
-    // ========== PLAYER MANAGEMENT SECTION ==========
+    // Player management next
     if (permissions.managePlayers) {
       htmlContent += `
          <!-- Edit Player Section -->
@@ -1059,8 +1056,7 @@ ${
              </div>
          </div>`;
     }
-
-    // ========== ROLES MANAGEMENT SECTION ==========
+    // Player Roles Section (requires manageRoles permission)
     if (permissions.manageRoles) {
       htmlContent += `
          <!-- Player Roles Section -->
@@ -1081,6 +1077,7 @@ ${
                              <span class="text-sm text-slate-400">Start typing to see preview...</span>
                          </div>
                      </div>
+                     <!-- Create Role and Existing Roles list -->
                      <div id="roles-tab-content-create" class="mt-3"></div>
                  </div>
                  <div class="mt-3 pt-3 border-t border-slate-700">
@@ -1111,8 +1108,7 @@ ${
              </div>
          </div>`;
     }
-
-    // ========== AWARDS MANAGEMENT SECTION ==========
+    // Manage Awards Section (requires manageAwards permission)
     if (permissions.manageAwards) {
       htmlContent += `
          <!-- Manage Awards Section -->
@@ -1126,7 +1122,7 @@ ${
                          <input type="text" id="award-icon-input" placeholder="Icon (emoji or fa-*)" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                          <textarea id="award-description-input" placeholder="Description" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2" rows="2"></textarea>
                          <button onclick="createAward()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg w-full md:col-span-2">Create Award</button>
-                         <!-- Live Preview -->
+                         <!-- Live Preview (moved to be directly under Create New Award inputs) -->
                          <div class="md:col-span-2 mt-2">
                            <h5 class="text-xs font-semibold text-slate-400 mb-2">Live Preview</h5>
                            <div id="award-preview" class="flex items-center gap-3 p-2 bg-slate-800/50 rounded-lg">
@@ -1137,6 +1133,7 @@ ${
                              </div>
                            </div>
                          </div>
+                         <!-- Existing Awards list -->
                          <div class="md:col-span-2 mt-3">
                              <div id="awards-tab-content-create" class="mt-3"></div>
                              <div class="mt-3 pt-3 border-t border-slate-700">
@@ -1162,8 +1159,7 @@ ${
              </div>
          </div>`;
     }
-
-    // ========== MODERATOR MANAGEMENT SECTION ==========
+    // Manage Moderators Section (requires manageModerators permission - inherently admin)
     if (permissions.manageModerators) {
       htmlContent += `
          <!-- Manage Moderators Section -->
@@ -1205,22 +1201,28 @@ ${
                      </select>
                      <div id="moderator-permissions-container" class="hidden space-y-2">
                          <label class="flex items-center gap-2 text-sm text-slate-300">
-                             <input type="checkbox" id="perm-manageModerators" class="rounded bg-slate-800 border-slate-700"> Manage Moderators
+                             <input type="checkbox" id="perm-manageModerators" class="rounded bg-slate-800 border-slate-700">
+                             Manage Moderators
                          </label>
                          <label class="flex items-center gap-2 text-sm text-slate-300">
-                             <input type="checkbox" id="perm-manageGames" class="rounded bg-slate-800 border-slate-700"> Manage Games
+                             <input type="checkbox" id="perm-manageGames" class="rounded bg-slate-800 border-slate-700">
+                             Manage Games
                          </label>
                          <label class="flex items-center gap-2 text-sm text-slate-300">
-                             <input type="checkbox" id="perm-managePlayers" class="rounded bg-slate-800 border-slate-700"> Manage Players
+                             <input type="checkbox" id="perm-managePlayers" class="rounded bg-slate-800 border-slate-700">
+                             Manage Players
                          </label>
                          <label class="flex items-center gap-2 text-sm text-slate-300">
-                             <input type="checkbox" id="perm-manageRoles" class="rounded bg-slate-800 border-slate-700"> Manage Roles
+                             <input type="checkbox" id="perm-manageRoles" class="rounded bg-slate-800 border-slate-700">
+                             Manage Roles
                          </label>
                          <label class="flex items-center gap-2 text-sm text-slate-300">
-                             <input type="checkbox" id="perm-manageAwards" class="rounded bg-slate-800 border-slate-700"> Manage Awards
+                             <input type="checkbox" id="perm-manageAwards" class="rounded bg-slate-800 border-slate-700">
+                             Manage Awards
                          </label>
                          <label class="flex items-center gap-2 text-sm text-slate-300">
-                             <input type="checkbox" id="perm-manageSettings" class="rounded bg-slate-800 border-slate-700"> Manage Settings
+                             <input type="checkbox" id="perm-manageSettings" class="rounded bg-slate-800 border-slate-700">
+                             Manage Settings
                          </label>
                          <button onclick="updateModeratorPermissions()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full mt-2">Update Permissions</button>
                      </div>
@@ -1228,11 +1230,12 @@ ${
              </div>
          </div>`;
     }
+    // ========== SETTINGS SECTIONS (MOVED TO BOTTOM) ==========
 
-    // ========== SETTINGS SECTIONS ==========
+    // Event Time Settings Section (requires manageSettings permission)
     if (permissions.manageSettings) {
       htmlContent += `
-        <!-- Event Time Settings Section -->
+        <!-- Event Time Settings Section (with merged Live Preview) -->
         <div class="glass rounded-lg p-4">
           <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-cyan-400 mr-2"></i>Event Time Settings</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
@@ -1264,28 +1267,479 @@ ${
               </div>
             </div>
           </div>
-        </div>
-        
-        <!-- Cheesetracker Settings Section -->
-        <div class="glass rounded-lg p-4">
-            <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-link text-orange-400 mr-2"></i>Cheesetracker Integration</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-300 mb-2">Cheesetracker URL</label>
-                    <input type="url" id="cheesetracker-url-input" value="${settings.cheesetracker_url || ""}" placeholder="https://cheesetrackers.theincrediblewheelofchee.se/..." class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-                    <p class="text-xs text-slate-400 mt-2">Enter the URL to your Cheesetracker page to enable automatic check tracking and progress display.</p>
-                </div>
-                <button onclick="updateCheesetrackerSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Cheesetracker Settings</button>
-            </div>
         </div>`;
     }
 
-    // Render the final HTML
-    content.innerHTML = htmlContent + "</div>";
-    modal.classList.remove("hidden");
-    document.addEventListener("keydown", onModeratorKeydown);
+    // Cheesetracker Settings Section (requires manageSettings permission)
+    if (permissions.manageSettings) {
+      htmlContent += `
+            <!-- Cheesetracker Settings Section -->
+            <div class="glass rounded-lg p-4">
+                <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-link text-orange-400 mr-2"></i>Cheesetracker Integration</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-2">Cheesetracker URL</label>
+                        <input type="url" id="cheesetracker-url-input" value="${settings.cheesetracker_url || ""}" placeholder="https://cheesetrackers.theincrediblewheelofchee.se/..." class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
+                        <p class="text-xs text-slate-400 mt-2">Enter the URL to your Cheesetracker page to enable automatic check tracking and progress display.</p>
+                    </div>
+                    <button onclick="updateCheesetrackerSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg w-full">Save Cheesetracker Settings</button>
+                </div>
+            </div>`;
+    }
 
-    // ... [Event listeners and live preview logic continue exactly as they were in your original file] ...
+    // Render the final HTML
+    content.innerHTML = htmlContent;
+    modal.classList.remove("hidden");
+    // Listen for Escape to close modal
+    document.addEventListener("keydown", onModeratorKeydown);
+    // Update preview on input change
+    const startInput = $("event-start-time-input");
+    const endInput = $("event-end-time-input");
+    function updatePreview() {
+      const previewTimer = $("preview-timer");
+      const previewStatus = $("preview-status");
+      const startTime = startInput.value;
+      const endTime = endInput.value;
+      if (!startTime) {
+        previewTimer.textContent = "0:00:00";
+        previewStatus.textContent = "Not Set";
+        return;
+      }
+      const now = Date.now();
+      const start = new Date(startTime).getTime();
+      const end = endTime ? new Date(endTime).getTime() : null;
+      if (now < start) {
+        previewTimer.textContent = formatTime(start - now);
+        previewStatus.textContent = "Starts In";
+        previewStatus.className = "text-xs text-yellow-400 uppercase";
+      } else if (end === null || (now >= start && now <= end)) {
+        previewTimer.textContent = formatTime(now - start);
+        previewStatus.textContent = "Event Live";
+        previewStatus.className = "text-xs text-green-400 uppercase";
+      } else {
+        previewTimer.textContent = formatTime(now - end);
+        previewStatus.textContent = "Event Ended";
+        previewStatus.className = "text-xs text-red-400 uppercase";
+      }
+    }
+    startInput.addEventListener("change", updatePreview);
+    endInput.addEventListener("change", updatePreview);
+    updatePreview();
+    // Setup form handlers
+    const addGameForm = $("add-game-form");
+    if (addGameForm) {
+      addGameForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const gameData = {
+          id: $("game-id").value.trim(),
+          name: $("game-name").value.trim(),
+          logo: $("game-logo").value.trim(),
+          yaml_slot_name: $("game-yaml-slot-name").value.trim(),
+          slot_count: (function () {
+            const v = parseInt($("game-slot-count").value, 10);
+            return isNaN(v) ? 1 : v;
+          })(),
+          apworld_link: $("game-apworld-link").value.trim(),
+          apworld_version: $("game-apworld-version").value.trim(),
+          mod_link: $("game-mod-link").value.trim(),
+          mod_version: $("game-mod-version").value.trim(),
+          mod_setup_guide_link: $("game-mod-setup-guide-link").value.trim(),
+          tracker_link: $("game-tracker-link").value.trim(),
+          game_info_link: $("game-game-info-link").value.trim(),
+          support_link: $("game-support-link").value.trim(),
+          save_file_link: $("game-save-file-link").value.trim(),
+          rules: $("game-rules").value.trim(),
+          extra_information: $("game-extra-information").value.trim(),
+          current_player: null,
+          claimed_at: null,
+          total_time_ms: 0,
+          completed: false,
+          logs: []
+        };
+        try {
+          const res = await fetch("/api/moderator-actions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...AUTH.authHeader()
+            },
+            body: JSON.stringify({ action: "addGame", gameData })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error);
+          alert("Game added successfully!");
+          addGameForm.reset();
+          loadData();
+        } catch (err) {
+          alert("Error: " + err.message);
+        }
+      };
+    }
+    const editGameSelect = $("edit-game-select");
+    if (editGameSelect) {
+      editGameSelect.onchange = () => {
+        const gameId = editGameSelect.value;
+        const container = $("edit-game-form-container");
+        if (!gameId) {
+          container.classList.add("hidden");
+          return;
+        }
+        const game = games.find((g) => g.id === gameId);
+        if (!game) return;
+        $("edit-game-name").value = game.name;
+        $("edit-game-id").value = game.id;
+        $("edit-game-yaml-slot-name").value = game.yaml_slot_name || "";
+        $("edit-game-logo").value = game.logo || "";
+        $("edit-game-apworld-link").value = game.apworld_link || "";
+        $("edit-game-apworld-version").value = game.apworld_version || "";
+        $("edit-game-mod-link").value = game.mod_link || "";
+        $("edit-game-mod-version").value = game.mod_version || "";
+        $("edit-game-mod-setup-guide-link").value =
+          game.mod_setup_guide_link || "";
+        $("edit-game-tracker-link").value = game.tracker_link || "";
+        $("edit-game-game-info-link").value = game.game_info_link || "";
+        $("edit-game-support-link").value = game.support_link || "";
+        $("edit-game-save-file-link").value = game.save_file_link || "";
+        $("edit-game-rules").value = game.rules || "";
+        $("edit-game-extra-information").value = game.extra_information || "";
+        container.classList.remove("hidden");
+      };
+    }
+    // Remove Game handler for moderation panel
+    const removeGameBtn = $("remove-game-btn");
+    if (removeGameBtn) {
+      removeGameBtn.addEventListener("click", async () => {
+        const sel = $("remove-game-select");
+        if (!sel) return;
+        const gameIdToRemove = sel.value;
+        if (!gameIdToRemove) return alert("Please select a game to remove.");
+        if (
+          !confirm(
+            "Are you sure you want to permanently remove this game? This will also delete logs and Cheesetracker entries."
+          )
+        )
+          return;
+        try {
+          const res = await fetch("/api/moderator-actions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...AUTH.authHeader()
+            },
+            body: JSON.stringify({
+              action: "removeGame",
+              gameId: gameIdToRemove
+            })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "Failed to remove game");
+          alert("Game removed successfully!");
+          loadData();
+          closeModeratorModal();
+        } catch (err) {
+          alert("Error: " + err.message);
+        }
+      });
+    }
+    const editPlayerSelect = $("edit-player-select");
+    if (editPlayerSelect) {
+      editPlayerSelect.onchange = () => {
+        const playerName = editPlayerSelect.value;
+        const container = $("edit-player-form-container");
+        if (!playerName) {
+          container.classList.add("hidden");
+          return;
+        }
+        const player = players.find((p) => p.name === playerName);
+        if (!player) return;
+        $("edit-player-new-name").value = "";
+        $("edit-player-pfp").value = player.pfp_link || "";
+        $("edit-player-bio").value = player.bio || "";
+        $("edit-player-pronouns").value = player.pronouns || "";
+        $("edit-player-discord").value = player.discord || "";
+        container.classList.remove("hidden");
+      };
+    }
+    const editLogGameSelect = $("edit-log-game-select");
+    if (editLogGameSelect) {
+      editLogGameSelect.onchange = () => {
+        const gameId = editLogGameSelect.value;
+        const container = $("edit-logs-container");
+        if (!gameId) {
+          container.classList.add("hidden");
+          return;
+        }
+        const game = games.find((g) => g.id === gameId);
+        if (!game || !game.logs || game.logs.length === 0) {
+          container.innerHTML =
+            '<p class="text-slate-400">No logs for this game.</p>';
+          container.classList.remove("hidden");
+          return;
+        }
+        container.innerHTML = game.logs
+          .map(
+            (log, i) => `
+             <div class="flex justify-between items-center bg-slate-800/50 p-2 rounded">
+                 <span class="text-sm text-slate-300">${log.player} - ${formatTime(log.duration_ms)}</span>
+                 <button onclick="removeLog('${gameId}', ${i})" class="text-red-400 hover:text-red-300">
+                     <i class="fa-solid fa-trash"></i>
+                 </button>
+             </div>
+         `
+          )
+          .join("");
+        container.classList.remove("hidden");
+      };
+    }
+    // ===== LIVE PREVIEW FUNCTIONALITY =====
+    // Helper function to render game card preview
+    function renderGameCardPreview(game, previewElement) {
+      const hasCoverImage = game.logo && game.logo.trim() !== "";
+      const hasRules = game.rules && game.rules.trim() !== "";
+      const hasExtraInfo =
+        game.extra_information && game.extra_information.trim() !== "";
+      const hasApworldVersion =
+        game.apworld_version && game.apworld_version.trim() !== "";
+      const hasModVersion = game.mod_version && game.mod_version.trim() !== "";
+      // If all major fields are empty, show placeholder
+      const allEmpty =
+        !(game.name && game.name.trim()) &&
+        !hasCoverImage &&
+        !game.apworld_link &&
+        !game.mod_link &&
+        !hasRules &&
+        !hasExtraInfo;
+      if (allEmpty) {
+        previewElement.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
+        return;
+      }
+      const links = [
+        {
+          url: game.apworld_link,
+          icon: "fa-globe",
+          label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === "Core" ? "Core" : "v" + game.apworld_version})` : ""}`
+        },
+        {
+          url: game.mod_link,
+          icon: "fa-puzzle-piece",
+          label: `Mod${hasModVersion ? ` (${game.mod_version === "Core" ? "" : "v"}${game.mod_version})` : ""}`
+        },
+        {
+          url: game.mod_setup_guide_link,
+          icon: "fa-book",
+          label: "Setup Guide"
+        },
+        { url: game.tracker_link, icon: "fa-map", label: "Tracker" },
+        {
+          url: game.game_info_link,
+          icon: "fa-circle-info",
+          label: "Game Info"
+        },
+        {
+          url: game.support_link,
+          icon: "fa-circle-question",
+          label: "Support"
+        },
+        {
+          url: game.save_file_link,
+          icon: "fa-download",
+          label: "Save File",
+          primary: true
+        }
+      ].filter((l) => l.url && l.url.trim() !== "");
+
+      previewElement.innerHTML = `
+     <div class="game-card-header">
+       <div class="cover-art-container">
+         ${hasCoverImage ? `<img src="${game.logo}" alt="${game.name}" class="cover-art-logo" onerror="this.style.display='none'">` : ""}
+       </div>
+       <div class="game-card-title-time-row">
+         <div class="game-card-title">
+           <h2 class="text-xl font-bold text-white">${game.name || "Game Name"}</h2>
+           <span class="inline-block mt-1 px-2 py-0.5 rounded text-xs font-semibold bg-green-500/20 text-green-400">Available</span>
+         </div>
+       </div>
+     </div>
+${hasRules ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Rules:</span> <span class="break-words overflow-wrap-anywhere">${game.rules}</span></div>` : ""}
+${hasExtraInfo ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Information:</span> <span class="break-words overflow-wrap-anywhere">${game.extra_information}</span></div>` : ""}
+${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary)).join("")}</div>` : ""}
+
+<!-- Always-visible Cheesetracker Progress Bar -->
+<div class="bg-slate-800/50 rounded-lg p-3 border border-slate-700 mt-2">
+  <div class="flex justify-between items-center mb-2">
+    <span class="text-xs font-bold text-slate-400">Progress</span>
+    <span class="text-sm font-mono ${hasCheesetracker ? "text-ap-accent" : "text-slate-400"}">
+          ${hasCheesetracker ? `${completedChecks}/${totalChecks} (${checkPercentage}%)` : `?/? (?%)`}
+    </span>
+  </div>
+  <div class="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+    <div class="${hasCheesetracker ? "bg-gradient-to-r from-green-500 to-green-400" : "bg-slate-500"} h-full transition-all duration-500" style="width: ${hasCheesetracker ? `${checkPercentage}%` : "100%"}"></div>
+  </div>
+</div>
+
+<div class="mt-2">
+  <div class="text-center text-xs text-slate-400 mt-1">Current session: <span class="font-mono text-white">${formatTime(currentSessionMs)}</span></div>
+  ${isMyClaim ? `<button onclick="unclaimGame('${game.id}', event)" class="w-full mt-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-upload"></i> Mark as Done</button>` : canClaim ? `<button onclick="claimGame('${game.id}', event)" class="w-full mt-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Claim Game</button>` : `<button disabled class="w-full mt-1 bg-slate-700 text-slate-500 font-bold py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center gap-2"><i class="fa-solid fa-lock"></i> ${eventNotStarted ? "Event hasn't started" : currentPlayer === "" ? "Log In on Players Page" : "Currently Unavailable"}</button>`}
+</div>
+   `;
+    }
+    // Add Game Live Preview
+    const addGameInputs = [
+      "game-name",
+      "game-id",
+      "game-logo",
+      "game-apworld-link",
+      "game-apworld-version",
+      "game-mod-link",
+      "game-mod-version",
+      "game-mod-setup-guide-link",
+      "game-tracker-link",
+      "game-game-info-link",
+      "game-support-link",
+      "game-save-file-link",
+      "game-rules",
+      "game-extra-information"
+    ];
+    addGameInputs.forEach((id) => {
+      const input = $(id);
+      if (input) {
+        input.addEventListener("input", () => {
+          const previewEl = $("add-game-preview");
+          if (!previewEl) return;
+          const gameData = {
+            name: $("game-name").value.trim() || "Game Name",
+            logo: $("game-logo").value.trim(),
+            apworld_link: $("game-apworld-link").value.trim(),
+            apworld_version: $("game-apworld-version").value.trim(),
+            mod_link: $("game-mod-link").value.trim(),
+            mod_version: $("game-mod-version").value.trim(),
+            mod_setup_guide_link: $("game-mod-setup-guide-link").value.trim(),
+            tracker_link: $("game-tracker-link").value.trim(),
+            game_info_link: $("game-game-info-link").value.trim(),
+            support_link: $("game-support-link").value.trim(),
+            save_file_link: $("game-save-file-link").value.trim(),
+            rules: $("game-rules").value.trim(),
+            extra_information: $("game-extra-information").value.trim()
+          };
+          renderGameCardPreview(gameData, previewEl);
+        });
+      }
+    });
+    // Edit Game Live Preview
+    const editGameInputs = [
+      "edit-game-name",
+      "edit-game-logo",
+      "edit-game-apworld-link",
+      "edit-game-apworld-version",
+      "edit-game-mod-link",
+      "edit-game-mod-version",
+      "edit-game-mod-setup-guide-link",
+      "edit-game-tracker-link",
+      "edit-game-game-info-link",
+      "edit-game-support-link",
+      "edit-game-save-file-link",
+      "edit-game-rules",
+      "edit-game-extra-information"
+    ];
+    editGameInputs.forEach((id) => {
+      const input = $(id);
+      if (input) {
+        input.addEventListener("input", () => {
+          const previewContainer = $("edit-game-preview-container");
+          const previewEl = $("edit-game-preview");
+          if (!previewContainer || !previewEl) return;
+          previewContainer.classList.remove("hidden");
+          const gameData = {
+            name: $("edit-game-name").value.trim() || "Game Name",
+            logo: $("edit-game-logo").value.trim(),
+            apworld_link: $("edit-game-apworld-link").value.trim(),
+            apworld_version: $("edit-game-apworld-version").value.trim(),
+            mod_link: $("edit-game-mod-link").value.trim(),
+            mod_version: $("edit-game-mod-version").value.trim(),
+            mod_setup_guide_link: $(
+              "edit-game-mod-setup-guide-link"
+            ).value.trim(),
+            tracker_link: $("edit-game-tracker-link").value.trim(),
+            game_info_link: $("edit-game-game-info-link").value.trim(),
+            support_link: $("edit-game-support-link").value.trim(),
+            save_file_link: $("edit-game-save-file-link").value.trim(),
+            rules: $("edit-game-rules").value.trim(),
+            extra_information: $("edit-game-extra-information").value.trim()
+          };
+          renderGameCardPreview(gameData, previewEl);
+        });
+      }
+    });
+    // Edit Player Live Preview
+    const editPlayerInputs = [
+      "edit-player-new-name",
+      "edit-player-pfp",
+      "edit-player-bio",
+      "edit-player-pronouns",
+      "edit-player-discord"
+    ];
+    editPlayerInputs.forEach((id) => {
+      const input = $(id);
+      if (input) {
+        input.addEventListener("input", () => {
+          const previewContainer = $("edit-player-preview-container");
+          const previewEl = $("edit-player-preview");
+          if (!previewContainer || !previewEl) return;
+          previewContainer.classList.remove("hidden");
+          const playerName = $("edit-player-select").value;
+          const player = players.find((p) => p.name === playerName) || {};
+          const displayName =
+            $("edit-player-new-name").value.trim() ||
+            player.name ||
+            "Player Name";
+          const pfpLink =
+            $("edit-player-pfp").value.trim() || player.pfp_link || "";
+          const bio = $("edit-player-bio").value.trim() || player.bio || "";
+          const pronouns =
+            $("edit-player-pronouns").value.trim() || player.pronouns || "";
+          const discord =
+            $("edit-player-discord").value.trim() || player.discord || "";
+          const previewPlayer = {
+            name: displayName,
+            pfp_link: pfpLink,
+            bio: bio,
+            pronouns: pronouns,
+            discord: discord,
+            roles: player.roles || []
+          };
+          renderPlayerPreview(previewPlayer, "edit-player-preview");
+        });
+      }
+    });
+    // Add New Role Live Preview
+    const newRoleNameInput = $("new-role-name");
+    const newRoleColorInput = $("new-role-color");
+    if (newRoleNameInput && newRoleColorInput) {
+      newRoleNameInput.addEventListener("input", updateRolePreview);
+      newRoleColorInput.addEventListener("input", updateRolePreview);
+    }
+    function updateRolePreview() {
+      const previewEl = $("add-role-preview");
+      if (!previewEl || !newRoleNameInput || !newRoleColorInput) return;
+      const roleName = newRoleNameInput.value.trim();
+      const roleColor = newRoleColorInput.value || "#ff0000";
+      // If name is empty, show start-typing placeholder
+      if (!roleName) {
+        previewEl.style.color = "";
+        previewEl.style.borderColor = "";
+        previewEl.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
+        return;
+      }
+      // Render role pill like in player pop-out preview
+      previewEl.style.color = "";
+      previewEl.style.borderColor = "";
+      previewEl.innerHTML = `
+     <span style="display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 12px; font-size: 0.875rem; font-weight:700; background-color: ${roleColor}33; color: ${roleColor}; border: 1px solid ${roleColor};">
+       <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${roleColor};flex-shrink:0"></span>
+       <span style="color:inherit;">${roleName}</span>
+     </span>
+   `;
+    }
   }
   function closeModeratorModal() {
     const modal = $("moderator-modal");
@@ -1359,14 +1813,14 @@ ${
                  <input type="text" id="inline-edit-game-yaml-slot-name" placeholder="YAML Slot Name (for Cheesetracker)" value="${game.yaml_slot_name || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-logo" placeholder="Logo URL" value="${game.logo || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-apworld-link" placeholder="Apworld Link" value="${game.apworld_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                 <input type="text" id="inline-edit-game-apworld-version" placeholder="Apworld Version (or 'Core'/'Manual')" value="${game.apworld_version || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                 <input type="text" id="inline-edit-game-apworld-version" placeholder="Apworld Version (or 'Core')" value="${game.apworld_version || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-mod-link" placeholder="Mod Link" value="${game.mod_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="text" id="inline-edit-game-mod-version" placeholder="Mod Version" value="${game.mod_version || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-mod-setup-guide-link" placeholder="Setup Guide Link" value="${game.mod_setup_guide_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-tracker-link" placeholder="Tracker Link" value="${game.tracker_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-support-link" placeholder="Support Link" value="${game.support_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="url" id="inline-edit-game-save-file-link" placeholder="Save File Link" value="${game.save_file_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                 <input type="url" id="inline-edit-game-game-info-link" placeholder="Apworld Info Link" value="${game.game_info_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
+                 <input type="url" id="inline-edit-game-game-info-link" placeholder="Game Info Link" value="${game.game_info_link || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <input type="number" id="inline-edit-game-slot-count" placeholder="Slot Count (0 = no limit)" min="0" value="${game.slot_count || 1}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white">
                  <textarea id="inline-edit-game-rules" placeholder="Rules" rows="2" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2">${game.rules || ""}</textarea>
                  <textarea id="inline-edit-game-extra-information" placeholder="Extra Information" rows="2" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white md:col-span-2">${game.extra_information || ""}</textarea>
@@ -1504,11 +1958,7 @@ ${
       },
       { url: game.mod_setup_guide_link, icon: "fa-book", label: "Setup Guide" },
       { url: game.tracker_link, icon: "fa-map", label: "Tracker" },
-      {
-        url: game.game_info_link,
-        icon: "fa-circle-info",
-        label: "Apworld Info"
-      },
+      { url: game.game_info_link, icon: "fa-circle-info", label: "Game Info" },
       { url: game.support_link, icon: "fa-circle-question", label: "Support" },
       {
         url: game.save_file_link,
@@ -1976,35 +2426,36 @@ ${
       console.error("Failed to load moderator permissions:", err);
     }
   }
-  // ✅ FIXED CODE
-  async function loadModeratorPermissions(moderatorName) {
+  async function populateModeratorSelect() {
     try {
       const res = await fetch("/api/get-moderators", {
         headers: AUTH.authHeader()
       });
       if (res.ok) {
         const data = await res.json();
-        const mod = data.moderators.find((m) => m.name === moderatorName);
-
-        // Safely extract permissions, defaulting to an empty object if undefined
-        const perms = mod?.permissions || {};
-
-        // Always explicitly set the checkboxes to prevent state leakage
-        document.getElementById("perm-manageModerators").checked =
-          !!perms.manageModerators;
-        document.getElementById("perm-manageGames").checked =
-          !!perms.manageGames;
-        document.getElementById("perm-managePlayers").checked =
-          !!perms.managePlayers;
-        document.getElementById("perm-manageRoles").checked =
-          !!perms.manageRoles;
-        document.getElementById("perm-manageAwards").checked =
-          !!perms.manageAwards;
-        document.getElementById("perm-manageSettings").checked =
-          !!perms.manageSettings;
+        const modSelect = $("moderator-select");
+        if (modSelect) {
+          modSelect.innerHTML =
+            '<option value="">Select a moderator...</option>' +
+            data.moderators
+              .slice()
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((m) => `<option value="${m.name}">${m.name}</option>`)
+              .join("");
+        }
+        const adminSelect = $("admin-select");
+        if (adminSelect) {
+          adminSelect.innerHTML =
+            '<option value="">Select a moderator...</option>' +
+            data.moderators
+              .slice()
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((m) => `<option value="${m.name}">${m.name}</option>`)
+              .join("");
+        }
       }
     } catch (err) {
-      console.error("Failed to load moderator permissions:", err);
+      console.error("Failed to load moderators:", err);
     }
   }
   async function populateAdminSelect() {
