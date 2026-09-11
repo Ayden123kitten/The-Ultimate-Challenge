@@ -2137,5 +2137,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "koroksanity",
+    "name": "The Legend of Zelda: Koroksanity",
+    "logo": "https://files.catbox.moe/uldt7q.png",
+    "yaml_slot_name": "Koroksanity",
+    "slot_count": 1,
+    "apworld_link": "https://cdn.discordapp.com/attachments/1410628877067223172/1524066297736990791/manual_koroksanity_dnp.apworld?ex=6aa567d9&is=6aa41659&hm=ab8a043b4be467f027cef9907dac5a9d8090ed295d879267fdb0c20b9c9211cc&",
+    "apworld_version": "Manual",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/1097532591650910289/1410628877067223172",
+    "save_file_link": "https://drive.google.com/drive/folders/1nKSv9zlYbpXKaoHpJ6j8pIsY6Bmlpycq?usp=drive_link",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
