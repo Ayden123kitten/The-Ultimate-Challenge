@@ -2160,5 +2160,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+     "id": "ninesols",
+    "name": "Nine Sols",
+    "logo": "https://cdn2.steamgriddb.com/logo_thumb/35ef81be8aa079f19ee264fcec99fc83.png",
+    "yaml_slot_name": "NineSols",
+    "slot_count": 1,
+    "apworld_link": "https://github.com/Ixrec/NineSolsArchipelagoRandomizer/releases/download/0.6.3/nine_sols.apworld",
+    "apworld_version": "0.6.3",
+    "mod_link": "https://thunderstore.io/c/nine-sols/p/Ixrec/ArchipelagoRandomizer/",
+    "mod_version": "0.6.3",
+    "mod_setup_guide_link": "https://github.com/Ixrec/NineSolsArchipelagoRandomizer?tab=readme-ov-file#installation",
+    "tracker_link": "https://github.com/Ayden123kitten/Choo-Choo-Charles-PopTracker-Remake/releases/download/2.3.2/Choo-Choo.Charles.zip",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/731205301247803413/1532480133946937605",
+    "save_file_link": "https://drive.google.com/drive/folders/1M3FsRVv6B9BbbR3b9ahu-G-XNYiLdMq9",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
