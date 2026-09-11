@@ -325,7 +325,7 @@ ${
 </div>
 ${hasRules ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Rules:</span> <span class="break-words overflow-wrap-anywhere">${game.rules}</span></div>` : ""}
 ${hasExtraInfo ? `<div class="bg-slate-800/50 rounded-lg p-3 text-sm text-slate-300 border border-slate-700 overflow-hidden"><span class="text-ap-accent font-semibold">Information:</span> <span class="break-words overflow-wrap-anywhere">${game.extra_information}</span></div>` : ""}
-${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary)).join("")}</div>` : ""}
+${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${links.map((link) => renderLink(link.url, link.icon, link.label, link.primary, link.showTooltip)).join("")}</div>` : ""}
 
 <!-- ALWAYS VISIBLE CHEESETRACKER PROGRESS BAR -->
 <div class="bg-slate-800/50 rounded-lg p-3 border border-slate-700 mt-2">
