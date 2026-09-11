@@ -870,17 +870,5 @@
 
     // Refresh data every 10 seconds
     setInterval(loadData, 10000);
-
-    // Add moderation button to header/nav if user is a moderator
-    (async () => {
-      try {
-        if (AUTH.isLoggedIn()) {
-          const isModerator = await AUTH.checkModerator();
-          // Moderation button is provided globally in `app.js`; avoid adding a duplicate here.
-        }
-      } catch (e) {
-        console.warn("Could not add moderation button:", e);
-      }
-    })();
   });
 })();

@@ -25,33 +25,6 @@
     return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   }
   // Background prefetch for moderator-related data to make controls load faster
-  async function prefetchModeratorData() {
-    try {
-      // Only run if user appears to be a moderator (optimistic check)
-      const isMod = localStorage.getItem("isModerator") === "true";
-      if (!isMod) return;
-      // Fetch roles, awards and moderators in background and cache them
-      const endpoints = [
-        { url: "/api/get-data?type=roles", key: "rolesCache" },
-        { url: "/api/get-data?type=awards", key: "awardsCache" },
-        { url: "/api/get-moderators", key: "moderatorsCache" }
-      ];
-      await Promise.all(
-        endpoints.map(async (ep) => {
-          try {
-            const res = await fetch(ep.url + "&t=" + Date.now());
-            if (!res.ok) return;
-            const data = await res.json();
-            localStorage.setItem(ep.key, JSON.stringify(data));
-          } catch (e) {
-            console.debug("Prefetch failed for", ep.url, e);
-          }
-        })
-      );
-    } catch (e) {
-      console.debug("PrefetchModeratorData error", e);
-    }
-  }
   let editingAwardOriginal = null;
   async function deleteAwardInline(awardName) {
     if (
@@ -301,18 +274,7 @@
       } else if (game.slot_count > 1) {
         slotHtml = `<div class="text-xs text-slate-400 mt-2">${game.slot_count} slots</div>`;
       }
-      // Add inline edit button for moderator
-      const inlineEditButtonHtml =
-        inlineEditMode && isModerator
-          ? `
-         <button onclick="openGameInlineEditor('${game.id}', event)" class="absolute top-3 right-3 p-2 rounded-lg bg-slate-700/80 hover:bg-ap-accent/80 text-slate-300 hover:text-white transition-all z-10" title="Edit Game">
-             <i class="fa-solid fa-gear"></i>
-         </button>
-     `
-          : "";
       card.innerHTML = `
-${inlineEditButtonHtml}
-<div class="game-card-header">
 ${
   hasCoverImage
     ? `<div class="cover-art-container"><img src="${game.logo}" alt="${game.name}" class="cover-art-logo" onerror="this.style.display='none'"></div>`
@@ -471,7 +433,6 @@ ${
       timerEl.textContent = "0:00:00";
       statusEl.textContent = "";
       // Add inline edit button for moderator
-      addInlineEditButtonToTimer();
       return;
     }
     const now = Date.now();
@@ -494,143 +455,6 @@ ${
       statusEl.className = "text-xs text-red-400 uppercase tracking-widest";
     }
     // Add inline edit button for moderator
-    addInlineEditButtonToTimer();
-  }
-  // Add inline edit button to the global timer
-  function addInlineEditButtonToTimer() {
-    const timerEl = document.querySelector("#global-timer");
-    if (!timerEl) return;
-    const timerContainer = timerEl.parentElement;
-    if (!timerContainer) return;
-    // Remove existing edit button
-    const existingBtn = timerContainer.querySelector(".inline-edit-btn");
-    if (existingBtn) existingBtn.remove();
-    // Only add button if in inline edit mode and user is moderator
-    if (!inlineEditMode || !isModerator) return;
-    const editBtn = document.createElement("button");
-    editBtn.className =
-      "inline-edit-btn absolute top-2 right-2 p-1.5 rounded-lg bg-slate-700/80 hover:bg-ap-accent/80 text-slate-300 hover:text-white transition-all z-10";
-    editBtn.innerHTML = '<i class="fa-solid fa-gear"></i>';
-    editBtn.title = "Edit Event Timer Settings";
-    editBtn.onclick = () => openEventTimerSettingsModal();
-    timerContainer.style.position = "relative";
-    timerContainer.appendChild(editBtn);
-  }
-  // Open event timer settings modal
-  function openEventTimerSettingsModal() {
-    const modal = $("moderator-modal");
-    const content = $("moderator-panel-content");
-    if (!modal || !content) return;
-    content.innerHTML = `
-     <div class="space-y-6">
-         <!-- Event Time Settings Section -->
-     <div class="glass rounded-lg p-4">
-       <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-clock text-ap-accent mr-2"></i>Event Timer Settings & Preview</h3>
-       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-         <div>
-           <div class="space-y-4">
-             <div>
-               <label class="block text-sm font-semibold text-slate-300 mb-2">Event Start Time</label>
-               <input type="datetime-local" id="event-start-time-input" value="${settings.start_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-               <p class="text-xs text-slate-400 mt-2">Set when the event starts. Before this time, a countdown will be shown.</p>
-             </div>
-             <div>
-               <label class="block text-sm font-semibold text-slate-300 mb-2">Event End Time (optional)</label>
-               <input type="datetime-local" id="event-end-time-input" value="${settings.end_time || ""}" class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white w-full">
-               <p class="text-xs text-slate-400 mt-2">Set when the event ends. Leave empty for an ongoing event.</p>
-             </div>
-             <div class="flex gap-2">
-               <button onclick="saveEventTimeSettings()" class="bg-ap-accent hover:bg-ap-accent/80 text-slate-900 font-bold py-2 px-4 rounded-lg flex-1">Save Settings</button>
-               <button onclick="closeModeratorModal()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-lg flex-1">Cancel</button>
-             </div>
-           </div>
-         </div>
-         <div>
-           <h4 class="text-sm font-semibold text-slate-300 mb-3">Live Preview</h4>
-           <div id="event-timer-preview" class="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-             <div class="text-center w-full">
-               <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent">${formatTime(Date.now() - (settings.start_time ? new Date(settings.start_time).getTime() : 0))}</div>
-               <div id="preview-status" class="text-xs text-slate-400 uppercase">${settings.start_time ? "Event Live" : "Not Set"}</div>
-             </div>
-           </div>
-         </div>
-       </div>
-     </div>
-     </div>
- `;
-    modal.classList.remove("hidden");
-    // Listen for Escape to close modal
-    document.addEventListener("keydown", onModeratorKeydown);
-    // Update preview on input change
-    const startInput = $("event-start-time-input");
-    const endInput = $("event-end-time-input");
-    function updatePreview() {
-      const previewContainer = $("event-timer-preview");
-      const startTime = startInput.value;
-      const endTime = endInput.value;
-      // If no start time set, show placeholder
-      if (!startTime) {
-        if (previewContainer) {
-          previewContainer.innerHTML = `<div class="text-center text-slate-400 text-sm">Start typing to see preview...</div>`;
-        }
-        return;
-      }
-      // Ensure the preview structure exists
-      if (previewContainer) {
-        previewContainer.innerHTML = `
-     <div class="text-center">
-       <div id="preview-timer" class="text-2xl font-mono font-bold text-ap-accent"></div>
-       <div id="preview-status" class="text-xs text-slate-400 uppercase"></div>
-     </div>
-   `;
-      }
-      const previewTimer = $("preview-timer");
-      const previewStatus = $("preview-status");
-      const now = Date.now();
-      const start = new Date(startTime).getTime();
-      const end = endTime ? new Date(endTime).getTime() : null;
-      if (now < start) {
-        previewTimer.textContent = formatTime(start - now);
-        previewStatus.textContent = "Starts In";
-        previewStatus.className = "text-xs text-yellow-400 uppercase";
-      } else if (end === null || (now >= start && now <= end)) {
-        previewTimer.textContent = formatTime(now - start);
-        previewStatus.textContent = "Event Live";
-        previewStatus.className = "text-xs text-green-400 uppercase";
-      } else {
-        previewTimer.textContent = formatTime(now - end);
-        previewStatus.textContent = "Event Ended";
-        previewStatus.className = "text-xs text-red-400 uppercase";
-      }
-    }
-    startInput.addEventListener("change", updatePreview);
-    endInput.addEventListener("change", updatePreview);
-    updatePreview();
-  }
-  // Save event time settings
-  async function saveEventTimeSettings() {
-    const startTime = $("event-start-time-input").value;
-    const endTime = $("event-end-time-input").value;
-    try {
-      const res = await fetch("/api/moderator-actions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
-        body: JSON.stringify({
-          action: "updateSettings",
-          settingsData: {
-            start_time: startTime,
-            end_time: endTime
-          }
-        })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      alert("Event timer settings updated successfully!");
-      closeModeratorModal();
-      loadData();
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
   }
   // Initialize
   setInterval(updateGlobalTimer, 1000);
@@ -693,168 +517,12 @@ ${
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => AUTH.logout());
   }
-  // Moderator status check and panel setup
-  let isModerator = false;
-  let isAdmin = false;
-  let inlineEditMode = false; // Track inline edit mode state
-  // Load inline edit mode preference from localStorage
-  try {
-    const savedMode = localStorage.getItem("inlineEditMode");
-    inlineEditMode = savedMode === "true";
-  } catch (e) {
-    console.warn("Could not load inline edit mode preference:", e);
-  }
   // Expose the in-flight moderator-status check on window so other
   // page scripts (e.g. players.js) can await this same result instead
   // of firing their own duplicate AUTH.checkModerator()/checkAdmin()
   // network calls. This is set synchronously (before any await) so it
   // is available to other scripts immediately, no matter load order.
-  window.__moderatorStatusPromise = (async () => {
-    if (!AUTH.isLoggedIn()) {
-      return { isModerator: false, isAdmin: false };
-    }
-    // Run both checks in parallel instead of sequentially - this alone
-    // roughly halves the time before isModerator is known.
-    const [modResult, adminResult] = await Promise.all([
-      AUTH.checkModerator(),
-      AUTH.checkAdmin()
-    ]);
-    return { isModerator: modResult, isAdmin: adminResult };
-  })();
-  (async () => {
-    if (AUTH.isLoggedIn()) {
-      ({ isModerator, isAdmin } = await window.__moderatorStatusPromise);
-      console.log("Moderator status:", isModerator);
-      console.log("Admin status:", isAdmin);
-      // Cache moderator status so other pages can render optimistically
-      try {
-        localStorage.setItem("isModerator", isModerator ? "true" : "false");
-      } catch (e) {
-        console.warn("Could not cache moderator status:", e);
-      }
-      // Add moderator button to header if user is a moderator
-      if (isModerator) {
-        const navSection = $("nav-container");
-        if (navSection) {
-          const modBtn = document.createElement("button");
-          modBtn.id = "moderator-toggle-btn";
-          modBtn.className =
-            "group flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all";
-          modBtn.innerHTML =
-            '<i class="fa-solid fa-shield-halved group-hover:text-ap-accent transition-colors"></i><span class="text-sm font-medium hidden xl:inline">Moderation</span>';
-          modBtn.onclick = openModeratorModal;
-          navSection.appendChild(modBtn);
-          // Add inline edit mode toggle button
-          const pagePath = (window.location && window.location.pathname) || "";
-          const isLeaderboardPage =
-            pagePath.endsWith("/leaderboard.html") ||
-            pagePath.endsWith("leaderboard.html");
-          const isSettingsPage =
-            pagePath.endsWith("/settings.html") ||
-            pagePath.endsWith("settings.html");
-          const isPlayersPage =
-            pagePath.endsWith("/players.html") ||
-            pagePath.endsWith("players.html"); // <-- ADD THIS LINE
-
-          // Don't add the inline-edit toggle on the leaderboard or settings pages (user requested)
-          if (!isLeaderboardPage && !isSettingsPage && !isPlayersPage) {
-            const inlineEditBtn = document.createElement("button");
-            inlineEditBtn.id = "inline-edit-toggle-btn";
-            inlineEditBtn.className =
-              "group flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
-              (inlineEditMode
-                ? "text-ap-accent bg-ap-accent/20"
-                : "text-slate-400 hover:text-white hover:bg-slate-700/50");
-            inlineEditBtn.innerHTML =
-              '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm font-medium hidden xl:inline">Inline Edit</span>';
-            inlineEditBtn.onclick = toggleInlineEditMode;
-            inlineEditBtn.title = "Toggle inline editing mode";
-            navSection.appendChild(inlineEditBtn);
-          }
-        }
-        // Add to mobile menu as well
-        const mobileModContainer = $("mobile-moderation-container");
-        if (mobileModContainer) {
-          const modBtnMobile = document.createElement("button");
-          // Use the same mobile nav button classes as other pages for consistency
-          modBtnMobile.className =
-            "mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-all";
-          modBtnMobile.innerHTML =
-            '<i class="fa-solid fa-shield-halved"></i><span class="text-sm">Moderation</span>';
-          modBtnMobile.onclick = openModeratorModal;
-          mobileModContainer.appendChild(modBtnMobile);
-
-          if (!isLeaderboardPage && !isSettingsPage) {
-            const inlineEditBtnMobile = document.createElement("button");
-            inlineEditBtnMobile.className =
-              "mobile-nav-link flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
-              (inlineEditMode
-                ? "text-ap-accent bg-ap-accent/20"
-                : "text-slate-400 hover:text-white hover:bg-slate-700/50");
-            inlineEditBtnMobile.innerHTML =
-              '<i class="fa-solid fa-pen-to-square"></i><span class="text-sm">Inline Edit</span>';
-            inlineEditBtnMobile.onclick = toggleInlineEditMode;
-            inlineEditBtnMobile.title = "Toggle inline editing mode";
-            mobileModContainer.appendChild(inlineEditBtnMobile);
-          }
-        }
-
-        if (typeof renderPlayers === "function") {
-          renderPlayers();
-        }
-
-        // Kick off background prefetch for moderator data (non-blocking)
-        try {
-          prefetchModeratorData();
-        } catch (e) {
-          console.debug("prefetchModeratorData invocation failed", e);
-        }
-      }
-    }
-  })();
   // Close modal when clicking the overlay (onclick in HTML calls this)
-  function closeModeratorModalOnClick(e) {
-    // Only close when clicking the backdrop itself, not inner content
-    if (!e) return;
-    const modal = $("moderator-modal");
-    if (!modal) return;
-    if (e.target === modal) {
-      closeModeratorModal();
-    }
-  }
-  // Keydown handler for Escape to close modal
-  function onModeratorKeydown(e) {
-    if (e.key === "Escape") closeModeratorModal();
-  }
-  // Toggle inline edit mode
-  function toggleInlineEditMode() {
-    inlineEditMode = !inlineEditMode;
-    try {
-      localStorage.setItem("inlineEditMode", inlineEditMode.toString());
-    } catch (e) {
-      console.warn("Could not save inline edit mode preference:", e);
-    }
-    // Update button appearance
-    const btn = $("inline-edit-toggle-btn");
-    if (btn) {
-      btn.className =
-        "group flex items-center gap-2 px-3 py-2 rounded-lg transition-all " +
-        (inlineEditMode
-          ? "text-ap-accent bg-ap-accent/20"
-          : "text-slate-400 hover:text-white hover:bg-slate-700/50");
-    }
-    // Re-render components with inline edit buttons
-    renderGames();
-    updateGlobalTimer(); // This will add edit button to timer
-    // If on players page, re-render players
-    if (typeof renderPlayers === "function") {
-      renderPlayers();
-    }
-    // If on leaderboard page, re-render leaderboard
-    if (typeof renderLeaderboard === "function") {
-      renderLeaderboard(currentTab || "games");
-    }
-  }
 
   // Tab helpers for roles/awards in moderator modal
   function switchRolesTab(tab) {
@@ -1741,17 +1409,6 @@ ${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${link
    `;
     }
   }
-  function closeModeratorModal() {
-    const modal = $("moderator-modal");
-    const content = $("moderator-panel-content");
-    if (modal) modal.classList.add("hidden");
-    // Clear content to avoid stale event listeners and DOM nodes
-    if (content) content.innerHTML = "";
-    // Remove Escape key listener if present
-    try {
-      document.removeEventListener("keydown", onModeratorKeydown);
-    } catch (e) {}
-  }
   async function saveEditedGame() {
     const gameId = $("edit-game-select").value;
     if (!gameId) return;
@@ -1843,47 +1500,6 @@ ${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${link
     document.addEventListener("keydown", onModeratorKeydown);
     // Setup live preview
     setupInlineGamePreview(game);
-  }
-  // Delete a game from inline editor
-  // Delete a game from inline editor
-  async function deleteInlineGame(gameId) {
-    if (
-      !confirm(
-        "Are you sure you want to permanently remove this game? This cannot be undone."
-      )
-    ) {
-      return;
-    }
-
-    try {
-      const res = await fetch("/api/moderator-actions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...AUTH.authHeader() },
-        body: JSON.stringify({ action: "removeGame", gameId })
-      });
-
-      // ✅ SAFE JSON PARSING
-      const contentType = res.headers.get("content-type");
-      let data;
-      if (contentType && contentType.includes("application/json")) {
-        data = await res.json();
-      } else {
-        const text = await res.text();
-        throw new Error(
-          `Server returned non-JSON response (${res.status}): ${text.substring(0, 150)}`
-        );
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to remove game");
-      }
-
-      alert("Game removed successfully!");
-      closeModeratorModal();
-      loadData();
-    } catch (err) {
-      alert("Error: " + err.message);
-    }
   }
   // Setup live preview for game editing
   function setupInlineGamePreview(originalGame) {
@@ -2810,13 +2426,6 @@ ${links.length > 0 ? `<div class="grid grid-cols-2 gap-2 text-sm min-w-0">${link
   // Expose modal helpers and inline edit functions for inline HTML handlers
   // Expose modal helpers and inline edit functions for inline HTML handlers
   try {
-    window.closeModeratorModal = closeModeratorModal;
-    window.closeModeratorModalOnClick = closeModeratorModalOnClick;
-    window.openGameInlineEditor = openGameInlineEditor;
-    window.saveInlineEditedGame = saveInlineEditedGame;
-    window.deleteInlineGame = deleteInlineGame;
-    window.toggleInlineEditMode = toggleInlineEditMode;
-    window.openModeratorModal = openModeratorModal;
     window.claimGame = claimGame;
     window.unclaimGame = unclaimGame;
     window.saveEventTimeSettings = saveEventTimeSettings;

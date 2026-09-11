@@ -184,9 +184,6 @@
   let searchQuery = "",
     playersSortOption = "az";
   function renderPlayers() {
-    const inlineEditMode = localStorage.getItem("inlineEditMode") === "true",
-      cachedMod = localStorage.getItem("isModerator") === "true",
-      effMod = isModerator || cachedMod;
     const container = $("players-container");
     container.innerHTML = "";
     const playerStats = players.map((p) => {
@@ -328,7 +325,7 @@
         this.style.boxShadow = "none";
       };
       card.onclick = (e) => {
-        if (!e.target.closest(".inline-edit-btn")) showPlayerModal(stat);
+        card.onclick = () => showPlayerModal(stat);
       };
       const av = stat.pfpLink
         ? `<img src="${stat.pfpLink}" alt="${stat.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; background: #222;">`
@@ -975,20 +972,6 @@
       playersSortOption = e.target.value;
       renderPlayers();
     });
-
-  (async () => {
-    if (AUTH.isLoggedIn()) {
-      if (window.__moderatorStatusPromise)
-        ({ isModerator } = await window.__moderatorStatusPromise);
-      else isModerator = await AUTH.checkModerator();
-      try {
-        localStorage.setItem("isModerator", isModerator ? "true" : "false");
-      } catch (e) {}
-      try {
-        renderPlayers();
-      } catch (e) {}
-    }
-  })();
 
   loadData();
   setInterval(loadData, 10000);
