@@ -13,17 +13,6 @@
       }
     },
     {
-      "name": "TeraKord",
-      "permissions": {
-        "manageModerators": false,
-        "manageGames": true,
-        "managePlayers": false,
-        "manageRoles": false,
-        "manageAwards": false,
-        "manageSettings": false
-      }
-    },
-    {
       "name": "LORD X",
       "permissions": {
         "manageModerators": true,
@@ -32,17 +21,6 @@
         "manageRoles": true,
         "manageAwards": true,
         "manageSettings": true
-      }
-    },
-    {
-      "name": "Grilled",
-      "permissions": {
-        "manageModerators": false,
-        "manageGames": true,
-        "managePlayers": false,
-        "manageRoles": false,
-        "manageAwards": false,
-        "manageSettings": false
       }
     }
   ]
