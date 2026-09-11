@@ -2229,5 +2229,28 @@
     "total_time_ms": 0,
     "completed": false,
     "logs": []
+  },
+  {
+    "id": "eateot",
+    "name": "Everywhere at the End of Time",
+    "logo": "https://upload.wikimedia.org/wikipedia/en/5/5b/The_Caretaker_-_Everywhere_at_the_End_of_Time_-_Stage_1_cover.jpg",
+    "yaml_slot_name": "EATEOT",
+    "slot_count": 1,
+    "apworld_link": "https://fixcdn.hyonsu.com/attachments/1461489206210727957/1461489207632593161/manual_everywhereattheendoftime_.apworld?ex=6aa52b24&is=6aa3d9a4&hm=671b9c160e42f9cd29bf62970bcac04dfdc1cf3a0c31aa398f3c6eb35c16dc4b&",
+    "apworld_version": "Manual",
+    "mod_link": "",
+    "mod_version": "",
+    "mod_setup_guide_link": "",
+    "tracker_link": "",
+    "game_info_link": "",
+    "support_link": "https://discord.com/channels/1097532591650910289/1461489206210727957",
+    "save_file_link": "",
+    "rules": "",
+    "extra_information": "",
+    "current_player": null,
+    "claimed_at": null,
+    "total_time_ms": 0,
+    "completed": false,
+    "logs": []
   }
 ]
