@@ -261,8 +261,8 @@
         {
           url: game.apworld_link,
           icon: "fa-globe",
-          label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === "Core" ? "Core" : "v" + game.apworld_version})` : ""}`,
-          showTooltip: true // Enables tooltip for Apworld
+          label: `Apworld${hasApworldVersion ? ` (${game.apworld_version === "Core" || game.apworld_version === "Manual" ? game.apworld_version : "v" + game.apworld_version})` : ""}`,
+          showTooltip: true
         },
         {
           url: game.mod_link,
