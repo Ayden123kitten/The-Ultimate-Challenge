@@ -28,9 +28,7 @@
     "bio": "A is for \"Apple\".",
     "pronouns": "she/her",
     "discord": "ayden123kitten",
-    "roles": [
-      "Choo-Choo Charles Fan Club"
-    ],
+    "roles": ["Choo-Choo Charles Fan Club"],
     "awards": [
       {
         "name": "Veteran",
@@ -112,7 +110,7 @@
   {
     "name": "teaftea",
     "password_hash": "$2b$10$aquZOveBG.5n6QmEWXzrfuoTOWTlF.uLN6ZMEHrRyabn4ZAQO9hkS",
-    "pfp_link": "https://fixcdn.hyonsu.com/avatars/665933369019727873/8da288feb8a632e90272b782eb5a7851.webp?size=1024",
+    "pfp_link": "https://cdn.discordapp.com/avatars/665933369019727873/8da288feb8a632e90272b782eb5a7851.webp?size=1024",
     "awards": [
       {
         "name": "Veteran",
