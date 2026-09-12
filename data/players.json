@@ -28,7 +28,9 @@
     "bio": "A is for \"Apple\".",
     "pronouns": "she/her",
     "discord": "ayden123kitten",
-    "roles": ["Choo-Choo Charles Fan Club"],
+    "roles": [
+      "Choo-Choo Charles Fan Club"
+    ],
     "awards": [
       {
         "name": "Veteran",
@@ -76,7 +78,6 @@
     "name": "Grilled",
     "password_hash": "$2b$10$N77zapuO1eXPVLMGvgD.FeWK3ZkiRPL08Wqk3JHBKMfIMBZiTa7OC",
     "pfp_link": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpoLmAkAzrevvUP-FcY7bUjRezY3tLt3ipYYl_PVDWNw&s=10",
-
     "bio": "I Like Beans",
     "pronouns": "He/Him/Фасоль",
     "discord": "grilledbeaned",
@@ -214,7 +215,7 @@
   {
     "name": "RedstoneWarden17",
     "password_hash": "$2b$10$oZpG4yrEelin7Uqdt6xWduQ0oVXzzrtqdrPRkCdDjQrX/h5vJwYVa",
-    "pfp_link": "https://fixcdn.hyonsu.com/avatars/1359356927821484032/c1a60242d71ad20061646b839eda0ba6.webp?size=160",
+    "pfp_link": "https://cdn.discordapp.com/avatars/1359356927821484032/c1a60242d71ad20061646b839eda0ba6.webp?size=160",
     "bio": "",
     "pronouns": "he/him/they/them",
     "discord": "RedstoneWarden17",
