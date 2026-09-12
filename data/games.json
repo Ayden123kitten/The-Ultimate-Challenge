@@ -2186,7 +2186,7 @@
   },
   {
     "id": "bee",
-    "name": "The Bee Movie but Every Time \"Bee\" is Said, a Check is Sent",
+    "name": "The Bee Movie",
     "logo": "http://static.wikia.nocookie.net/logopedia/images/d/df/Thinkinbee.png",
     "yaml_slot_name": "TheBeeMovie",
     "slot_count": 1,
