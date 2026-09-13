@@ -28,7 +28,9 @@
     "bio": "A is for \"Apple\".",
     "pronouns": "she/her",
     "discord": "ayden123kitten",
-    "roles": ["Choo-Choo Charles Fan Club"],
+    "roles": [
+      "Choo-Choo Charles Fan Club"
+    ],
     "awards": [
       {
         "name": "Veteran",
@@ -241,5 +243,13 @@
         "awardedAt": "2026-09-07T01:43:29.842Z"
       }
     ]
+  },
+  {
+    "name": "Z11Gaming",
+    "password_hash": "$2b$10$ow1N8cdZEG4HOjVF18a7aulfO8B0Mh3j3/tz8dfl2LJmd96IgcmTG",
+    "pfp_link": "https://cdn.discordapp.com/attachments/1242516338317197314/1535443430312902728/biwa_hayahide_umamusume_and_1_more_drawn_by_kawamochi_kawauti919__sample-add3fdc58b5efe6a89a9c2cbcb3b72cb.png?ex=6aa7e760&is=6aa695e0&hm=3e4342ea4fa4e018f54cb15527d03c0ad62e714d8056b2b27a1d3cf6f5be980c&",
+    "bio": "",
+    "pronouns": "",
+    "discord": ""
   }
 ]
